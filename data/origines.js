@@ -96,8 +96,7 @@ window.ORIGINES = {
     "La Lanxess Arena": {"img": "assets/cartes/la-lanxess-arena.png", "color": "#7a3fb0", "map": true},
     "DreamHack — Jönköping": {"img": "assets/cartes/dreamhack-jonkoping.png", "color": "#b0302a", "map": true},
     "BlizzCon": {"img": "assets/cartes/blizzcon.png", "color": "#3a7fc0", "dark": true},
-    "Madlife": {"img": "assets/cartes/madlife.jpg", "color": "#2a3f8a", "photo": true},
-    "Doublelift — « Everyone else is trash »": {"img": "assets/cartes/doublelift.jpg", "color": "#2aa8e0", "photo": true}
+    "Madlife": {"img": "assets/cartes/madlife.jpg", "color": "#2a3f8a", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
@@ -191,7 +190,7 @@ window.ORIGINES = {
     ["Bjergsen", "P", "Joueur", "League of Legends", null, "Mid laner danois"],
     ["Arteezy", "P", "Joueur", "Dota 2", null, "Joueur canadien de Dota 2"],
     ["Gumayusi", "P", "Joueur", "League of Legends", null, "ADC coréen de T1"],
-    ["Doublelift — « Everyone else is trash »", "E", "Moment", "League of Legends", 2015, "Le chambrage le plus célèbre de LoL"],
+    ["Doublelift", "E", "Joueur", "League of Legends", null, "ADC américain"],
     ["Madlife", "E", "Joueur", "League of Legends", null, "Le dieu des hooks"],
     ["Ruler", "E", "Joueur", "League of Legends", null, "ADC coréen"],
     ["Rookie", "E", "Joueur", "League of Legends", null, "Mid laner coréen"],
