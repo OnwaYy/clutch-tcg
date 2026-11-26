@@ -1,13 +1,18 @@
 # Clutch TCG
 
-Jeu de cartes à collectionner sur le thème de l'e-sport, sur navigateur : joueurs, équipes et moments marquants (LoL, CS2, Valorant).
+Jeu de cartes à collectionner sur le thème de l'e-sport, sur navigateur : joueurs, équipes et moments marquants, tous jeux confondus.
 
 ## Contenu
 
-- `index.html` : page d'accueil (booster, taux de drop, quêtes, collection, extensions). Données d'exemple.
-- `prototypes/carte-faker.html` : premier prototype de carte légendaire animée (stamp Origines, Édition 1).
+- `index.html` : le site (accueil, boosters, collection, échanges, classement, profil). Progression enregistrée dans le navigateur. L'ouverture des boosters n'est pas encore faite.
+- `prototypes/carte-faker.html` : premier prototype de carte légendaire animée (stamp Origines, Édition 1, 151/150).
 
+## Séries
 
+- **Origines** (symbole ORI, tampon Édition 1) : série de base qui retrace les grands moments de l'e-sport. 150 cartes + 25 secrètes, numérotées jusqu'à 175/150.
+  - Numérotées (001 à 150) : 50 communes, 45 peu communes, 30 rares, 25 épiques.
+  - Secrètes (151 à 175) : 18 légendaires, 5 mythiques, 2 ultimes.
+- **Séries d'événement** : sortent uniquement pendant les events.
 
 ## Lancer
 
