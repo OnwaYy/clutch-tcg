@@ -95,7 +95,8 @@ window.ORIGINES = {
     "IEM Katowice — Le Spodek": {"img": "assets/cartes/iem-katowice-le-spodek.png", "color": "#6f8fb5", "map": true},
     "La Lanxess Arena": {"img": "assets/cartes/la-lanxess-arena.png", "color": "#7a3fb0", "map": true},
     "DreamHack — Jönköping": {"img": "assets/cartes/dreamhack-jonkoping.png", "color": "#b0302a", "map": true},
-    "BlizzCon": {"img": "assets/cartes/blizzcon.png", "color": "#3a7fc0", "dark": true}
+    "BlizzCon": {"img": "assets/cartes/blizzcon.png", "color": "#3a7fc0", "dark": true},
+    "Madlife": {"img": "assets/cartes/madlife.png", "color": "#2a3f8a", "player": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],

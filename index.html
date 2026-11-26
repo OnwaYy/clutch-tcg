@@ -317,6 +317,37 @@
   .cc.u-foil .cc-set { color: var(--foot-strong); text-shadow: 0 1px 0 rgba(255,255,255,.25); }
   .cc.u-foil .cc-set svg { color: #a7afbd; }
   .cc.u-foil .cc-band::before { background: linear-gradient(#f4f6fa, #8f98a8 50%, #e9edf3); }
+
+  /* ---------- Épique : cadre violet métal, rayons, holo marqué, joueur qui sort du cadre ---------- */
+  .cc.e-epic { padding: 1.9%; background: linear-gradient(135deg, #f1d9ff 0%, #8b3dff 18%, #3a0f7a 36%, #c78bff 52%, #5a1bb8 70%, #f6c45a 86%, #8b3dff 100%); background-size: 220% 220%; background-position: var(--mx, 50%) var(--my, 50%); }
+  .cc.e-epic .cc-panel { border-radius: 4.2% / 3%; background: linear-gradient(160deg, #2a1650, #120a26); }
+  .cc.e-epic .cc-photo { overflow: visible; box-shadow: inset 0 0 0 1px rgba(200,150,255,.35);
+    background:
+      repeating-conic-gradient(from 0deg at 50% 78%, rgba(255,255,255,.16) 0 4deg, transparent 4deg 12deg),
+      radial-gradient(70% 60% at 50% 78%, color-mix(in srgb, var(--p1) 70%, #ffffff), var(--p2) 60%, #170a33 100%); }
+  .cc.e-epic .cc-photo::before { display: none; }
+  .cc.e-epic .cc-photo::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(circle, rgba(255,255,255,.9) 0 .5px, transparent 1.2px) 0 0 / calc(var(--u) * 5) calc(var(--u) * 5),
+      repeating-linear-gradient(115deg, #ff5ea8 0%, #ffd25e 6%, #6dffb5 12%, #5ec8ff 18%, #b07bff 24%, #ff5ea8 30%);
+    background-size: calc(var(--u) * 5) calc(var(--u) * 5), 260% 260%;
+    background-position: 0 0, var(--mx, 50%) var(--my, 50%);
+    mix-blend-mode: hard-light; opacity: .22; }
+  .cc.big.e-epic .cc-photo::after { opacity: calc(.18 + var(--o, 0) * .26); transition: opacity .2s; }
+  .cc.e-epic .cc-ghost { -webkit-text-stroke-color: rgba(214,180,255,.35); z-index: 0; }
+  .cc.e-epic .cc-photo img.is-player { z-index: 2; height: 112%; filter: drop-shadow(0 0 calc(var(--u) * 3) rgba(180,120,255,.65)) drop-shadow(0 calc(var(--u) * 2) calc(var(--u) * 2) rgba(0,0,0,.5));
+    -webkit-mask-image: linear-gradient(#000 88%, transparent); mask-image: linear-gradient(#000 88%, transparent); }
+  .cc.e-epic .cc-num { z-index: 3; background: linear-gradient(135deg, #c78bff, #5a1bb8); box-shadow: 0 0 calc(var(--u) * 3) rgba(180,120,255,.7); }
+  .cc.e-epic .cc-tag { z-index: 3; }
+  .cc.e-epic .cc-stamp { z-index: 3; border-color: #e7c8ff; color: #e7c8ff; mix-blend-mode: normal; background: rgba(40,14,80,.55); }
+  .cc.e-epic .cc-band { z-index: 3; background: linear-gradient(90deg, #1c0f3a, #2a1650); box-shadow: 0 -1px 0 rgba(200,150,255,.35); }
+  .cc.e-epic .cc-band::before { background: linear-gradient(#f1d9ff, #8b3dff 50%, #f6c45a); }
+  .cc.e-epic .cc-band p { color: #d9c2ff; opacity: .9; }
+  .cc.e-epic .cc-foot { color: #b9a3e0; }
+  .cc.e-epic .cc-set { color: #f1d9ff; }
+  .cc.e-epic .cc-set i { background: #c78bff; box-shadow: 0 0 6px #c78bff; }
+  .cc.e-epic::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 4;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 30%), rgba(255,255,255,.28), transparent 45%); mix-blend-mode: overlay; }
   .cc-panel { height: 100%; border-radius: inherit; padding: calc(var(--u) * 3.4); overflow: hidden; display: grid; grid-template-rows: 1fr auto auto; gap: calc(var(--u) * 2.6); background: linear-gradient(160deg, var(--p1), var(--p2)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
   .cc-photo { position: relative; border-radius: calc(var(--u) * 2.4); overflow: hidden; display: grid; place-items: center; min-height: 0;
     background: linear-gradient(115deg, transparent 58%, rgba(255,255,255,.14) 58% 72%, transparent 72%), radial-gradient(80% 70% at 45% 40%, var(--ph1), var(--ph2)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
@@ -905,7 +936,7 @@
       '<div class="cc-foot"><span>' + esc(c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + n3(c.num) + '/' + s.size + '<i></i></span></div></div>';
   }
   // Finition selon la rareté
-  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft' };
+  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic' };
   const finish = function (c) { return FINISH[c.rarity] || ''; };
   function ownedSlot(c) {
     return '<button class="cc mini ' + finish(c) + '" data-card="' + c.num + '" style="' + cardStyle(c) + '" aria-label="' + esc(c.name) + '">' + cardInner(c) + '</button>';
