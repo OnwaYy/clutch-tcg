@@ -146,6 +146,7 @@ window.ORIGINES = {
     "Luminosity — Le premier Major brésilien": {"img": "assets/cartes/luminosity-le-premier-major-bresilien.jpg", "color": "#1f6fd1", "photo": true},
     "Jaedong": {"img": "assets/cartes/jaedong.jpg", "color": "#1f3a8a", "photo": true},
     "SK Telecom T1 — Le doublé mondial": {"img": "assets/cartes/sk-telecom-t1-le-double-mondial.jpg", "color": "#e2012d", "photo": true},
+    "Zen — Le prodige de Rocket League": {"img": "assets/cartes/zen-le-prodige-de-rocket-league.jpg", "color": "#f5c935", "photo": true},
     "Faker": {"img": "assets/cartes/faker.png", "color": "#e2012d", "player": true},
     "Fortnite World Cup — Arthur Ashe Stadium": {"img": "assets/cartes/fortnite-world-cup-arthur-ashe-stadium.jpg", "color": "#5b3df5", "photo": true},
     "Evil Geniuses — Champions de TI5": {"img": "assets/cartes/evil-geniuses-champions-de-ti5.jpg", "color": "#1d3c6e", "photo": true},
