@@ -57,7 +57,7 @@ window.ORIGINES = {
     ['Train', 'C', 'Map', 'Counter-Strike', null, null],
     ["La Faille de l'invocateur", 'C', 'Map', 'League of Legends', null, null],
     ['Ascent', 'C', 'Map', 'Valorant', null, null],
-    ['Final Destination', 'C', 'Map', 'Super Smash Bros.', null, null],
+    ['Overpass', 'C', 'Map', 'Counter-Strike', null, "La map du boost d'olofmeister"],
     ['Cabochard', 'C', 'Joueur', 'League of Legends', null, 'Top laner français'],
     ['Saken', 'C', 'Joueur', 'League of Legends', null, 'Mid laner français'],
     ['Targamas', 'C', 'Joueur', 'League of Legends', null, 'Support de la Karmine Corp'],
