@@ -22,6 +22,7 @@
     --c-rare: #4fa8ff;
     --c-epic: #b46bff;
     --c-legend: #f2c25b;
+    --c-secret: #ff7ad9;
     --ok: #5fd39a;
     --bad: #ff6b7a;
     --f-display: 'Oxanium', 'Segoe UI', system-ui, sans-serif;
@@ -174,7 +175,7 @@
   .pack.shake { animation: shake .5s !important; }
   @keyframes shake { 20%,60% { translate: -6px 0; rotate: -2deg; } 40%,80% { translate: 6px 0; rotate: 2deg; } }
 
-  .odds { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+  .odds { display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
   .odd { padding: 14px 16px; display: grid; gap: 4px; border-right: 1px solid var(--line); position: relative; }
   .odd:last-child { border-right: 0; }
   .odd::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--r); }
@@ -209,7 +210,9 @@
   .legend i { width: 8px; height: 8px; border-radius: 2px; background: var(--r); }
 
   .sets-panel { grid-column: 1 / -1; }
-  .set-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .set-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .set.event { border-style: dashed; --c: var(--c-rare); }
+  .set .ed { display: inline-flex; align-items: center; gap: 6px; }
   .set { position: relative; border-radius: 12px; padding: 18px; min-height: 150px; display: grid; align-content: space-between; gap: 18px; overflow: hidden; border: 1px solid var(--line); background: var(--panel-2); text-decoration: none; color: inherit; }
   .set:hover { border-color: color-mix(in srgb, var(--c) 60%, var(--line)); }
   .set::before { content:""; position:absolute; inset:0; background: radial-gradient(400px 200px at 100% 0%, color-mix(in srgb, var(--c) 25%, transparent), transparent 70%); }
@@ -222,7 +225,8 @@
   .inv-list { display: flex; flex-wrap: wrap; gap: 10px; flex: 1; min-width: 0; }
   .inv-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); }
   .inv-item b { font-family: var(--f-mono); color: var(--gold); }
-  .shop { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .shop { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+  .event-panel { border-style: dashed; align-content: center; justify-items: start; }
   .offer { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; }
   .offer-info { display: grid; gap: 10px; min-width: 0; }
   .offer-info h3 { font-size: 19px; text-transform: uppercase; letter-spacing: .04em; }
@@ -246,9 +250,14 @@
   }
   .slot .lock { width: 14px; height: 11px; border-radius: 2px; background: currentColor; position: relative; opacity: .6; margin-top: 6px; }
   .slot .lock::before { content:""; position:absolute; left:2px; right:2px; top:-7px; height:9px; border: 2px solid currentColor; border-bottom: 0; border-radius: 6px 6px 0 0; }
-  .slot-num { font-family: var(--f-mono); font-size: 12px; }
-  .slot-set { position: absolute; left: 0; right: 0; bottom: 6px; font-family: var(--f-display); font-size: 10px; letter-spacing: .14em; opacity: .7; }
-  .slot-r { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--r); }
+  .slot-ed { position: absolute; top: 6px; left: 6px; font-family: var(--f-display); font-weight: 800; font-size: 8px; letter-spacing: .08em; line-height: 1; padding: 3px 4px; border-radius: 3px; border: 1px solid currentColor; opacity: .85; }
+  .slot-stamp { position: absolute; left: 6px; right: 6px; bottom: 6px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-family: var(--f-mono); font-size: 9.5px; font-variant-numeric: tabular-nums; opacity: .85; }
+  .slot-stamp svg { width: 11px; height: 11px; flex: none; }
+  .stamp { display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); font-family: var(--f-mono); font-size: 12px; color: var(--gold); white-space: nowrap; }
+  .stamp svg { width: 16px; height: 16px; }
+  .stamp .ed1 { font-family: var(--f-display); font-weight: 800; font-size: 10px; letter-spacing: .12em; padding: 2px 6px; border-radius: 3px; border: 1px solid var(--gold); }
+  .r-ico { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: 16px; color: var(--g); background: color-mix(in srgb, var(--g) 14%, var(--panel)); border: 1px solid color-mix(in srgb, var(--g) 40%, transparent); }
+  .slot-r { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--r); }
 
   /* ---------- Échanges ---------- */
   .trade-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 20px; }
@@ -297,8 +306,9 @@
     .home-grid, .trade-grid, .profile-grid { grid-template-columns: 1fr; }
     .set-list, .shop { grid-template-columns: 1fr; }
     .odds { grid-template-columns: repeat(2, 1fr); }
-    .odd:nth-child(2) { border-right: 0; }
-    .odd:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    .odd:nth-child(2n) { border-right: 0; }
+    .odd:nth-child(-n+4) { border-bottom: 1px solid var(--line); }
+    .odd:last-child { grid-column: 1 / -1; }
   }
   @media (max-width: 760px) {
     nav { display: none; }
@@ -316,6 +326,10 @@
 </style>
 </head>
 <body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="sym-ori" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4.5 L17.5 15 H6.5 Z" fill="currentColor"/><circle cx="12" cy="18.6" r="1.7" fill="currentColor"/></symbol>
+</svg>
 
 <header>
   <div class="wrap bar">
@@ -341,12 +355,12 @@
   <div data-view="accueil">
     <section class="wrap hero">
       <div class="hero-copy">
-        <span class="set-tag"><i class="live-dot"></i>Extension en cours · Worlds 2026</span>
+        <span class="set-tag"><i class="live-dot"></i>Série Origines · Édition 1</span>
         <h1>Ouvre. Collectionne.<br><span>Trouve les légendes.</span></h1>
-        <p>Chaque booster contient 5 cartes de joueurs, d'équipes et de moments e-sport. Les champions du monde se cachent dans les légendaires.</p>
+        <p>La première série retrace les grands moments de l'histoire de l'e-sport, tous jeux confondus. Chaque booster contient 5 cartes, et les plus grands exploits se cachent dans les légendaires.</p>
         <div class="cta-row">
           <a class="btn btn-gold" href="#boosters">Acheter un booster <small><i class="coin"></i> 500</small></a>
-          <a class="btn btn-ghost" href="#collection" data-set-link="w26">Voir l'extension</a>
+          <a class="btn btn-ghost" href="#collection" data-set-link="ori">Voir la série</a>
         </div>
         <div class="free">
           <div>
@@ -358,10 +372,10 @@
         </div>
       </div>
       <div class="stage">
-        <div class="pack" id="heroPack" aria-label="Booster Worlds 2026">
+        <div class="pack" id="heroPack" aria-label="Booster Origines">
           <div class="pack-inner">
-            <div class="pack-emblem"><div>W26</div></div>
-            <div class="pack-title">WORLDS<small>BOOSTER</small></div>
+            <div class="pack-emblem"><div>ORI</div></div>
+            <div class="pack-title">ORIGINES<small>ÉDITION 1</small></div>
             <div class="pack-count">5 CARTES · 1 RARE MINIMUM</div>
           </div>
         </div>
@@ -370,10 +384,11 @@
 
     <section class="wrap" aria-label="Taux d'obtention">
       <div class="odds">
-        <div class="odd" style="--r:var(--c-common)"><span class="odd-name">Commune</span><span class="odd-pct">70 %</span><span class="odd-note">Joueurs pros, équipes</span></div>
+        <div class="odd" style="--r:var(--c-common)"><span class="odd-name">Commune</span><span class="odd-pct">70 %</span><span class="odd-note">Joueurs, équipes, moments</span></div>
         <div class="odd" style="--r:var(--c-rare)"><span class="odd-name">Rare</span><span class="odd-pct">22 %</span><span class="odd-note">Stars, cadre argenté</span></div>
         <div class="odd" style="--r:var(--c-epic)"><span class="odd-name">Épique</span><span class="odd-pct">7 %</span><span class="odd-note">MVP, effet holo</span></div>
-        <div class="odd" style="--r:var(--c-legend)"><span class="odd-name">Légendaire</span><span class="odd-pct">1 %</span><span class="odd-note">Champions du monde</span></div>
+        <div class="odd" style="--r:var(--c-legend)"><span class="odd-name">Légendaire</span><span class="odd-pct">0,8 %</span><span class="odd-note">Moments historiques</span></div>
+        <div class="odd" style="--r:var(--c-secret)"><span class="odd-name">Secrète</span><span class="odd-pct">0,2 %</span><span class="odd-note">Hors numérotation, 151 à 175</span></div>
       </div>
     </section>
 
@@ -385,18 +400,20 @@
 
       <div class="panel">
         <div class="panel-head"><h2>Ma collection</h2><a href="#collection">Tout voir →</a></div>
+        <div><span class="stamp"><svg><use href="#sym-ori"/></svg>Origines · <span data-bind="owned">0</span>/<span data-bind="catalog">0</span><span class="ed1">ÉDITION 1</span></span></div>
         <div class="rarity-mix" aria-hidden="true"></div>
         <div class="legend">
           <span style="--r:var(--c-common)"><i></i>Communes 0</span>
           <span style="--r:var(--c-rare)"><i></i>Rares 0</span>
           <span style="--r:var(--c-epic)"><i></i>Épiques 0</span>
           <span style="--r:var(--c-legend)"><i></i>Légendaires 0</span>
+          <span style="--r:var(--c-secret)"><i></i>Secrètes 0</span>
         </div>
         <div class="games" id="homeGames"></div>
       </div>
 
       <div class="panel sets-panel">
-        <div class="panel-head"><h2>Extensions</h2><a href="#boosters">Boutique →</a></div>
+        <div class="panel-head"><h2>Séries</h2><a href="#boosters">Boutique →</a></div>
         <div class="set-list" id="homeSets"></div>
       </div>
     </section>
@@ -422,7 +439,7 @@
         <div>
           <div class="eyebrow" data-bind="freeLabel">Booster gratuit dans</div>
           <div class="timer" data-bind="freeTimer">--:--:--</div>
-          <div class="muted" style="font-size:13px">Un booster Worlds 2026 offert toutes les 4 heures.</div>
+          <div class="muted" style="font-size:13px">Un booster Origines offert toutes les 4 heures.</div>
         </div>
         <button class="btn btn-ok btn-sm" data-action="claim-free" hidden>Récupérer</button>
       </div>
@@ -436,7 +453,7 @@
     <div class="wrap page-head">
       <div>
         <h1>Collection</h1>
-        <p>Toutes les cartes de chaque extension. Les emplacements se remplissent quand tu obtiens une carte.</p>
+        <p>Chaque carte porte le symbole de sa série, son numéro et son tampon d'édition. Les emplacements se remplissent quand tu obtiens une carte.</p>
       </div>
       <div class="coll-stats">
         <span class="chip"><span class="num"><span data-bind="owned">0</span> / <span data-bind="catalog">0</span></span>&nbsp;cartes</span>
@@ -444,7 +461,7 @@
     </div>
     <div class="wrap page-body">
       <div class="panel filters">
-        <div class="filters-row"><span class="eyebrow">Extension</span><div class="seg" id="setFilter"></div></div>
+        <div class="filters-row"><span class="eyebrow">Série</span><div class="seg" id="setFilter"></div></div>
         <div class="filters-row"><span class="eyebrow">Rareté</span><div class="seg" id="rarityFilter"></div></div>
         <div class="filters-row"><label class="toggle"><input type="checkbox" id="ownedOnly"> Seulement mes cartes</label><span class="muted" id="slotCount" style="font-size:13px"></span></div>
       </div>
@@ -509,7 +526,7 @@
     <div class="wrap page-head">
       <div>
         <h1>Classement</h1>
-        <p>Score de collection : commune 1 pt, rare 3 pts, épique 10 pts, légendaire 50 pts. Les autres joueurs sont des exemples.</p>
+        <p>Score de collection : commune 1 pt, rare 3 pts, épique 10 pts, légendaire 50 pts, secrète 100 pts. Les autres joueurs sont des exemples.</p>
       </div>
       <div class="seg" id="boardTabs">
         <button aria-pressed="true" data-board="score">Score</button>
@@ -579,17 +596,17 @@
 <script>
 (function () {
   // ---------- Données ----------
+  // Séries : Origines est la série de base. Les séries d'événement s'ajoutent ici pendant les events.
   const SETS = [
-    { id: 'w26', code: 'W26', name: 'Worlds 2026', game: 'League of Legends', short: 'LoL', size: 120, status: 'on', note: 'Fin dans 18 j', c: '#f2c25b', p: ['#2b1d5e', '#4b2a8c', '#1a1238'], edge: ['#f2c25b', '#8c6420'] },
-    { id: 'cgn', code: 'CGN', name: 'Major de Cologne', game: 'Counter-Strike 2', short: 'CS2', size: 100, status: 'soon', note: 'Sortie dans 6 j', c: '#f28a3a', p: ['#3a1a0c', '#7a3514', '#22100a'], edge: ['#f28a3a', '#8a4416'] },
-    { id: 'ch26', code: 'C26', name: 'Champions 2026', game: 'Valorant', short: 'VAL', size: 90, status: 'off', note: 'Plus en boutique', c: '#ff5a6a', p: ['#3a0c18', '#7a1a30', '#220a10'], edge: ['#ff5a6a', '#8a2030'] }
+    { id: 'ori', code: 'ORI', name: 'Origines', edition: 'Édition 1', desc: 'Les grands moments de l\'histoire de l\'e-sport', games: 'Tous les jeux', size: 150, secret: 25, status: 'on', note: 'Série de base', c: '#f2c25b', p: ['#2b1d5e', '#4b2a8c', '#1a1238'], edge: ['#f2c25b', '#8c6420'] }
   ];
   const STATUS = { on: 'Disponible', soon: 'Bientôt', off: 'Terminée' };
   const RAR = [
     { id: 'common', name: 'Commune', color: 'var(--c-common)', pts: 1 },
     { id: 'rare', name: 'Rare', color: 'var(--c-rare)', pts: 3 },
     { id: 'epic', name: 'Épique', color: 'var(--c-epic)', pts: 10 },
-    { id: 'legend', name: 'Légendaire', color: 'var(--c-legend)', pts: 50 }
+    { id: 'legend', name: 'Légendaire', color: 'var(--c-legend)', pts: 50 },
+    { id: 'secret', name: 'Secrète', color: 'var(--c-secret)', pts: 100 }
   ];
   const PRICE = 500, PRICE5 = 2250, FREE_EVERY = 4 * 3600 * 1000;
   // Catalogue : emplacements vides, rareté répartie par extension
@@ -597,9 +614,11 @@
   SETS.forEach(function (s) {
     for (let i = 0; i < s.size; i++) {
       const fromEnd = s.size - i;
-      const r = fromEnd <= 4 ? 'legend' : fromEnd <= 16 ? 'epic' : fromEnd <= 46 ? 'rare' : 'common';
+      const r = fromEnd <= 6 ? 'legend' : fromEnd <= 21 ? 'epic' : fromEnd <= 60 ? 'rare' : 'common';
       CATALOG.push({ set: s.id, num: i + 1, rarity: r });
     }
+    // Cartes secrètes : numérotées au-delà du total (ex. 151/150)
+    for (let j = 1; j <= (s.secret || 0); j++) CATALOG.push({ set: s.id, num: s.size + j, rarity: 'secret' });
   });
   const SAMPLE_BOARD = [
     ['NeoFaker', 1240, 9, 310], ['Sp1ke', 1105, 8, 296], ['MidOrFeed', 980, 6, 288], ['Lunaa', 870, 5, 260],
@@ -608,7 +627,7 @@
   ];
 
   // ---------- État (sauvegardé dans le navigateur) ----------
-  const KEY = 'clutch-tcg-v1';
+  const KEY = 'clutch-tcg-v2';
   const today = function () { return new Date().toISOString().slice(0, 10); };
   function fresh() {
     return {
@@ -649,7 +668,7 @@
   function packHTML(s, mini) {
     return '<div class="pack' + (mini ? ' mini' : '') + (s.status === 'off' ? ' off' : '') + '" style="--p1:' + s.p[0] + ';--p2:' + s.p[1] + ';--p3:' + s.p[2] + ';--edge:' + s.edge[0] + ';--edge2:' + s.edge[1] + '">' +
       '<div class="pack-inner"><div class="pack-emblem"><div>' + s.code + '</div></div>' +
-      '<div class="pack-title">' + esc(s.name.split(' ')[0].toUpperCase()) + '<small>BOOSTER</small></div>' +
+      '<div class="pack-title">' + esc(s.name.split(' ')[0].toUpperCase()) + '<small>' + esc((s.edition || 'BOOSTER').toUpperCase()) + '</small></div>' +
       '<div class="pack-count">5 CARTES · 1 RARE MINIMUM</div></div></div>';
   }
 
@@ -689,18 +708,23 @@
     }).join('');
   }
 
+  const EVENT_CARD = '<div class="set event"><div><span class="status soon">Pendant les events</span></div>' +
+    '<div><h3>Séries d\'événement</h3><div class="set-meta"><span>Disponibles seulement pendant un event e-sport</span><span>Aucun event en cours</span></div></div></div>';
   function renderHome() {
-    $('#homeGames').innerHTML = SETS.map(function (s) {
-      const have = CATALOG.filter(function (c) { return c.set === s.id && S.cards[s.id + '-' + c.num]; }).length;
-      const pct = Math.round(have / s.size * 100);
-      return '<a class="game" href="#collection" data-set-link="' + s.id + '" style="--g:' + s.c + '"><div class="game-ico">' + s.short + '</div>' +
-        '<div><div class="game-name">' + s.game + '</div><div class="game-sub">' + have + ' / ' + s.size + ' cartes · ' + s.name + '</div><div class="track"><i style="width:' + pct + '%"></i></div></div>' +
+    const s = SETS[0];
+    $('#homeGames').innerHTML = RAR.slice().reverse().map(function (r) {
+      const total = CATALOG.filter(function (c) { return c.set === s.id && c.rarity === r.id; }).length;
+      const have = CATALOG.filter(function (c) { return c.set === s.id && c.rarity === r.id && S.cards[c.set + '-' + c.num]; }).length;
+      const pct = Math.round(have / total * 100);
+      return '<a class="game" href="#collection" data-set-link="' + s.id + '" data-rar-link="' + r.id + '" style="--g:' + r.color + '"><div class="r-ico">' + r.name[0] + '</div>' +
+        '<div><div class="game-name">' + r.name + 's</div><div class="game-sub">' + have + ' / ' + total + ' cartes</div><div class="track"><i style="width:' + pct + '%"></i></div></div>' +
         '<span class="game-pct">' + pct + ' %</span></a>';
     }).join('');
     $('#homeSets').innerHTML = SETS.map(function (s) {
-      return '<a class="set" href="#boosters" style="--c:' + s.c + '"><div><span class="status ' + s.status + '">' + STATUS[s.status] + '</span></div>' +
-        '<div><h3>' + s.name + '</h3><div class="set-meta"><span>' + s.short + ' · ' + s.size + ' cartes</span><span>' + s.note + '</span></div></div></a>';
-    }).join('');
+      return '<a class="set" href="#boosters" style="--c:' + s.c + '"><div class="row" style="justify-content:space-between"><span class="status ' + s.status + '">' + STATUS[s.status] + '</span>' +
+        '<span class="stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + s.code + '<span class="ed1">ÉDITION 1</span></span></div>' +
+        '<div><h3>' + s.name + '</h3><div class="set-meta"><span>' + s.desc + '</span><span>' + s.size + ' + ' + s.secret + ' secrètes</span></div></div></a>';
+    }).join('') + EVENT_CARD;
   }
 
   function renderBoosters() {
@@ -715,9 +739,11 @@
         ? '<div class="offer-buy"><button class="btn btn-gold btn-sm" data-buy="' + s.id + '" data-qty="1"' + (S.coins < PRICE ? ' disabled' : '') + '>Acheter <small><i class="coin"></i> ' + PRICE + '</small></button>' +
           '<button class="btn btn-ghost btn-sm" data-buy="' + s.id + '" data-qty="5"' + (S.coins < PRICE5 ? ' disabled' : '') + '>Lot de 5 <small class="num" style="font-size:12px;opacity:.8"><i class="coin"></i> ' + fmt(PRICE5) + '</small></button></div>'
         : '<div class="offer-buy"><button class="btn btn-ghost btn-sm" disabled>' + (s.status === 'soon' ? 'Bientôt disponible' : 'Plus en vente') + '</button></div>';
-      return '<div class="panel offer">' + packHTML(s, true) + '<div class="offer-info"><div><span class="status ' + s.status + '">' + STATUS[s.status] + '</span></div>' +
-        '<h3>' + s.name + '</h3><ul><li>' + s.game + ' · ' + s.size + ' cartes</li><li>5 cartes par booster</li><li>' + s.note + '</li></ul>' + buy + '</div></div>';
-    }).join('');
+      return '<div class="panel offer">' + packHTML(s, true) + '<div class="offer-info"><div class="row"><span class="status ' + s.status + '">' + STATUS[s.status] + '</span>' +
+        '<span class="stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + s.code + '<span class="ed1">ÉDITION 1</span></span></div>' +
+        '<h3>' + s.name + '</h3><ul><li>' + s.desc + '</li><li>' + s.games + ' · ' + s.size + ' cartes + ' + s.secret + ' secrètes</li><li>5 cartes par booster, 1 rare minimum</li></ul>' + buy + '</div></div>';
+    }).join('') + '<div class="panel event-panel"><span class="status soon">Pendant les events</span><h3 style="font-size:19px;text-transform:uppercase;letter-spacing:.04em">Séries d\'événement</h3>' +
+      '<p class="muted" style="margin:0">Des séries spéciales sortent uniquement pendant les grands events e-sport, avec leur propre symbole. Aucun event en cours.</p></div>';
   }
 
   const F = { set: 'all', rarity: 'all', ownedOnly: false };
@@ -738,8 +764,9 @@
     const rc = {}; RAR.forEach(function (r) { rc[r.id] = r; });
     $('#slots').innerHTML = list.map(function (c) {
       const s = setById(c.set);
-      return '<div class="slot" style="--r:' + rc[c.rarity].color + '" title="' + s.name + ' #' + c.num + ' · ' + rc[c.rarity].name + ' · non obtenue">' +
-        '<span class="slot-r"></span><span class="slot-num">#' + String(c.num).padStart(3, '0') + '</span><span class="lock"></span><span class="slot-set">' + s.code + '</span></div>';
+      return '<div class="slot" style="--r:' + rc[c.rarity].color + '" title="' + s.name + ' · ' + s.edition + ' · ' + String(c.num).padStart(3, '0') + '/' + s.size + ' · ' + rc[c.rarity].name + ' · non obtenue">' +
+        '<span class="slot-ed">ÉD.1</span><span class="slot-r"></span><span class="lock"></span>' +
+        '<span class="slot-stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + String(c.num).padStart(3, '0') + '/' + s.size + '</span></div>';
     }).join('');
   }
 
@@ -790,7 +817,7 @@
   document.addEventListener('click', function (e) {
     const t = e.target.closest('button, a');
     if (!t) return;
-    if (t.dataset.setLink) { F.set = t.dataset.setLink; F.rarity = 'all'; renderCollection(); }
+    if (t.dataset.setLink) { F.set = t.dataset.setLink; F.rarity = t.dataset.rarLink || 'all'; renderCollection(); }
     if (t.dataset.quest) {
       const q = QUESTS.find(function (x) { return x.id === t.dataset.quest; }), st = S.quests[q.id];
       if (st.claimed || st.n < q.goal) return;
@@ -808,8 +835,8 @@
     }
     if (t.dataset.action === 'claim-free') {
       if (!freeState().ready) return;
-      S.packs.w26 = (S.packs.w26 || 0) + 1; S.nextFree = Date.now() + FREE_EVERY; save(); renderAll();
-      toast('Booster gratuit Worlds 2026 récupéré.');
+      S.packs.ori = (S.packs.ori || 0) + 1; S.nextFree = Date.now() + FREE_EVERY; save(); renderAll();
+      toast('Booster gratuit Origines récupéré.');
     }
     if (t.dataset.open) { toast('L\'ouverture des boosters arrive bientôt. Ton booster est gardé.'); }
     if (t.dataset.fset) { F.set = t.dataset.fset; renderCollection(); }

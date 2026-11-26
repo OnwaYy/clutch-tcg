@@ -111,6 +111,10 @@
     40% { opacity:1; transform: translateY(-14px) scale(1); }
     100% { opacity:0; transform: translateY(-34px) scale(.3); }
   }
+  .stamps { position:absolute; left:9.5%; right:9.5%; top:76.4%; display:flex; justify-content:space-between; align-items:center; transform: translateZ(40px); pointer-events:none; }
+  .ed-stamp { font-family:'Cinzel',serif; font-weight:900; font-size:clamp(7px,2vw,9.5px); letter-spacing:.12em; color:#f7d77a; padding:3px 6px; border:1.5px solid #f7d77a; border-radius:3px; background:rgba(10,6,22,.75); box-shadow:0 0 8px rgba(0,0,0,.6); }
+  .set-stamp { display:flex; align-items:center; gap:5px; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:clamp(8px,2.3vw,11px); letter-spacing:.06em; color:#f7d77a; padding:2px 7px 2px 4px; border-radius:20px; background:rgba(10,6,22,.75); border:1px solid rgba(247,215,122,.5); }
+  .set-stamp svg { width:13px; height:13px; }
   .hint { font-size:13px; letter-spacing:.15em; opacity:.55; text-transform:uppercase; }
   @media (prefers-reduced-motion: reduce) { .card,.spark,.rarity,.rays,.halo,.sheen { animation:none; } }
 </style>
@@ -233,6 +237,10 @@
       </g>
     </svg>
 
+    <div class="stamps">
+      <span class="ed-stamp">ÉDITION 1</span>
+      <span class="set-stamp"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4.5 L17.5 15 H6.5 Z" fill="currentColor"/><circle cx="12" cy="18.6" r="1.7" fill="currentColor"/></svg>ORI · 145/150</span>
+    </div>
     <div class="rarity">LÉGENDAIRE</div>
     <div class="plate">
       <div class="name">FAKER</div>

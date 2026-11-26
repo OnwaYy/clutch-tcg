@@ -5,7 +5,9 @@ Jeu de cartes à collectionner sur le thème de l'e-sport, sur navigateur : joue
 ## Contenu
 
 - `index.html` : page d'accueil (booster, taux de drop, quêtes, collection, extensions). Données d'exemple.
-- `prototypes/carte-faker.html` : premier prototype de carte légendaire animée.
+- `prototypes/carte-faker.html` : premier prototype de carte légendaire animée (stamp Origines, Édition 1).
+
+
 
 ## Lancer
 
