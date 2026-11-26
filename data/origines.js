@@ -50,7 +50,11 @@ window.ORIGINES = {
     "yay": {"img": "assets/cartes/yay.png", "color": "#c8202a", "player": true},
     "Crimsix": {"img": "assets/cartes/crimsix.png", "color": "#5cb82f", "player": true},
     "KuroKy": {"img": "assets/cartes/kuroky.png", "color": "#2f8be0", "player": true},
-    "Shroud": {"img": "assets/cartes/shroud.png", "color": "#2aa8e0", "player": true}
+    "Shroud": {"img": "assets/cartes/shroud.png", "color": "#2aa8e0", "player": true},
+    "Virtus.pro": {"img": "assets/cartes/virtus-pro.png", "color": "#ff5100"},
+    "OpTic Gaming": {"img": "assets/cartes/optic-gaming.png", "color": "#93c54b"},
+    "Evil Geniuses": {"img": "assets/cartes/evil-geniuses.png", "color": "#283a73"},
+    "Team Secret": {"img": "assets/cartes/team-secret.png", "color": "#c8c9cf"}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
