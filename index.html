@@ -23,8 +23,7 @@
     --c-epic: #b46bff;
     --c-legend: #f2c25b;
     --c-uncommon: #4fd1c5;
-    --c-mythic: #ff7ad9;
-    --c-ultimate: #ff5a4d;
+    --c-secret: #ff7ad9;
     --ok: #5fd39a;
     --bad: #ff6b7a;
     --f-display: 'Oxanium', 'Segoe UI', system-ui, sans-serif;
@@ -177,7 +176,7 @@
   .pack.shake { animation: shake .5s !important; }
   @keyframes shake { 20%,60% { translate: -6px 0; rotate: -2deg; } 40%,80% { translate: 6px 0; rotate: 2deg; } }
 
-  .odds { display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+  .odds { display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
   .odd { padding: 14px 14px 14px 16px; min-width: 0; display: grid; gap: 4px; border-right: 1px solid var(--line); position: relative; }
   .odd:last-child { border-right: 0; }
   .odd::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--r); }
@@ -307,9 +306,9 @@
   footer .wrap { padding-block: 20px; display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; }
 
   @media (max-width: 1100px) and (min-width: 901px) {
-    .odds { grid-template-columns: repeat(4, 1fr); }
-    .odd:nth-child(4n) { border-right: 0; }
-    .odd:nth-child(-n+4) { border-bottom: 1px solid var(--line); }
+    .odds { grid-template-columns: repeat(3, 1fr); }
+    .odd:nth-child(3n) { border-right: 0; }
+    .odd:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
   }
   @media (max-width: 900px) {
     .hero { grid-template-columns: 1fr; gap: 8px; padding-block: 24px 20px; }
@@ -318,8 +317,7 @@
     .set-list, .shop { grid-template-columns: 1fr; }
     .odds { grid-template-columns: repeat(2, 1fr); }
     .odd:nth-child(2n) { border-right: 0; }
-    .odd:not(:last-child) { border-bottom: 1px solid var(--line); }
-    .odd:last-child { grid-column: 1 / -1; }
+    .odd:nth-child(-n+4) { border-bottom: 1px solid var(--line); }
   }
   @media (max-width: 1040px) {
     nav { display: none; }
@@ -527,7 +525,7 @@
     <div class="wrap page-head">
       <div>
         <h1>Classement</h1>
-        <p>Score de collection : commune 1 pt, peu commune 2, rare 5, épique 15, légendaire 50, mythique 100, ultime 250. Les autres joueurs sont des exemples.</p>
+        <p>Score de collection : commune 1 pt, peu commune 2, rare 5, épique 15, légendaire 50, secrète 100. Les autres joueurs sont des exemples.</p>
       </div>
       <div class="seg" id="boardTabs">
         <button aria-pressed="true" data-board="score">Score</button>
@@ -602,20 +600,19 @@
     { id: 'ori', code: 'ORI', name: 'Origines', edition: 'Édition 1', desc: 'Les grands moments de l\'histoire de l\'e-sport', games: 'Tous les jeux', size: 150, secret: 25, status: 'on', note: 'Série de base', c: '#f2c25b', p: ['#2b1d5e', '#4b2a8c', '#1a1238'], edge: ['#f2c25b', '#8c6420'] }
   ];
   const STATUS = { on: 'Disponible', soon: 'Bientôt', off: 'Terminée' };
-  // Raretés : les 4 premières dans la numérotation (001 à 150), les 3 dernières sont secrètes (151 à 175)
+  // Raretés : les 5 premières dans la numérotation (001 à 150), les secrètes hors numérotation (151 à 175)
   const RAR = [
     { id: 'common', name: 'Commune', color: 'var(--c-common)', pts: 1, odds: '50 %', note: 'Joueurs, équipes' },
     { id: 'uncommon', name: 'Peu commune', color: 'var(--c-uncommon)', pts: 2, odds: '30 %', note: 'Joueurs confirmés' },
     { id: 'rare', name: 'Rare', color: 'var(--c-rare)', pts: 5, odds: '12 %', note: 'Stars, cadre argenté' },
-    { id: 'epic', name: 'Épique', color: 'var(--c-epic)', pts: 15, odds: '6 %', note: 'MVP, effet holo' },
-    { id: 'legend', name: 'Légendaire', color: 'var(--c-legend)', pts: 50, odds: '1,5 %', note: 'Secrète · moments historiques' },
-    { id: 'mythic', name: 'Mythique', color: 'var(--c-mythic)', pts: 100, odds: '0,4 %', note: 'Secrète · art spécial' },
-    { id: 'ultimate', name: 'Ultime', color: 'var(--c-ultimate)', pts: 250, odds: '0,1 %', note: 'Secrète · carte dorée' }
+    { id: 'epic', name: 'Épique', color: 'var(--c-epic)', pts: 15, odds: '5,5 %', note: 'MVP, effet holo' },
+    { id: 'legend', name: 'Légendaire', color: 'var(--c-legend)', pts: 50, odds: '2 %', note: 'Moments historiques' },
+    { id: 'secret', name: 'Secrète', color: 'var(--c-secret)', pts: 100, odds: '0,5 %', note: 'Hors numérotation, 151 à 175' }
   ];
   const PRICE = 500, PRICE5 = 2250, FREE_EVERY = 4 * 3600 * 1000;
   // Catalogue : emplacements vides, rareté répartie par extension
   // Nombre de cartes par rareté, dans l'ordre de numérotation (proportions inspirées de Pokémon 151)
-  const BANDS = [['common', 50], ['uncommon', 45], ['rare', 30], ['epic', 25], ['legend', 18], ['mythic', 5], ['ultimate', 2]];
+  const BANDS = [['common', 50], ['uncommon', 45], ['rare', 25], ['epic', 18], ['legend', 12], ['secret', 25]];
   const CATALOG = [];
   SETS.forEach(function (s) {
     let num = 1;
