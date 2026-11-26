@@ -141,7 +141,8 @@ window.ORIGINES = {
     "Sentinels — Masters Reykjavík": {"img": "assets/cartes/sentinels-masters-reykjavik.jpg", "color": "#ce0037", "photo": true},
     "Worlds 2013 — Staples Center": {"img": "assets/cartes/worlds-2013-staples-center.jpg", "color": "#e2012d", "photo": true},
     "Worlds 2017 — Nid d'Oiseau": {"img": "assets/cartes/worlds-2017-nid-d-oiseau.jpg", "color": "#1f3a6a", "photo": true},
-    "Worlds 2019 — Paris": {"img": "assets/cartes/worlds-2019-paris.jpg", "color": "#e8332a", "photo": true}
+    "Worlds 2019 — Paris": {"img": "assets/cartes/worlds-2019-paris.jpg", "color": "#e8332a", "photo": true},
+    "TI4 — KeyArena": {"img": "assets/cartes/ti4-keyarena.jpg", "color": "#2d9fd8", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
