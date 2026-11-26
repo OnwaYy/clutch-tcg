@@ -155,7 +155,8 @@ window.ORIGINES = {
     "ROX Tigers — Les Tigres": {"img": "assets/cartes/rox-tigers-les-tigres.jpg", "color": "#e0a43a", "photo": true},
     "Cloud9 — Le premier Major américain": {"img": "assets/cartes/cloud9-le-premier-major-americain.jpg", "color": "#3aa0e8", "photo": true},
     "Fatal1ty — Le premier pro gamer star": {"img": "assets/cartes/fatal1ty-le-premier-pro-gamer-star.jpg", "color": "#e0a43a", "photo": true},
-    "Team Liquid — Le sacre de TI7": {"img": "assets/cartes/team-liquid-le-sacre-de-ti7.jpg", "color": "#1b2d5b", "photo": true}
+    "Team Liquid — Le sacre de TI7": {"img": "assets/cartes/team-liquid-le-sacre-de-ti7.jpg", "color": "#1b2d5b", "photo": true},
+    "Fnatic — Champions du monde Saison 1": {"img": "assets/cartes/fnatic-champions-du-monde-saison-1.jpg", "color": "#ff8a00", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
