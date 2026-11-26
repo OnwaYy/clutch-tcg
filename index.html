@@ -299,8 +299,8 @@
   .cc-photo { position: relative; border-radius: calc(var(--u) * 2.4); overflow: hidden; display: grid; place-items: center; min-height: 0;
     background: linear-gradient(115deg, transparent 58%, rgba(255,255,255,.14) 58% 72%, transparent 72%), radial-gradient(80% 70% at 45% 40%, var(--ph1), var(--ph2)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
   .cc-photo::before { content: ""; position: absolute; right: -8%; bottom: -10%; width: 55%; aspect-ratio: 1; background: radial-gradient(circle, rgba(28,27,34,.16) 1.1px, transparent 1.5px) 0 0 / calc(var(--u) * 2.4) calc(var(--u) * 2.4); -webkit-mask-image: radial-gradient(circle at 70% 70%, #000, transparent 70%); mask-image: radial-gradient(circle at 70% 70%, #000, transparent 70%); }
-  .cc-ghost { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * -3); font: 800 calc(var(--u) * 38)/1 'Barlow Condensed', sans-serif; color: transparent; -webkit-text-stroke: calc(var(--u) * .45) rgba(28,27,34,.24); }
-  .cc-photo img { position: relative; width: 70%; max-height: 74%; object-fit: contain; filter: drop-shadow(0 calc(var(--u) * 2.4) calc(var(--u) * 2.4) rgba(28,27,34,.22)); }
+  .cc-ghost { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * -3); font: 800 calc(var(--u) * 38)/1 'Barlow Condensed', sans-serif; color: transparent; -webkit-text-stroke: calc(var(--u) * .45) var(--ghost, rgba(28,27,34,.24)); }
+  .cc-photo img { position: relative; width: 84%; max-height: 66%; object-fit: contain; filter: drop-shadow(0 calc(var(--u) * 2.4) calc(var(--u) * 2.4) rgba(28,27,34,.22)); }
   .cc-todo { position: relative; display: grid; justify-items: center; gap: calc(var(--u) * 1); font: 600 calc(var(--u) * 3.4) 'Barlow', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: rgba(28,27,34,.55); }
   .cc-todo b { font: 800 calc(var(--u) * 22)/1 'Barlow Condensed', sans-serif; letter-spacing: 0; color: rgba(28,27,34,.75); }
   .cc-num { position: absolute; top: calc(var(--u) * 3.2); left: calc(var(--u) * 3.2); background: #1c1b22; color: #fff; border-radius: calc(var(--u) * 2); padding: calc(var(--u) * 1.4) calc(var(--u) * 2.6) calc(var(--u) * 1.2); display: grid; line-height: 1; }
@@ -679,7 +679,7 @@
   const RCODE = { C: 'common', P: 'uncommon', R: 'rare', E: 'epic', L: 'legend', S: 'secret' };
   const CATALOG = (window.ORIGINES ? window.ORIGINES.cards : []).map(function (c, i) {
     const art = (window.ORIGINES.art || {})[i + 1] || {};
-    return { set: 'ori', num: i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null };
+    return { set: 'ori', num: i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null, dark: !!art.dark };
   });
   if (false) SETS.forEach(function (s) {
     let num = 1;
@@ -861,8 +861,10 @@
     const r = RAR.find(function (x) { return x.id === c.rarity; });
     const rgb = hexRgb(c.color || RHEX[c.rarity]), W = [255, 255, 255], K = [0, 0, 0];
     const lum = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-    return '--p1:' + mixc(rgb, W, .25) + ';--p2:' + mixc(rgb, K, .18) + ';--ph1:' + mixc(rgb, W, .85) + ';--ph2:' + mixc(rgb, W, .45) +
-      ';--foot:' + mixc(rgb, K, lum > .5 ? .55 : .4) + ';--foot-strong:' + mixc(rgb, K, lum > .5 ? .78 : .6) + ';--rr:' + r.color;
+    // dark : fond sombre derrière le visuel, pour les logos clairs
+    return '--p1:' + mixc(rgb, W, .25) + ';--p2:' + mixc(rgb, K, .18) + ';--ph1:' + (c.dark ? mixc(rgb, K, .3) : mixc(rgb, W, .85)) + ';--ph2:' + (c.dark ? mixc(rgb, K, .68) : mixc(rgb, W, .45)) +
+      ';--foot:' + (lum > .5 ? mixc(rgb, K, .55) : mixc(rgb, W, .62)) + ';--foot-strong:' + (lum > .5 ? mixc(rgb, K, .78) : mixc(rgb, W, .88)) +
+      ';--ghost:' + (c.dark ? 'rgba(255,255,255,.2)' : 'rgba(28,27,34,.24)') + ';--rr:' + r.color;
   }
   function cardInner(c) {
     const s = setById(c.set);

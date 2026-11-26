@@ -1,10 +1,16 @@
 // Série Origines — checklist (source : tableau « Checklist Origines »)
 // Chaque ligne : [nom, rareté, type, jeu, année, note]
 // Raretés : C commune, P peu commune, R rare, E épique, L légendaire, S secrète
-// img / color : visuel de la carte et couleur du fond (facultatifs)
+// img / color : visuel de la carte et couleur du fond (facultatifs) ; dark: true = fond sombre pour un logo clair
 window.ORIGINES = {
   code: 'ORI', name: 'Origines', edition: 'Édition 1', total: 150,
-  art: { 1: { img: 'assets/cartes/001.png', color: '#c8c9cf' } },
+  art: {
+    1: { img: 'assets/cartes/001.png', color: '#c8c9cf' },
+    2: { img: 'assets/cartes/002.png', color: '#d9361a' },
+    3: { img: 'assets/cartes/003.png', color: '#24408f', dark: true },
+    4: { img: 'assets/cartes/004.png', color: '#c8202f' },
+    5: { img: 'assets/cartes/005.png', color: '#7b78f5' }
+  },
   cards: [
     ['aAa', 'C', 'Logo de club', 'Multi-jeux', null, 'Club français historique'],
     ['mTw', 'C', 'Logo de club', 'Multi-jeux', null, 'Légende allemande des années 2000'],
