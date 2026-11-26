@@ -156,7 +156,8 @@ window.ORIGINES = {
     "Cloud9 — Le premier Major américain": {"img": "assets/cartes/cloud9-le-premier-major-americain.jpg", "color": "#3aa0e8", "photo": true},
     "Fatal1ty — Le premier pro gamer star": {"img": "assets/cartes/fatal1ty-le-premier-pro-gamer-star.jpg", "color": "#e0a43a", "photo": true},
     "Team Liquid — Le sacre de TI7": {"img": "assets/cartes/team-liquid-le-sacre-de-ti7.jpg", "color": "#1b2d5b", "photo": true},
-    "Fnatic — Champions du monde Saison 1": {"img": "assets/cartes/fnatic-champions-du-monde-saison-1.jpg", "color": "#ff8a00", "photo": true}
+    "Fnatic — Champions du monde Saison 1": {"img": "assets/cartes/fnatic-champions-du-monde-saison-1.jpg", "color": "#ff8a00", "photo": true},
+    "Na'Vi — Le premier The International": {"img": "assets/cartes/na-vi-le-premier-the-international.jpg", "color": "#f5d100", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
@@ -311,7 +312,7 @@ window.ORIGINES = {
     ["Team Liquid — Le sacre de TI7", "L", "Moment", "Dota 2", 2017, "Team Liquid bat Newbee 3-0 en finale, et KuroKy soulève enfin l'Aegis"],
     ["Fnatic — Champions du monde Saison 1", "S", "Moment", "League of Legends", 2011, "Fnatic remporte les tout premiers Worlds de LoL, à la DreamHack"],
     ["Na'Vi — Le premier The International", "S", "Moment", "Dota 2", 2011, "Na'Vi remporte le premier The International et 1 million de dollars"],
-    ["Thresh — La Ferrari de Carmack", "S", "Moment", "Quake", 1997, "Thresh gagne la Ferrari de John Carmack au tournoi Red Annihilation"],
+    ["Zen — Le prodige de Rocket League", "S", "Joueur", "Rocket League", 2023, "Champion du monde RLCS avec Team Vitality, à Düsseldorf"],
     ["Evo Moment 37", "S", "Moment", "Street Fighter III", 2004, "Daigo pare toute la super de Justin Wong et retourne le match, à Evo 2004"],
     ["BoxeR — L'Empereur des Terrans", "S", "Joueur", "StarCraft: Brood War", 2001, "La première star de StarCraft"],
     ["Flash — Le Dieu", "S", "Joueur", "StarCraft: Brood War", 2010, "Le joueur le plus dominant de Brood War"],
