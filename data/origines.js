@@ -109,7 +109,18 @@ window.ORIGINES = {
     "ScreaM": {"img": "assets/cartes/scream.jpg", "color": "#3a3a40", "photo": true},
     "Miracle-": {"img": "assets/cartes/miracle.jpg", "color": "#2a4f9a", "photo": true},
     "Ceb": {"img": "assets/cartes/ceb.jpg", "color": "#1f3a4a", "photo": true},
-    "Ana": {"img": "assets/cartes/ana.jpg", "color": "#1f3a4a", "photo": true}
+    "Ana": {"img": "assets/cartes/ana.jpg", "color": "#1f3a4a", "photo": true},
+    "cNed": {"img": "assets/cartes/cned.jpg", "color": "#3a2a6a", "photo": true},
+    "aspas": {"img": "assets/cartes/aspas.jpg", "color": "#1f6f8a", "photo": true},
+    "Derke": {"img": "assets/cartes/derke.jpg", "color": "#f5c935", "photo": true},
+    "Boaster": {"img": "assets/cartes/boaster.jpg", "color": "#f58c1b", "photo": true},
+    "MarineKing": {"img": "assets/cartes/marineking.jpg", "color": "#2a3f8a", "photo": true},
+    "Scarlett": {"img": "assets/cartes/scarlett.jpg", "color": "#c8202a", "photo": true},
+    "Tokido": {"img": "assets/cartes/tokido.jpg", "color": "#3a2a8a", "photo": true},
+    "Mang0": {"img": "assets/cartes/mang0.jpg", "color": "#1e9be0", "photo": true},
+    "Scump": {"img": "assets/cartes/scump.jpg", "color": "#93c54b", "photo": true},
+    "Sinatraa": {"img": "assets/cartes/sinatraa.jpg", "color": "#f58c1b", "photo": true},
+    "Ninja": {"img": "assets/cartes/ninja.jpg", "color": "#2a3f8a", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
