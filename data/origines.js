@@ -55,7 +55,22 @@ window.ORIGINES = {
     "OpTic Gaming": {"img": "assets/cartes/optic-gaming.png", "color": "#93c54b"},
     "Evil Geniuses": {"img": "assets/cartes/evil-geniuses.png", "color": "#283a73"},
     "Team Secret": {"img": "assets/cartes/team-secret.png", "color": "#c8c9cf"},
-    "Quake": {"img": "assets/cartes/quake.png", "color": "#8a5a2b"}
+    "Quake": {"img": "assets/cartes/quake.png", "color": "#8a5a2b"},
+    "StarCraft: Brood War": {"img": "assets/cartes/starcraft-brood-war.png", "color": "#5f8a6e"},
+    "Counter-Strike": {"img": "assets/cartes/counter-strike.png", "color": "#e8a23a"},
+    "Warcraft III": {"img": "assets/cartes/warcraft-iii.png", "color": "#8a4f14", "dark": true},
+    "Super Smash Bros. Melee": {"img": "assets/cartes/super-smash-bros-melee.png", "color": "#c8302a"},
+    "Halo": {"img": "assets/cartes/halo.png", "color": "#4a6fa0"},
+    "Call of Duty": {"img": "assets/cartes/call-of-duty.png", "color": "#c8c9cf"},
+    "League of Legends": {"img": "assets/cartes/league-of-legends.png", "color": "#0f6d84"},
+    "StarCraft II": {"img": "assets/cartes/starcraft-ii.png", "color": "#2a5a9a", "dark": true},
+    "Rocket League": {"img": "assets/cartes/rocket-league.png", "color": "#1d6fd1"},
+    "Rainbow Six Siege": {"img": "assets/cartes/rainbow-six-siege.png", "color": "#c8c9cf"},
+    "Overwatch": {"img": "assets/cartes/overwatch.png", "color": "#f99e1a"},
+    "Fortnite": {"img": "assets/cartes/fortnite.png", "color": "#7b4dd6"},
+    "Valorant": {"img": "assets/cartes/valorant.png", "color": "#ff4655"},
+    "Street Fighter": {"img": "assets/cartes/street-fighter.png", "color": "#d4402a", "dark": true},
+    "Dota 2": {"img": "assets/cartes/dota-2.png", "color": "#b0281a", "dark": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
