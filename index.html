@@ -287,7 +287,7 @@
   .cc.mini:hover::after { opacity: 1; }
   .tilt { perspective: 1000px; padding: 12px; touch-action: none; }
   .cc.big { container-type: inline-size; --u: 1cqw; isolation: isolate; --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%; --o: 0;
-    width: min(84vw, 340px, calc((100vh - 140px) * .716));
+    width: min(92vw, 425px, calc((100vh - 110px) * .716));
     transform: rotateX(var(--rx)) rotateY(var(--ry)); transition: transform .12s ease-out; transform-style: preserve-3d; will-change: transform; }
   .cc-holo, .cc-glare { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
   .cc-holo { background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,.0) 30%, rgba(255,255,255,.35) 45%, rgba(255,255,255,0) 60%, transparent 80%);
@@ -409,6 +409,13 @@
     background: radial-gradient(closest-side, rgba(255,200,90,.55), transparent); filter: blur(14px); animation: halo 3s ease-in-out infinite; }
   @keyframes halo { 50% { opacity: .55; } }
   @media (prefers-reduced-motion: reduce) { .cc.big.l-legend .cc-panel > .cc-glint, .cc.big.l-legend::before { animation: none; } }
+  /* Mention d'édition, verticale le long du bord droit de l'image */
+  .cc-ed { position: absolute; right: calc(var(--u) * 2.2); top: 50%; transform: translateY(-50%) rotate(180deg); writing-mode: vertical-rl; z-index: 5; pointer-events: none;
+    font: 700 calc(var(--u) * 2.6) 'Oswald', sans-serif; letter-spacing: .45em; color: rgba(255,255,255,.92); text-shadow: 0 1px 2px rgba(0,0,0,.6);
+    padding: calc(var(--u) * 1.6) calc(var(--u) * .8); background: rgba(20,18,28,.35); border-radius: 99px; white-space: nowrap; }
+  .cc.u-foil .cc-ed { background: linear-gradient(180deg, rgba(240,244,250,.5), rgba(150,158,172,.5)); color: #1c1b22; text-shadow: 0 1px 0 rgba(255,255,255,.5); }
+  .cc.e-epic .cc-ed { background: rgba(40,14,80,.55); color: #e7c8ff; }
+  .cc.l-legend .cc-ed { right: calc(var(--u) * 6); background: rgba(20,12,4,.55); color: #ffe08a; }
   .cc-panel { grid-template-columns: minmax(0, 1fr); height: 100%; border-radius: inherit; padding: calc(var(--u) * 3.4); overflow: hidden; display: grid; grid-template-rows: 1fr auto auto; gap: calc(var(--u) * 2.6); background: linear-gradient(160deg, var(--p1), var(--p2)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
   .cc-photo { position: relative; border-radius: calc(var(--u) * 2.4); overflow: hidden; display: grid; place-items: center; min-height: 0;
     background: linear-gradient(115deg, transparent 58%, rgba(255,255,255,.14) 58% 72%, transparent 72%), radial-gradient(80% 70% at 45% 40%, var(--ph1), var(--ph2)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
@@ -1005,7 +1012,7 @@
     return '<div class="cc-panel"><div class="cc-photo"><span class="cc-ghost">' + n3(c.num) + '</span>' +
       (c.img ? '<img' + (c.map ? ' class="is-map' + (c.fade ? ' is-fade' : '') + '"' : c.player ? ' class="is-player"' : c.photo ? ' class="is-photo"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
       '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>' +
-      '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-stamp">ÉDITION 1</span>' + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
+      '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-ed">PREMIÈRE ÉDITION</span>' + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
       '<div class="cc-band' + (fr ? ' fr' : '') + (story ? ' has-story' : '') + '">' + (c.rarity === 'legend' ? '<span class="cc-crest"><b>★</b> LÉGENDAIRE <b>★</b></span>' : '') + (story ? '<h3>' + esc(title) + '</h3><p class="cc-story">' + esc(story) + '</p>' : '<h3>' + esc(title) + '</h3><p>' + esc(subLine) + '</p>') + '</div>' +
       '<div class="cc-foot"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + n3(c.num) + '/' + s.size + '<i></i></span></div></div>';
   }
