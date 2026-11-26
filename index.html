@@ -325,8 +325,22 @@
   .cc.e-epic .cc-photo::before { display: none; }
   .cc.e-epic .cc-photo::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background: repeating-linear-gradient(115deg, #ff5ea8 0%, #ffd25e 6%, #6dffb5 12%, #5ec8ff 18%, #b07bff 24%, #ff5ea8 30%);
-    background-size: 260% 260%; background-position: var(--mx, 50%) var(--my, 50%); mix-blend-mode: soft-light; opacity: .18; }
-  .cc.big.e-epic .cc-photo::after { opacity: calc(.12 + var(--o, 0) * .22); transition: opacity .2s; }
+    background-size: 260% 260%; background-position: var(--mx, 50%) var(--my, 50%); mix-blend-mode: overlay; opacity: .55;
+    -webkit-mask-image: radial-gradient(55% 50% at 50% 42%, rgba(0,0,0,.15), #000 85%); mask-image: radial-gradient(55% 50% at 50% 42%, rgba(0,0,0,.15), #000 85%); }
+  .cc.e-epic .cc-photo { isolation: isolate; }
+  .cc.e-epic .cc-photo > .cc-spark { position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: screen; opacity: .45;
+    background: radial-gradient(circle, #fff 0 .6px, transparent 1.3px) 0 0 / calc(var(--u) * 6) calc(var(--u) * 6),
+                radial-gradient(circle, #ffe9ff 0 .5px, transparent 1.1px) calc(var(--u) * 3) calc(var(--u) * 3) / calc(var(--u) * 6) calc(var(--u) * 6);
+    -webkit-mask-image: linear-gradient(115deg, transparent 20%, #000 40%, #000 60%, transparent 80%); mask-image: linear-gradient(115deg, transparent 20%, #000 40%, #000 60%, transparent 80%);
+    -webkit-mask-size: 260% 260%; mask-size: 260% 260%; -webkit-mask-position: var(--mx, 50%) var(--my, 50%); mask-position: var(--mx, 50%) var(--my, 50%); }
+  .cc.big.e-epic .cc-photo::after { opacity: calc(.45 + var(--o, 0) * .4); transition: opacity .2s; }
+  /* Liseré prismatique qui tourne autour de la carte (seulement en grand) */
+  @property --spin { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+  .cc.big.e-epic::before { content: ""; position: absolute; inset: -3px; border-radius: inherit; z-index: -1; pointer-events: none;
+    background: conic-gradient(from var(--spin), #ff5ea8, #ffd25e, #6dffb5, #5ec8ff, #b07bff, #ff5ea8);
+    filter: blur(6px); opacity: .85; animation: spin 4s linear infinite; }
+  @keyframes spin { to { --spin: 360deg; } }
+  @media (prefers-reduced-motion: reduce) { .cc.big.e-epic::before { animation: none; } }
   .cc.e-epic .cc-ghost { display: none; }
   .cc.e-epic .cc-num { z-index: 3; background: linear-gradient(135deg, #b57bff, #5a1bb8); }
   .cc.e-epic .cc-tag { z-index: 3; }
@@ -920,7 +934,7 @@
     return '<div class="cc-panel"><div class="cc-photo"><span class="cc-ghost">' + n3(c.num) + '</span>' +
       (c.img ? '<img' + (c.map ? ' class="is-map' + (c.fade ? ' is-fade' : '') + '"' : c.player ? ' class="is-player"' : c.photo ? ' class="is-photo"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
       '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>' +
-      '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-stamp">ÉDITION 1</span></div>' +
+      '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-stamp">ÉDITION 1</span>' + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
       '<div class="cc-band' + (fr ? ' fr' : '') + '"><h3>' + esc(c.name) + '</h3><p>' + esc(sub) + '</p></div>' +
       '<div class="cc-foot"><span>' + esc(c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + n3(c.num) + '/' + s.size + '<i></i></span></div></div>';
   }
