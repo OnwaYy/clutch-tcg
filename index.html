@@ -394,9 +394,12 @@
   .cc.l-legend .cc-band p.cc-story { text-align: center; }
   /* holo doré */
   .cc.l-legend .cc-photo::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background: repeating-linear-gradient(115deg, #fff4c8 0%, #f2c25b 7%, #ff9f6b 14%, #ffe59a 21%, #fff 26%, #fff4c8 30%);
-    background-size: 280% 280%; background-position: var(--mx, 50%) var(--my, 50%); mix-blend-mode: soft-light; opacity: .45; }
-  .cc.big.l-legend .cc-photo::after { opacity: calc(.3 + var(--o, 0) * .35); transition: opacity .2s; }
+    background:
+      repeating-linear-gradient(115deg, #ff7eb6 0%, #ffd36b 6%, #7dffc4 12%, #6fd0ff 18%, #b996ff 24%, #ff7eb6 30%),
+      repeating-linear-gradient(65deg, rgba(255,255,255,.0) 0 calc(var(--u) * 1.2), rgba(255,255,255,.08) calc(var(--u) * 1.2) calc(var(--u) * 1.5));
+    background-size: 300% 300%, auto; background-position: var(--mx, 50%) var(--my, 50%), 0 0;
+    mix-blend-mode: color-dodge; opacity: .1; }
+  .cc.big.l-legend .cc-photo::after { opacity: calc(.07 + var(--o, 0) * .1); transition: opacity .2s; }
   /* cadre gravé intérieur */
   .cc.l-legend::after { content: ""; position: absolute; inset: 3.4%; border-radius: 3.6% / 2.6%; z-index: 5; pointer-events: none;
     border: 1px solid rgba(255,228,150,.75); box-shadow: 0 0 0 1px rgba(0,0,0,.35), inset 0 0 calc(var(--u) * 3) rgba(255,200,90,.15); }
