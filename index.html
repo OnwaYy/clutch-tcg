@@ -425,6 +425,38 @@
   .cc.l-legend.l-glass .cc-num { top: calc(var(--u) * 5); left: calc(var(--u) * 5); background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.45); -webkit-backdrop-filter: blur(calc(var(--u) * 2)); backdrop-filter: blur(calc(var(--u) * 2)); }
   .cc.l-legend.l-glass .cc-tag { top: calc(var(--u) * 5.5); right: calc(var(--u) * 5); }
   .cc.l-legend.l-glass .cc-ed { right: calc(var(--u) * 4.5); background: rgba(255,255,255,.14); color: #fff; -webkit-backdrop-filter: blur(calc(var(--u) * 2)); backdrop-filter: blur(calc(var(--u) * 2)); }
+  /* ---------- Secrète : full art, cadre chrome rosé gravé, holo texturé ---------- */
+  .cc.l-legend.s-secret { background-image:
+      repeating-linear-gradient(-45deg, rgba(255,255,255,.12) 0 1px, transparent 1px 3px),
+      linear-gradient(135deg, #ffe3f4 0%, #ff8fd2 16%, #8a2f78 32%, #ffc4ea 48%, #b76bd8 64%, #ffe9f7 80%, #d95fb6 100%);
+    background-size: auto, 240% 240%; background-position: 0 0, var(--mx, 50%) var(--my, 50%); }
+  .cc.l-legend.s-secret .cc-panel { background: #12060f; }
+  .cc.l-legend.s-secret .cc-panel::before { background: linear-gradient(to top, rgba(18,5,15,.97) 0%, rgba(18,5,15,.88) 18%, rgba(18,5,15,.5) 34%, rgba(18,5,15,0) 52%),
+      radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(18,5,15,.55) 100%); }
+  .cc.l-legend.s-secret .cc-band h3 { background: linear-gradient(180deg, #ffffff 0%, #ffd2ee 45%, #ff7ad9 70%, #c04aa6 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .cc.l-legend.s-secret .cc-band p { color: #ffe6f6; }
+  .cc.l-legend.s-secret .cc-crest { color: #ffb8e6; }
+  .cc.l-legend.s-secret .cc-crest b { color: #fff; }
+  .cc.l-legend.s-secret .cc-crest::before { background: linear-gradient(90deg, transparent, #ffb8e6); }
+  .cc.l-legend.s-secret .cc-crest::after { background: linear-gradient(90deg, #ffb8e6, transparent); }
+  .cc.l-legend.s-secret .cc-foot { color: #e7b6d6; border-top-color: rgba(255,150,220,.28); }
+  .cc.l-legend.s-secret .cc-set { color: #ffe0f3; }
+  .cc.l-legend.s-secret .cc-set i { background: #ff7ad9; box-shadow: 0 0 calc(var(--u) * 1.5) #ff7ad9; }
+  .cc.l-legend.s-secret .cc-num { background: linear-gradient(135deg, #ffe9f7, #ff8fd2 45%, #8a2f78); color: #2a0a22; }
+  .cc.l-legend.s-secret .cc-ed { background: rgba(30,8,26,.6); color: #ffc4ea; }
+  .cc.l-legend.s-secret .cc-hud { filter: drop-shadow(0 0 calc(var(--u) * 1.2) rgba(255,122,217,.55)); }
+  .cc.l-legend.s-secret .cc-hud .thin { stroke: #ffc4ea; }
+  .cc.l-legend.s-secret .cc-hud .bold { stroke: url(#hudRose); }
+  .cc.l-legend.s-secret .cc-hud .gem { fill: url(#hudRose); stroke: #3a0a30; }
+  .cc.l-legend.s-secret::after { border-color: rgba(255,190,235,.7); box-shadow: 0 0 0 1px rgba(0,0,0,.35), inset 0 0 calc(var(--u) * 3) rgba(255,122,217,.15); }
+  /* holo texturé : fines lignes gravées croisées qui s'irisent avec la lumière */
+  .cc.l-legend.s-secret .cc-photo::after { background:
+      repeating-linear-gradient(115deg, #ff7eb6 0%, #ffd36b 6%, #7dffc4 12%, #6fd0ff 18%, #b996ff 24%, #ff7eb6 30%),
+      repeating-linear-gradient(45deg, rgba(255,255,255,0) 0 calc(var(--u) * 1.1), rgba(255,255,255,.16) calc(var(--u) * 1.1) calc(var(--u) * 1.35)),
+      repeating-linear-gradient(-45deg, rgba(255,255,255,0) 0 calc(var(--u) * 1.1), rgba(255,255,255,.16) calc(var(--u) * 1.1) calc(var(--u) * 1.35));
+    background-size: 300% 300%, auto, auto; background-position: var(--mx, 50%) var(--my, 50%), 0 0, 0 0; opacity: .12; }
+  .cc.big.l-legend.s-secret .cc-photo::after { opacity: calc(.08 + var(--o, 0) * .14); }
+  .cc.big.l-legend.s-secret::before { background: radial-gradient(closest-side, rgba(255,122,217,.6), transparent); }
   /* ---------- GOAT : une seule carte, cadre obsidienne irisé, titre chrome, 6 étoiles (6 titres mondiaux) ---------- */
   .cc.l-legend.g-goat { background-image:
       repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 1px, transparent 1px 3px),
@@ -583,7 +615,7 @@
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs><linearGradient id="hudGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4c8"/><stop offset=".5" stop-color="#e2b04a"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient><linearGradient id="hudPrism" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7eb6"/><stop offset=".25" stop-color="#ffd36b"/><stop offset=".5" stop-color="#ffffff"/><stop offset=".75" stop-color="#6fd0ff"/><stop offset="1" stop-color="#b996ff"/></linearGradient></defs>
+  <defs><linearGradient id="hudGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4c8"/><stop offset=".5" stop-color="#e2b04a"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient><linearGradient id="hudRose" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9f7"/><stop offset=".5" stop-color="#ff7ad9"/><stop offset="1" stop-color="#8a2f78"/></linearGradient><linearGradient id="hudPrism" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7eb6"/><stop offset=".25" stop-color="#ffd36b"/><stop offset=".5" stop-color="#ffffff"/><stop offset=".75" stop-color="#6fd0ff"/><stop offset="1" stop-color="#b996ff"/></linearGradient></defs>
   <symbol id="sym-ori" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4.5 L17.5 15 H6.5 Z" fill="currentColor"/><circle cx="12" cy="18.6" r="1.7" fill="currentColor"/></symbol>
 </svg>
 
@@ -1077,7 +1109,7 @@
       '<div class="cc-foot"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + numText(c) + '<i></i></span></div></div>';
   }
   // Finition selon la rareté
-  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend l-glass', goat: 'l-legend g-goat', secret: 'l-legend' };
+  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend l-glass', goat: 'l-legend g-goat', secret: 'l-legend s-secret' };
   const finish = function (c) { return FINISH[c.rarity] || ''; };
   // Cadre HUD des légendaires : coins coupés, accents dorés sur les angles, losanges au centre
   const HUD = '<svg class="cc-hud" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">' +
