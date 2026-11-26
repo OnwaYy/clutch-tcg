@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Clutch TCG</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700;800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700;800&family=Barlow:wght@400;500;600&family=Oswald:wght@700&family=Barlow+Condensed:wght@800&family=JetBrains+Mono:wght@500&display=swap">
 <style>
   /* Layout : barre de jeu fixe en haut, une vue par onglet (routage par #), panneaux sombres et accents or */
   :root {
@@ -262,6 +262,44 @@
   #homeGames .game .track { margin-top: 4px; }
   #homeGames .r-ico { width: 32px; height: 32px; font-size: 13px; border-radius: 8px; }
   .r-ico { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: 16px; color: var(--g); background: color-mix(in srgb, var(--g) 14%, var(--panel)); border: 1px solid color-mix(in srgb, var(--g) 40%, transparent); }
+  button.slot { font: inherit; color: inherit; cursor: pointer; padding: 0; }
+  .slot.owned { border: 2px solid var(--r); color: var(--fg); background: linear-gradient(160deg, color-mix(in srgb, var(--tint) 45%, var(--panel)), var(--panel) 75%); align-content: stretch; grid-template-rows: 1fr auto auto; padding: 18px 6px 22px; transition: transform .15s; }
+  .slot.owned:hover { transform: translateY(-3px); }
+  .slot-pic { display: grid; place-items: center; min-height: 0; }
+  .slot-pic img { max-width: 82%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.4)); }
+  .slot-ini { font-family: var(--f-display); font-weight: 800; font-size: 22px; color: var(--r); opacity: .9; }
+  .slot-name { font-size: 11px; font-weight: 600; line-height: 1.15; padding: 2px 2px 0; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .slot.owned .slot-stamp, .slot.owned .slot-ed { color: color-mix(in srgb, var(--r) 70%, var(--fg)); }
+
+  /* ---------- Fenêtre carte ---------- */
+  .modal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; }
+  .modal-bg { position: absolute; inset: 0; background: rgba(5,4,10,.78); backdrop-filter: blur(4px); }
+  .modal-box { position: relative; display: grid; gap: 12px; justify-items: center; max-height: 100%; }
+  .modal-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center; font-size: 13px; text-align: center; }
+  .cc { --w: min(84vw, 330px, calc((100vh - 120px) * .716)); width: var(--w); aspect-ratio: 63 / 88; container-type: inline-size; border-radius: calc(var(--w) * .05); padding: calc(var(--w) * .038);
+    background: linear-gradient(160deg, #c9cad1, #a9abb4); box-shadow: 0 24px 50px -16px rgba(0,0,0,.9); color: #1c1b22; }
+  .cc-panel { height: 100%; border-radius: 2.8cqw; padding: 2.8cqw; display: grid; grid-template-rows: 1fr auto auto; gap: 2.6cqw; background: linear-gradient(160deg, var(--p1), var(--p2)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+  .cc-photo { position: relative; border-radius: 2.4cqw; overflow: hidden; display: grid; place-items: center; min-height: 0;
+    background: linear-gradient(115deg, transparent 58%, rgba(255,255,255,.14) 58% 72%, transparent 72%), radial-gradient(80% 70% at 45% 40%, var(--ph1), var(--ph2)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+  .cc-photo::before { content: ""; position: absolute; right: -8%; bottom: -10%; width: 55%; aspect-ratio: 1; background: radial-gradient(circle, rgba(28,27,34,.16) 1.1px, transparent 1.5px) 0 0 / 2.4cqw 2.4cqw; -webkit-mask-image: radial-gradient(circle at 70% 70%, #000, transparent 70%); mask-image: radial-gradient(circle at 70% 70%, #000, transparent 70%); }
+  .cc-ghost { position: absolute; left: 4cqw; bottom: -3cqw; font: 800 38cqw/1 'Barlow Condensed', sans-serif; color: transparent; -webkit-text-stroke: .35cqw rgba(28,27,34,.08); }
+  .cc-photo img { position: relative; width: 70%; max-height: 74%; object-fit: contain; filter: drop-shadow(0 2.4cqw 2.4cqw rgba(28,27,34,.22)); }
+  .cc-todo { position: relative; display: grid; justify-items: center; gap: 1cqw; font: 600 3.4cqw 'Barlow', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: rgba(28,27,34,.55); }
+  .cc-todo b { font: 800 22cqw/1 'Barlow Condensed', sans-serif; letter-spacing: 0; color: rgba(28,27,34,.75); }
+  .cc-num { position: absolute; top: 3.2cqw; left: 3.2cqw; background: #1c1b22; color: #fff; border-radius: 2cqw; padding: 1.4cqw 2.6cqw 1.2cqw; display: grid; line-height: 1; }
+  .cc-num b { font: 700 7.4cqw 'Oswald', sans-serif; }
+  .cc-num small { font: 600 2.8cqw 'Barlow', sans-serif; letter-spacing: .12em; opacity: .65; margin-top: .6cqw; }
+  .cc-tag { position: absolute; top: 3.8cqw; right: 3.2cqw; display: inline-flex; align-items: center; gap: 1.4cqw; background: #f2c037; color: #1c1b22; border-radius: 99px; padding: 1.2cqw 3cqw 1.2cqw 2cqw; font: 700 3.3cqw 'Oswald', sans-serif; letter-spacing: .16em; }
+  .cc-tag svg, .cc-set svg { width: 3.8cqw; height: 3.8cqw; }
+  .cc-stamp { position: absolute; right: 4cqw; bottom: 4.4cqw; transform: rotate(-10deg); border: .7cqw solid #d23a2f; color: #d23a2f; border-radius: 1.4cqw; padding: .8cqw 2.2cqw; font: 700 3.6cqw 'Oswald', sans-serif; letter-spacing: .18em; opacity: .9; }
+  .cc-band { position: relative; background: #1c1b22; color: #fff; border-radius: 2cqw; padding: 2.6cqw 4cqw 2.4cqw 5.6cqw; overflow: hidden; }
+  .cc-band::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1.6cqw; background: var(--rr); }
+  .cc-band.fr::before { background: linear-gradient(#2a5bb3 33.3%, #ffffff 33.3% 66.6%, #e0453a 66.6%); }
+  .cc-band h3 { font: italic 700 7.6cqw/1.05 'Oswald', sans-serif; text-wrap: balance; }
+  .cc-band p { font: 600 3cqw 'Barlow', sans-serif; letter-spacing: .14em; text-transform: uppercase; opacity: .72; margin-top: 1cqw; }
+  .cc-foot { display: flex; justify-content: space-between; align-items: center; gap: 2cqw; padding: 0 1cqw; font: 600 3cqw 'Barlow', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--foot); }
+  .cc-set { display: flex; align-items: center; gap: 1.4cqw; color: var(--foot-strong); white-space: nowrap; }
+  .cc-set i { width: 2.2cqw; height: 2.2cqw; border-radius: 50%; background: var(--rr); }
   .slot-r { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--r); }
 
   /* ---------- Échanges ---------- */
@@ -589,9 +627,18 @@
   </div>
 </main>
 
+<div class="modal" id="cardModal" hidden>
+  <div class="modal-bg" data-close-card></div>
+  <div class="modal-box" role="dialog" aria-label="Carte">
+    <article class="cc" id="bigCard"></article>
+    <div class="modal-meta"><span id="bigRarity" class="muted"></span><button class="btn btn-ghost btn-sm" data-close-card>Fermer</button></div>
+  </div>
+</div>
+
 <footer><div class="wrap"><span>Clutch TCG · prototype</span><span>Progression enregistrée dans ce navigateur</span></div></footer>
 <div class="toast" id="toast" role="status"></div>
 
+<script src="data/origines.js"></script>
 <script>
 (function () {
   // ---------- Données ----------
@@ -612,9 +659,12 @@
   const PRICE = 500, PRICE5 = 2250, FREE_EVERY = 4 * 3600 * 1000;
   // Catalogue : emplacements vides, rareté répartie par extension
   // Nombre de cartes par rareté, dans l'ordre de numérotation (proportions inspirées de Pokémon 151)
-  const BANDS = [['common', 50], ['uncommon', 45], ['rare', 25], ['epic', 18], ['legend', 12], ['secret', 25]];
-  const CATALOG = [];
-  SETS.forEach(function (s) {
+  const RCODE = { C: 'common', P: 'uncommon', R: 'rare', E: 'epic', L: 'legend', S: 'secret' };
+  const CATALOG = (window.ORIGINES ? window.ORIGINES.cards : []).map(function (c, i) {
+    const art = (window.ORIGINES.art || {})[i + 1] || {};
+    return { set: 'ori', num: i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null };
+  });
+  if (false) SETS.forEach(function (s) {
     let num = 1;
     BANDS.forEach(function (b) { for (let i = 0; i < b[1]; i++) CATALOG.push({ set: s.id, num: num++, rarity: b[0] }); });
   });
@@ -640,6 +690,9 @@
   try { S = Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY) || 'null') || {}); } catch (e) { S = fresh(); }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   if (S.questDay !== today()) { S.questDay = today(); S.quests = fresh().quests; save(); }
+  // Tant qu'il n'y a qu'un seul joueur : toute la collection est débloquée
+  const UNLOCK_ALL = true;
+  if (UNLOCK_ALL) CATALOG.forEach(function (c) { S.cards[c.set + '-' + c.num] = 1; });
 
   const QUESTS = [
     { id: 'login', name: 'Se connecter aujourd\'hui', goal: 1, reward: { coins: 100 } },
@@ -769,11 +822,51 @@
     const rc = {}; RAR.forEach(function (r) { rc[r.id] = r; });
     $('#slots').innerHTML = list.map(function (c) {
       const s = setById(c.set);
+      if (S.cards[c.set + '-' + c.num]) return ownedSlot(c, s, rc[c.rarity]);
       return '<div class="slot" style="--r:' + rc[c.rarity].color + '" title="' + s.name + ' · ' + s.edition + ' · ' + String(c.num).padStart(3, '0') + '/' + s.size + ' · ' + rc[c.rarity].name + ' · non obtenue">' +
         '<span class="slot-ed">ÉD.1</span><span class="slot-r"></span><span class="lock"></span>' +
         '<span class="slot-stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + String(c.num).padStart(3, '0') + '/' + s.size + '</span></div>';
     }).join('');
   }
+
+  const n3 = function (n) { return String(n).padStart(3, '0'); };
+  const initialsOf = function (name) {
+    const w = name.split(' — ')[0].replace(/[^A-Za-z0-9À-ÿ ]/g, '').split(' ').filter(Boolean);
+    if (w.length === 1) return (w[0].length <= 4 ? w[0] : w[0].slice(0, 2)).toUpperCase();
+    return w.slice(0, 2).map(function (x) { return x[0]; }).join('').toUpperCase() || '?';
+  };
+  function ownedSlot(c, s, r) {
+    const tint = c.color || r.color;
+    const pic = c.img ? '<img src="' + c.img + '" alt="">' : '<span class="slot-ini">' + esc(initialsOf(c.name)) + '</span>';
+    return '<button class="slot owned" data-card="' + c.num + '" style="--r:' + r.color + ';--tint:' + tint + '" title="' + esc(c.name) + ' · ' + r.name + '">' +
+      '<span class="slot-ed">ÉD.1</span><span class="slot-r"></span><span class="slot-pic">' + pic + '</span>' +
+      '<span class="slot-name">' + esc(c.name.split(' — ')[0]) + '</span>' +
+      '<span class="slot-stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + n3(c.num) + '/' + s.size + '</span></button>';
+  }
+
+  // ---------- Grande carte (modèle des communes, pour l'instant pour toutes) ----------
+  function hexRgb(h) { if (h.indexOf('var(') === 0) return null; h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }
+  const RHEX = { common: '#a7a3b8', uncommon: '#4fd1c5', rare: '#4fa8ff', epic: '#b46bff', legend: '#f2c25b', secret: '#ff7ad9' };
+  function mixc(c, d, k) { return 'rgb(' + c.map(function (v, i) { return Math.round(v + (d[i] - v) * k); }).join(',') + ')'; }
+  function openCard(num) {
+    const c = CATALOG[num - 1], s = setById(c.set), r = RAR.find(function (x) { return x.id === c.rarity; });
+    const rgb = hexRgb(c.color || RHEX[c.rarity]), W = [255, 255, 255], K = [0, 0, 0];
+    const lum = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+    const fr = /fran[cç]/i.test((c.note || '') + ' ' + c.name);
+    const sub = [c.note, c.year].filter(Boolean).join(' · ') || c.type;
+    const el = $('#bigCard');
+    el.style.cssText = '--p1:' + mixc(rgb, W, .25) + ';--p2:' + mixc(rgb, K, .18) + ';--ph1:' + mixc(rgb, W, .85) + ';--ph2:' + mixc(rgb, W, .45) +
+      ';--foot:' + mixc(rgb, K, lum > .5 ? .55 : .4) + ';--foot-strong:' + mixc(rgb, K, lum > .5 ? .78 : .6) + ';--rr:' + r.color;
+    el.innerHTML = '<div class="cc-panel"><div class="cc-photo"><span class="cc-ghost">' + n3(c.num) + '</span>' +
+      (c.img ? '<img src="' + c.img + '" alt="' + esc(c.name) + '">' : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
+      '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>' +
+      '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-stamp">ÉDITION 1</span></div>' +
+      '<div class="cc-band' + (fr ? ' fr' : '') + '"><h3>' + esc(c.name) + '</h3><p>' + esc(sub) + '</p></div>' +
+      '<div class="cc-foot"><span>' + esc(c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + n3(c.num) + '/' + s.size + '<i></i></span></div></div>';
+    $('#bigRarity').textContent = r.name + (c.rarity !== 'common' ? ' · design à venir, modèle commune en attendant' : '');
+    $('#cardModal').hidden = false;
+  }
+  function closeCard() { $('#cardModal').hidden = true; }
 
   let offerTab = 'recues';
   function renderTrades() {
@@ -849,6 +942,8 @@
     if (t.dataset.tab) { offerTab = t.dataset.tab; renderTrades(); }
     if (t.dataset.board) { board = t.dataset.board; renderBoard(); }
     if (t.dataset.trade) { toast('Il te faut au moins une carte en double pour proposer un échange.', true); }
+    if (t.dataset.card) { openCard(+t.dataset.card); return; }
+    if (t.dataset.closeCard !== undefined) { closeCard(); return; }
     if (t.dataset.unfriend) { const n = S.friends.splice(+t.dataset.unfriend, 1)[0]; save(); renderAll(); toast(n + ' retiré de tes amis.'); }
   });
   $('#heroPack').addEventListener('click', function () { const p = this; p.classList.remove('shake'); void p.offsetWidth; p.classList.add('shake'); });
@@ -884,6 +979,7 @@
   });
   function disarm() { resetBtn.classList.remove('armed'); resetBtn.textContent = 'Réinitialiser ma progression'; $('#resetMsg').textContent = 'Remet tes pièces, boosters et quêtes à zéro.'; }
 
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeCard(); });
   setInterval(renderBinds, 1000);
   renderAll(); route();
 })();
