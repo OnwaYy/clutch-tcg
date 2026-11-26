@@ -46,7 +46,15 @@ window.ORIGINES = {
     "Stewie2K": {"img": "assets/cartes/stewie2k.png", "color": "#1b2a4a", "player": true},
     "Twistzz": {"img": "assets/cartes/twistzz.png", "color": "#e3262e", "player": true},
     "ropz": {"img": "assets/cartes/ropz.png", "color": "#f2c230", "player": true},
-    "Hiko": {"img": "assets/cartes/hiko.png", "color": "#2b6fb5", "player": true}
+    "Hiko": {"img": "assets/cartes/hiko.png", "color": "#2b6fb5", "player": true},
+    "yay": {"img": "assets/cartes/yay.png", "color": "#c8202a", "player": true},
+    "Crimsix": {"img": "assets/cartes/crimsix.png", "color": "#5cb82f", "player": true},
+    "KuroKy": {"img": "assets/cartes/kuroky.png", "color": "#2f8be0", "player": true},
+    "Shroud": {"img": "assets/cartes/shroud.png", "color": "#2aa8e0", "player": true},
+    "WCG 2001 — Séoul": {"img": "assets/cartes/wcg-2001-seoul.jpg", "color": "#3a3a8c", "photo": true},
+    "Major de Katowice 2014": {"img": "assets/cartes/major-de-katowice-2014.jpg", "color": "#f26b1d", "photo": true},
+    "ESL One Cologne 2014": {"img": "assets/cartes/esl-one-cologne-2014.jpg", "color": "#c9a24a", "photo": true},
+    "MLG Columbus 2016": {"img": "assets/cartes/mlg-columbus-2016.jpg", "color": "#3d6fd6", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
