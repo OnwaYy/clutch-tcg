@@ -24,6 +24,7 @@
     --c-legend: #f2c25b;
     --c-uncommon: #4fd1c5;
     --c-secret: #ff7ad9;
+    --c-goat: #eef0ff;
     --ok: #5fd39a;
     --bad: #ff6b7a;
     --f-display: 'Oxanium', 'Segoe UI', system-ui, sans-serif;
@@ -412,6 +413,46 @@
     background: radial-gradient(closest-side, rgba(255,200,90,.55), transparent); filter: blur(14px); animation: halo 3s ease-in-out infinite; }
   @keyframes halo { 50% { opacity: .55; } }
   @media (prefers-reduced-motion: reduce) { .cc.big.l-legend .cc-panel > .cc-glint, .cc.big.l-legend::before { animation: none; } }
+  /* ---------- GOAT : une seule carte, cadre obsidienne irisé, titre chrome, 6 étoiles (6 titres mondiaux) ---------- */
+  .cc.l-legend.g-goat { background-image:
+      repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 1px, transparent 1px 3px),
+      linear-gradient(125deg, #ff7eb6, #ffd36b 17%, #7dffc4 34%, #6fd0ff 51%, #b996ff 68%, #ff7eb6 85%, #ffd36b),
+      linear-gradient(135deg, #3a3a46 0%, #0a0a0f 28%, #4a4a58 50%, #0a0a0f 72%, #3a3a46 100%);
+    background-size: auto, 320% 320%, 240% 240%; background-position: 0 0, var(--mx, 50%) var(--my, 50%), var(--mx, 50%) var(--my, 50%);
+    background-blend-mode: normal, soft-light, normal; }
+  .cc.l-legend.g-goat .cc-panel { background: #0b0306; }
+  .cc.l-legend.g-goat .cc-photo { background:
+      radial-gradient(55% 40% at 50% 40%, rgba(226,1,45,.6), transparent 70%),
+      repeating-conic-gradient(from 0deg at 50% 36%, rgba(255,255,255,.045) 0 3deg, transparent 3deg 11deg),
+      radial-gradient(120% 90% at 50% 32%, #4a0614, #0b0306 72%); }
+  .cc.l-legend.g-goat .cc-ghost { display: block; left: 50%; top: calc(var(--u) * 17); bottom: auto; transform: translateX(-50%); font-size: calc(var(--u) * 30); letter-spacing: .04em; -webkit-text-stroke: calc(var(--u) * .35) rgba(255,255,255,.28); z-index: 0; }
+  .cc.l-legend.g-goat .cc-photo img.is-player { height: 80%; filter: drop-shadow(0 0 calc(var(--u) * 3) rgba(255,40,70,.55)); }
+  .cc.l-legend.g-goat .cc-panel::before { background: linear-gradient(to top, rgba(8,2,5,.97) 0%, rgba(8,2,5,.88) 18%, rgba(8,2,5,.5) 33%, rgba(8,2,5,0) 50%),
+      radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(8,2,5,.6) 100%); }
+  .cc.l-legend.g-goat .cc-band h3 { font-size: calc(var(--u) * 11.5); letter-spacing: .03em; background: linear-gradient(180deg, #ffffff 0%, #eef0ff 42%, #8d94b8 52%, #e6e9ff 66%, #ffffff 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 calc(var(--u) * .4) 0 rgba(0,0,0,.7)) drop-shadow(0 0 calc(var(--u) * 2.4) rgba(255,40,70,.55)); }
+  .cc.l-legend.g-goat .cc-band p { color: #eceeff; }
+  .cc.l-legend.g-goat .cc-crest { color: #eef0ff; letter-spacing: .22em; font-size: calc(var(--u) * 2.5); }
+  .cc.l-legend.g-goat .cc-crest b { color: #ffd76a; letter-spacing: .05em; text-shadow: 0 0 calc(var(--u) * 1.2) rgba(255,215,106,.7); }
+  .cc.l-legend.g-goat .cc-crest::before { background: linear-gradient(90deg, transparent, #eef0ff); }
+  .cc.l-legend.g-goat .cc-crest::after { background: linear-gradient(90deg, #eef0ff, transparent); }
+  .cc.l-legend.g-goat .cc-foot { color: #c3c6de; border-top-color: rgba(255,255,255,.22); }
+  .cc.l-legend.g-goat .cc-set { color: #fff; letter-spacing: .18em; }
+  .cc.l-legend.g-goat .cc-set i { background: conic-gradient(#ff7eb6, #ffd36b, #7dffc4, #6fd0ff, #b996ff, #ff7eb6); box-shadow: 0 0 calc(var(--u) * 1.5) rgba(255,255,255,.8); }
+  .cc.l-legend.g-goat .cc-num { color: #fff; border: calc(var(--u) * .45) solid transparent;
+    background: linear-gradient(#0b0b10, #0b0b10) padding-box, linear-gradient(135deg, #ff7eb6, #ffd36b, #7dffc4, #6fd0ff, #b996ff) border-box; }
+  .cc.l-legend.g-goat .cc-num b { letter-spacing: .08em; }
+  .cc.l-legend.g-goat .cc-num small { font-size: calc(var(--u) * 1.9); letter-spacing: .16em; }
+  .cc.l-legend.g-goat .cc-ed { background: rgba(10,10,16,.6); color: #eef0ff; }
+  .cc.l-legend.g-goat .cc-hud { filter: drop-shadow(0 0 calc(var(--u) * 1.2) rgba(255,255,255,.45)); }
+  .cc.l-legend.g-goat .cc-hud .thin { stroke: #eef0ff; }
+  .cc.l-legend.g-goat .cc-hud .bold { stroke: url(#hudPrism); }
+  .cc.l-legend.g-goat .cc-hud .gem { fill: url(#hudPrism); stroke: #111; }
+  .cc.l-legend.g-goat::after { border-color: rgba(255,255,255,.6); box-shadow: 0 0 0 1px rgba(0,0,0,.4), inset 0 0 calc(var(--u) * 3) rgba(255,255,255,.12); }
+  .cc.l-legend.g-goat .cc-photo::after { opacity: .1; }
+  .cc.big.l-legend.g-goat .cc-photo::after { opacity: calc(.07 + var(--o, 0) * .14); }
+  .cc.big.l-legend.g-goat::before { inset: -8px; background: conic-gradient(from var(--spin, 0deg), #ff7eb6, #ffd36b, #7dffc4, #6fd0ff, #b996ff, #ff7eb6); filter: blur(20px); opacity: .55; animation: spin 6s linear infinite; }
+  @media (prefers-reduced-motion: reduce) { .cc.big.l-legend.g-goat::before { animation: none; } }
   /* Mention d'édition, verticale le long du bord droit de l'image */
   .cc-ed { position: absolute; right: calc(var(--u) * 2.2); top: 50%; transform: translateY(-50%) rotate(180deg); writing-mode: vertical-rl; z-index: 5; pointer-events: none;
     font: 700 calc(var(--u) * 2.6) 'Oswald', sans-serif; letter-spacing: .45em; color: rgba(255,255,255,.92); text-shadow: 0 1px 2px rgba(0,0,0,.6);
@@ -530,7 +571,7 @@
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs><linearGradient id="hudGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4c8"/><stop offset=".5" stop-color="#e2b04a"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient></defs>
+  <defs><linearGradient id="hudGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4c8"/><stop offset=".5" stop-color="#e2b04a"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient><linearGradient id="hudPrism" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7eb6"/><stop offset=".25" stop-color="#ffd36b"/><stop offset=".5" stop-color="#ffffff"/><stop offset=".75" stop-color="#6fd0ff"/><stop offset="1" stop-color="#b996ff"/></linearGradient></defs>
   <symbol id="sym-ori" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4.5 L17.5 15 H6.5 Z" fill="currentColor"/><circle cx="12" cy="18.6" r="1.7" fill="currentColor"/></symbol>
 </svg>
 
@@ -807,15 +848,18 @@
     { id: 'uncommon', name: 'Peu commune', color: 'var(--c-uncommon)', pts: 2, odds: '30 %', note: 'Jeux, grands clubs, lieux' },
     { id: 'epic', name: 'Épique', color: 'var(--c-epic)', pts: 10, odds: '15 %', note: 'Stars et grands rendez-vous' },
     { id: 'legend', name: 'Légendaire', color: 'var(--c-legend)', pts: 50, odds: '4,5 %', note: 'Moments historiques' },
-    { id: 'secret', name: 'Secrète', color: 'var(--c-secret)', pts: 100, odds: '0,5 %', note: 'Hors numérotation, 151 à 175' }
+    { id: 'secret', name: 'Secrète', color: 'var(--c-secret)', pts: 100, odds: '0,49 %', note: 'Hors numérotation, 151 à 175' },
+    { id: 'goat', name: 'GOAT', color: 'var(--c-goat)', pts: 500, odds: '0,01 %', note: 'Une seule carte, sans numéro' }
   ];
   const PRICE = 500, PRICE5 = 2250, FREE_EVERY = 4 * 3600 * 1000;
   // Catalogue : emplacements vides, rareté répartie par extension
   // Nombre de cartes par rareté, dans l'ordre de numérotation (proportions inspirées de Pokémon 151)
-  const RCODE = { C: 'common', P: 'uncommon', R: 'rare', E: 'epic', L: 'legend', S: 'secret' };
-  const CATALOG = (window.ORIGINES ? window.ORIGINES.cards : []).map(function (c, i) {
+  const RCODE = { C: 'common', P: 'uncommon', R: 'rare', E: 'epic', L: 'legend', S: 'secret', G: 'goat' };
+  // Les cartes GOAT n'ont pas de numéro : elles suivent les 175, marquées « GOAT »
+  const ORI_ALL = window.ORIGINES ? window.ORIGINES.cards.concat(window.ORIGINES.goat || []) : [];
+  const CATALOG = ORI_ALL.map(function (c, i) {
     const art = (window.ORIGINES.art || {})[c[0]] || {};
-    return { set: 'ori', num: i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null, dark: !!art.dark, map: !!art.map, fade: !!art.fade, player: !!art.player, photo: !!art.photo };
+    return { set: 'ori', num: c[1] === 'G' ? 'GOAT' : i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null, dark: !!art.dark, map: !!art.map, fade: !!art.fade, player: !!art.player, photo: !!art.photo };
   });
   if (false) SETS.forEach(function (s) {
     let num = 1;
@@ -977,13 +1021,14 @@
     $('#slots').innerHTML = list.map(function (c) {
       const s = setById(c.set);
       if (S.cards[c.set + '-' + c.num]) return ownedSlot(c);
-      return '<div class="slot" style="--r:' + rc[c.rarity].color + '" title="' + s.name + ' · ' + s.edition + ' · ' + String(c.num).padStart(3, '0') + '/' + s.size + ' · ' + rc[c.rarity].name + ' · non obtenue">' +
+      return '<div class="slot" style="--r:' + rc[c.rarity].color + '" title="' + s.name + ' · ' + s.edition + ' · ' + numText(c) + ' · ' + rc[c.rarity].name + ' · non obtenue">' +
         '<span class="slot-ed">ÉD.1</span><span class="slot-r"></span><span class="lock"></span>' +
-        '<span class="slot-stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + String(c.num).padStart(3, '0') + '/' + s.size + '</span></div>';
+        '<span class="slot-stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + numText(c) + '</span></div>';
     }).join('');
   }
 
   const n3 = function (n) { return String(n).padStart(3, '0'); };
+  const numText = function (c) { return c.num === 'GOAT' ? 'GOAT' : n3(c.num) + '/' + setById(c.set).size; };
   const initialsOf = function (name) {
     const w = name.split(' — ')[0].replace(/[^A-Za-z0-9À-ÿ ]/g, '').split(' ').filter(Boolean);
     if (w.length === 1) return (w[0].length <= 4 ? w[0] : w[0].slice(0, 2)).toUpperCase();
@@ -991,7 +1036,7 @@
   };
   // ---------- Carte (modèle des communes, pour l'instant pour toutes les raretés) ----------
   function hexRgb(h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }
-  const RHEX = { common: '#a7a3b8', uncommon: '#4fd1c5', rare: '#4fa8ff', epic: '#b46bff', legend: '#f2c25b', secret: '#ff7ad9' };
+  const RHEX = { common: '#a7a3b8', uncommon: '#4fd1c5', rare: '#4fa8ff', epic: '#b46bff', legend: '#f2c25b', secret: '#ff7ad9', goat: '#e2012d' };
   function mixc(c, d, k) { return 'rgb(' + c.map(function (v, i) { return Math.round(v + (d[i] - v) * k); }).join(',') + ')'; }
   function cardStyle(c) {
     const r = RAR.find(function (x) { return x.id === c.rarity; });
@@ -1004,23 +1049,23 @@
   }
   function cardInner(c) {
     const s = setById(c.set);
-    const fr = /fran[cç]/i.test((c.note || '') + ' ' + c.name);
+    const fr = /fran[cç]/i.test((c.note || '') + ' ' + c.name), goat = c.rarity === 'goat';
     // « Nom — Sous-titre » : le nom en gros, le sous-titre en dessous
     const parts = c.name.split(' — ');
     const title = parts[0];
     const sub = parts[1] ? parts[1] + (c.year ? ' · ' + c.year : '') : ([c.note, c.year].filter(Boolean).join(' · ') || c.type);
     // Moments et événements : la note raconte ce qui s'est passé
-    const story = (parts[1] || c.type === 'Moment' || c.type === 'Événement') && c.note ? c.note : '';
+    const story = (parts[1] || c.type === 'Moment' || c.type === 'Événement' || c.rarity === 'goat') && c.note ? c.note : '';
     const subLine = story && !parts[1] ? (c.year ? String(c.year) : c.type) : sub;
-    return '<div class="cc-panel"><div class="cc-photo"><span class="cc-ghost">' + n3(c.num) + '</span>' +
+    return '<div class="cc-panel"><div class="cc-photo"><span class="cc-ghost">' + (goat ? 'GOAT' : n3(c.num)) + '</span>' +
       (c.img ? '<img' + (c.map ? ' class="is-map' + (c.fade ? ' is-fade' : '') + '"' : c.player ? ' class="is-player"' : c.photo ? ' class="is-photo"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
-      '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>' +
+      (goat ? '<span class="cc-num"><b>GOAT</b><small>HORS SÉRIE</small></span>' : '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>') +
       '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-ed">PREMIÈRE ÉDITION</span>' + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
-      '<div class="cc-band' + (fr ? ' fr' : '') + (story ? ' has-story' : '') + '">' + (c.rarity === 'legend' ? '<span class="cc-crest"><b>★</b> LÉGENDAIRE <b>★</b></span>' : '') + (story ? '<h3>' + esc(title) + '</h3><p class="cc-story">' + esc(story) + '</p>' : '<h3>' + esc(title) + '</h3><p>' + esc(subLine) + '</p>') + '</div>' +
-      '<div class="cc-foot"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + n3(c.num) + '/' + s.size + '<i></i></span></div></div>';
+      '<div class="cc-band' + (fr ? ' fr' : '') + (story ? ' has-story' : '') + '">' + (c.rarity === 'legend' ? '<span class="cc-crest"><b>★</b> LÉGENDAIRE <b>★</b></span>' : goat ? '<span class="cc-crest"><b>★★★</b> GREATEST OF ALL TIME <b>★★★</b></span>' : '') + (story ? '<h3>' + esc(title) + '</h3><p class="cc-story">' + esc(story) + '</p>' : '<h3>' + esc(title) + '</h3><p>' + esc(subLine) + '</p>') + '</div>' +
+      '<div class="cc-foot"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + numText(c) + '<i></i></span></div></div>';
   }
   // Finition selon la rareté
-  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend' };
+  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend', goat: 'l-legend g-goat' };
   const finish = function (c) { return FINISH[c.rarity] || ''; };
   // Cadre HUD des légendaires : coins coupés, accents dorés sur les angles, losanges au centre
   const HUD = '<svg class="cc-hud" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">' +
@@ -1029,17 +1074,17 @@
     '<polyline class="bold" points="3.6,124 3.6,132.6 9,136.4 22,136.4"/><polyline class="bold" points="78,136.4 91,136.4 96.4,132.6 96.4,124"/>' +
     '<polygon class="gem" points="50,1.9 52.6,3.6 50,5.3 47.4,3.6"/><polygon class="gem" points="50,134.7 52.6,136.4 50,138.1 47.4,136.4"/>' +
     '</svg>';
-  const corners = function (c) { return c.rarity === 'legend' ? HUD : ''; };
+  const corners = function (c) { return c.rarity === 'legend' || c.rarity === 'goat' ? HUD : ''; };
   function ownedSlot(c) {
     return '<button class="cc mini ' + finish(c) + '" data-card="' + c.num + '" style="' + cardStyle(c) + '" aria-label="' + esc(c.name) + '">' + cardInner(c) + corners(c) + '</button>';
   }
   function openCard(num) {
-    const c = CATALOG[num - 1], r = RAR.find(function (x) { return x.id === c.rarity; });
+    const c = CATALOG.find(function (x) { return String(x.num) === String(num); }), r = RAR.find(function (x) { return x.id === c.rarity; });
     const el = $('#bigCard');
     el.className = 'cc big ' + finish(c);
     el.style.cssText = cardStyle(c);
     el.innerHTML = cardInner(c) + corners(c) + '<span class="cc-holo"></span><span class="cc-glare"></span>';
-    if (c.rarity === 'legend') el.querySelector('.cc-panel').insertAdjacentHTML('beforeend', '<span class="cc-glint"></span>');
+    if (c.rarity === 'legend' || c.rarity === 'goat') el.querySelector('.cc-panel').insertAdjacentHTML('beforeend', '<span class="cc-glint"></span>');
     $('#bigRarity').textContent = r.name + (c.rarity === 'secret' ? ' · design à venir' : '');
     const mo = $('#cardModal'); mo.classList.add('open'); mo.setAttribute('aria-hidden', 'false');
     tiltReset();
@@ -1146,7 +1191,7 @@
     if (t.dataset.tab) { offerTab = t.dataset.tab; renderTrades(); }
     if (t.dataset.board) { board = t.dataset.board; renderBoard(); }
     if (t.dataset.trade) { toast('Il te faut au moins une carte en double pour proposer un échange.', true); }
-    if (t.dataset.card) { openCard(+t.dataset.card); return; }
+    if (t.dataset.card) { openCard(t.dataset.card); return; }
     if (t.dataset.closeCard !== undefined) { closeCard(); return; }
     if (t.dataset.unfriend) { const n = S.friends.splice(+t.dataset.unfriend, 1)[0]; save(); renderAll(); toast(n + ' retiré de tes amis.'); }
   });

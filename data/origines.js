@@ -1,6 +1,6 @@
 // Série Origines — checklist (source : tableau « Checklist Origines »)
 // Chaque ligne : [nom, rareté, type, jeu, année, note]
-// Raretés : C commune, P peu commune, R rare, E épique, L légendaire, S secrète
+// Raretés : C commune, P peu commune, E épique, L légendaire, S secrète, G GOAT (hors série)
 // art : visuel par nom de carte — img, color (fond), dark (fond sombre pour un logo clair), map / player (cadrage)
 window.ORIGINES = {
   code: 'ORI', name: 'Origines', edition: 'Édition 1', total: 150,
@@ -145,7 +145,7 @@ window.ORIGINES = {
     "Le dragon des Worlds 2017": {"img": "assets/cartes/le-dragon-des-worlds-2017.jpg", "color": "#2a3f8a", "photo": true},
     "Luminosity — Le premier Major brésilien": {"img": "assets/cartes/luminosity-le-premier-major-bresilien.jpg", "color": "#1f6fd1", "photo": true},
     "Jaedong": {"img": "assets/cartes/jaedong.jpg", "color": "#1f3a8a", "photo": true},
-    "Faker — Les larmes de 2017": {"img": "assets/cartes/faker-les-larmes-de-2017.jpg", "color": "#e2012d", "photo": true}
+    "Faker": {"img": "assets/cartes/faker.png", "color": "#e2012d", "player": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
@@ -286,7 +286,7 @@ window.ORIGINES = {
     ["Worlds 2017 — Nid d'Oiseau", "E", "Événement", "League of Legends", 2017, "Samsung Galaxy bat SK Telecom T1 en finale, à Pékin"],
     ["Worlds 2019 — Paris", "E", "Événement", "League of Legends", 2019, "FunPlus Phoenix bat G2 Esports 3-0 en finale, à Paris"],
     ["TI4 — KeyArena", "E", "Événement", "Dota 2", 2014, "Newbee remporte The International et l'Aegis, à Seattle"],
-    ["Faker — Les larmes de 2017", "L", "Moment", "League of Legends", 2017, "Battu en finale par Samsung, Faker fond en larmes sur scène, au Nid d'Oiseau"],
+    ["ROX Tigers — Les Tigres de 2016", "L", "Équipe", "League of Legends", 2016, "Champions de LCK, ils poussent SK Telecom T1 jusqu'au 5e match en demi-finale des Worlds"],
     ["Le dragon des Worlds 2017", "L", "Moment", "League of Legends", 2017, "Un dragon en réalité augmentée survole le Nid d'Oiseau pendant la cérémonie d'ouverture"],
     ["Luminosity — Le premier Major brésilien", "L", "Moment", "Counter-Strike", 2016, "Le Brésil soulève son premier Major de CS:GO, à la MLG Columbus"],
     ["Gwangalli 2004 — 100 000 fans pour StarCraft", "L", "Moment", "StarCraft: Brood War", 2004, "Une finale de Proleague sur la plage de Busan, devant environ 100 000 spectateurs"],
@@ -297,7 +297,7 @@ window.ORIGINES = {
     ["SK Telecom T1 — Le doublé mondial", "L", "Moment", "League of Legends", "2015-2016", "SK Telecom T1 champion du monde en 2015 puis en 2016"],
     ["Cloud9 — Le premier Major américain", "L", "Moment", "Counter-Strike", 2018, "Cloud9 bat FaZe Clan en finale du Major de Boston"],
     ["Fatal1ty — Le premier pro gamer star", "L", "Joueur", "Quake", "Années 2000", "Le premier joueur pro connu dans le monde entier"],
-    ["Faker — Champion du monde", "L", "Joueur", "League of Legends", null, "Le plus grand joueur de LoL"],
+    ["Team Liquid — Le sacre de TI7", "L", "Moment", "Dota 2", 2017, "Team Liquid bat Newbee 3-0 en finale, et KuroKy soulève enfin l'Aegis"],
     ["Fnatic — Champions du monde Saison 1", "S", "Moment", "League of Legends", 2011, "Fnatic remporte les tout premiers Worlds de LoL, à la DreamHack"],
     ["Na'Vi — Le premier The International", "S", "Moment", "Dota 2", 2011, "Na'Vi remporte le premier The International et 1 million de dollars"],
     ["Thresh — La Ferrari de Carmack", "S", "Moment", "Quake", 1997, "Thresh gagne la Ferrari de John Carmack au tournoi Red Annihilation"],
@@ -318,10 +318,14 @@ window.ORIGINES = {
     ["La Coupe de l'Invocateur", "S", "Trophée", "League of Legends", null, "Le trophée des Worlds de LoL"],
     ["L'Aegis des Champions", "S", "Trophée", "Dota 2", null, "Le trophée de The International"],
     ["Le trophée du Major", "S", "Trophée", "Counter-Strike", null, "Le trophée des Majors de CS"],
-    ["Faker — Six fois champion du monde", "S", "Joueur", "League of Legends", "2013-2025", "2013, 2015, 2016, 2023, 2024 et 2025"],
+    ["Vitality — La saison record", "S", "Moment", "Counter-Strike", 2025, "Deux Majors, Austin et Budapest, et un record de 30 séries gagnées d'affilée"],
     ["T1 — Logo 6 étoiles", "S", "Logo de club", "League of Legends", 2025, "Six titres mondiaux"],
     ["Deft — Le rêve de DRX", "S", "Moment", "League of Legends", 2022, "Sortie des play-ins, DRX bat T1 en finale des Worlds 2022"],
     ["Spacewar! — Le tout premier tournoi", "S", "Moment", "Spacewar!", 1972, "Stanford, le premier tournoi de jeu vidéo"],
     ["Gotaga — Le Roi de Call of Duty", "S", "Joueur", "Call of Duty", null, "La légende française de CoD"]
+  ],
+  // GOAT : une seule carte, sans numéro, hors des 175
+  goat: [
+    ["Faker", "G", "Joueur", "League of Legends", "2013-2025", "Six fois champion du monde : 2013, 2015, 2016, 2023, 2024 et 2025"]
   ]
 };
