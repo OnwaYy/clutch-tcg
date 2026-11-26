@@ -142,10 +142,10 @@ window.ORIGINES = {
     "Worlds 2017 — Nid d'Oiseau": {"img": "assets/cartes/worlds-2017-nid-d-oiseau.jpg", "color": "#1f3a6a", "photo": true},
     "Worlds 2019 — Paris": {"img": "assets/cartes/worlds-2019-paris.jpg", "color": "#e8332a", "photo": true},
     "TI4 — KeyArena": {"img": "assets/cartes/ti4-keyarena.jpg", "color": "#2d9fd8", "photo": true},
-    "Faker — Les larmes de 2017": {"img": "assets/cartes/faker-les-larmes-de-2017.jpg", "color": "#e2012d", "photo": true},
     "Le dragon des Worlds 2017": {"img": "assets/cartes/le-dragon-des-worlds-2017.jpg", "color": "#2a3f8a", "photo": true},
     "Luminosity — Le premier Major brésilien": {"img": "assets/cartes/luminosity-le-premier-major-bresilien.jpg", "color": "#1f6fd1", "photo": true},
-    "Jaedong": {"img": "assets/cartes/jaedong.jpg", "color": "#1f3a8a", "photo": true}
+    "Jaedong": {"img": "assets/cartes/jaedong.jpg", "color": "#1f3a8a", "photo": true},
+    "Faker — Les larmes de 2017": {"img": "assets/cartes/faker-les-larmes-de-2017.jpg", "color": "#e2012d", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
