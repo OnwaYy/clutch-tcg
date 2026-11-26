@@ -22,7 +22,9 @@
     --c-rare: #4fa8ff;
     --c-epic: #b46bff;
     --c-legend: #f2c25b;
-    --c-secret: #ff7ad9;
+    --c-uncommon: #4fd1c5;
+    --c-mythic: #ff7ad9;
+    --c-ultimate: #ff5a4d;
     --ok: #5fd39a;
     --bad: #ff6b7a;
     --f-display: 'Oxanium', 'Segoe UI', system-ui, sans-serif;
@@ -175,12 +177,12 @@
   .pack.shake { animation: shake .5s !important; }
   @keyframes shake { 20%,60% { translate: -6px 0; rotate: -2deg; } 40%,80% { translate: 6px 0; rotate: 2deg; } }
 
-  .odds { display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
-  .odd { padding: 14px 16px; display: grid; gap: 4px; border-right: 1px solid var(--line); position: relative; }
+  .odds { display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+  .odd { padding: 14px 14px 14px 16px; min-width: 0; display: grid; gap: 4px; border-right: 1px solid var(--line); position: relative; }
   .odd:last-child { border-right: 0; }
   .odd::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--r); }
   .odd-name { font-family: var(--f-display); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--r); }
-  .odd-pct { font-family: var(--f-mono); font-size: 22px; font-variant-numeric: tabular-nums; }
+  .odd-pct { font-family: var(--f-mono); font-size: 20px; font-variant-numeric: tabular-nums; }
   .odd-note { color: var(--muted); font-size: 13px; }
 
   .home-grid { display: grid; grid-template-columns: 1fr 1.35fr; gap: 20px; padding-block: 28px 48px; }
@@ -256,6 +258,10 @@
   .stamp { display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); font-family: var(--f-mono); font-size: 12px; color: var(--gold); white-space: nowrap; }
   .stamp svg { width: 16px; height: 16px; }
   .stamp .ed1 { font-family: var(--f-display); font-weight: 800; font-size: 10px; letter-spacing: .12em; padding: 2px 6px; border-radius: 3px; border: 1px solid var(--gold); }
+  #homeGames { gap: 8px; }
+  #homeGames .game { grid-template-columns: 32px 1fr auto; padding: 8px 12px; gap: 12px; }
+  #homeGames .game .track { margin-top: 4px; }
+  #homeGames .r-ico { width: 32px; height: 32px; font-size: 13px; border-radius: 8px; }
   .r-ico { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: 16px; color: var(--g); background: color-mix(in srgb, var(--g) 14%, var(--panel)); border: 1px solid color-mix(in srgb, var(--g) 40%, transparent); }
   .slot-r { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--r); }
 
@@ -300,6 +306,11 @@
   footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
   footer .wrap { padding-block: 20px; display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; }
 
+  @media (max-width: 1100px) and (min-width: 901px) {
+    .odds { grid-template-columns: repeat(4, 1fr); }
+    .odd:nth-child(4n) { border-right: 0; }
+    .odd:nth-child(-n+4) { border-bottom: 1px solid var(--line); }
+  }
   @media (max-width: 900px) {
     .hero { grid-template-columns: 1fr; gap: 8px; padding-block: 24px 20px; }
     .stage { min-height: 340px; order: -1; }
@@ -307,19 +318,21 @@
     .set-list, .shop { grid-template-columns: 1fr; }
     .odds { grid-template-columns: repeat(2, 1fr); }
     .odd:nth-child(2n) { border-right: 0; }
-    .odd:nth-child(-n+4) { border-bottom: 1px solid var(--line); }
+    .odd:not(:last-child) { border-bottom: 1px solid var(--line); }
     .odd:last-child { grid-column: 1 / -1; }
   }
-  @media (max-width: 760px) {
+  @media (max-width: 1040px) {
     nav { display: none; }
     .menu-btn { display: grid; place-items: center; }
-    .bar { gap: 12px; justify-content: space-between; }
-    .chip.shards { display: none; }
-    .logo { font-size: 16px; gap: 8px; letter-spacing: .08em; }
-    .wallet { gap: 6px; }
     nav.open { display: grid; position: absolute; top: 64px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 8px max(16px, env(safe-area-inset-left,0px)); }
     nav a[aria-current="page"]::after { display: none; }
     nav a[aria-current="page"] { background: var(--panel); }
+    .bar { gap: 12px; justify-content: space-between; }
+  }
+  @media (max-width: 760px) {
+    .chip.shards { display: none; }
+    .logo { font-size: 16px; gap: 8px; letter-spacing: .08em; }
+    .wallet { gap: 6px; }
     .slots { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; }
   }
   @media (prefers-reduced-motion: reduce) { .pack, .stage .pack, .live-dot { animation: none !important; } }
@@ -383,13 +396,7 @@
     </section>
 
     <section class="wrap" aria-label="Taux d'obtention">
-      <div class="odds">
-        <div class="odd" style="--r:var(--c-common)"><span class="odd-name">Commune</span><span class="odd-pct">70 %</span><span class="odd-note">Joueurs, équipes, moments</span></div>
-        <div class="odd" style="--r:var(--c-rare)"><span class="odd-name">Rare</span><span class="odd-pct">22 %</span><span class="odd-note">Stars, cadre argenté</span></div>
-        <div class="odd" style="--r:var(--c-epic)"><span class="odd-name">Épique</span><span class="odd-pct">7 %</span><span class="odd-note">MVP, effet holo</span></div>
-        <div class="odd" style="--r:var(--c-legend)"><span class="odd-name">Légendaire</span><span class="odd-pct">0,8 %</span><span class="odd-note">Moments historiques</span></div>
-        <div class="odd" style="--r:var(--c-secret)"><span class="odd-name">Secrète</span><span class="odd-pct">0,2 %</span><span class="odd-note">Hors numérotation, 151 à 175</span></div>
-      </div>
+      <div class="odds" id="odds"></div>
     </section>
 
     <section class="wrap home-grid">
@@ -402,13 +409,7 @@
         <div class="panel-head"><h2>Ma collection</h2><a href="#collection">Tout voir →</a></div>
         <div><span class="stamp"><svg><use href="#sym-ori"/></svg>Origines · <span data-bind="owned">0</span>/<span data-bind="catalog">0</span><span class="ed1">ÉDITION 1</span></span></div>
         <div class="rarity-mix" aria-hidden="true"></div>
-        <div class="legend">
-          <span style="--r:var(--c-common)"><i></i>Communes 0</span>
-          <span style="--r:var(--c-rare)"><i></i>Rares 0</span>
-          <span style="--r:var(--c-epic)"><i></i>Épiques 0</span>
-          <span style="--r:var(--c-legend)"><i></i>Légendaires 0</span>
-          <span style="--r:var(--c-secret)"><i></i>Secrètes 0</span>
-        </div>
+        <div class="legend" id="homeLegend"></div>
         <div class="games" id="homeGames"></div>
       </div>
 
@@ -526,7 +527,7 @@
     <div class="wrap page-head">
       <div>
         <h1>Classement</h1>
-        <p>Score de collection : commune 1 pt, rare 3 pts, épique 10 pts, légendaire 50 pts, secrète 100 pts. Les autres joueurs sont des exemples.</p>
+        <p>Score de collection : commune 1 pt, peu commune 2, rare 5, épique 15, légendaire 50, mythique 100, ultime 250. Les autres joueurs sont des exemples.</p>
       </div>
       <div class="seg" id="boardTabs">
         <button aria-pressed="true" data-board="score">Score</button>
@@ -601,24 +602,24 @@
     { id: 'ori', code: 'ORI', name: 'Origines', edition: 'Édition 1', desc: 'Les grands moments de l\'histoire de l\'e-sport', games: 'Tous les jeux', size: 150, secret: 25, status: 'on', note: 'Série de base', c: '#f2c25b', p: ['#2b1d5e', '#4b2a8c', '#1a1238'], edge: ['#f2c25b', '#8c6420'] }
   ];
   const STATUS = { on: 'Disponible', soon: 'Bientôt', off: 'Terminée' };
+  // Raretés : les 4 premières dans la numérotation (001 à 150), les 3 dernières sont secrètes (151 à 175)
   const RAR = [
-    { id: 'common', name: 'Commune', color: 'var(--c-common)', pts: 1 },
-    { id: 'rare', name: 'Rare', color: 'var(--c-rare)', pts: 3 },
-    { id: 'epic', name: 'Épique', color: 'var(--c-epic)', pts: 10 },
-    { id: 'legend', name: 'Légendaire', color: 'var(--c-legend)', pts: 50 },
-    { id: 'secret', name: 'Secrète', color: 'var(--c-secret)', pts: 100 }
+    { id: 'common', name: 'Commune', color: 'var(--c-common)', pts: 1, odds: '50 %', note: 'Joueurs, équipes' },
+    { id: 'uncommon', name: 'Peu commune', color: 'var(--c-uncommon)', pts: 2, odds: '30 %', note: 'Joueurs confirmés' },
+    { id: 'rare', name: 'Rare', color: 'var(--c-rare)', pts: 5, odds: '12 %', note: 'Stars, cadre argenté' },
+    { id: 'epic', name: 'Épique', color: 'var(--c-epic)', pts: 15, odds: '6 %', note: 'MVP, effet holo' },
+    { id: 'legend', name: 'Légendaire', color: 'var(--c-legend)', pts: 50, odds: '1,5 %', note: 'Secrète · moments historiques' },
+    { id: 'mythic', name: 'Mythique', color: 'var(--c-mythic)', pts: 100, odds: '0,4 %', note: 'Secrète · art spécial' },
+    { id: 'ultimate', name: 'Ultime', color: 'var(--c-ultimate)', pts: 250, odds: '0,1 %', note: 'Secrète · carte dorée' }
   ];
   const PRICE = 500, PRICE5 = 2250, FREE_EVERY = 4 * 3600 * 1000;
   // Catalogue : emplacements vides, rareté répartie par extension
+  // Nombre de cartes par rareté, dans l'ordre de numérotation (proportions inspirées de Pokémon 151)
+  const BANDS = [['common', 50], ['uncommon', 45], ['rare', 30], ['epic', 25], ['legend', 18], ['mythic', 5], ['ultimate', 2]];
   const CATALOG = [];
   SETS.forEach(function (s) {
-    for (let i = 0; i < s.size; i++) {
-      const fromEnd = s.size - i;
-      const r = fromEnd <= 6 ? 'legend' : fromEnd <= 21 ? 'epic' : fromEnd <= 60 ? 'rare' : 'common';
-      CATALOG.push({ set: s.id, num: i + 1, rarity: r });
-    }
-    // Cartes secrètes : numérotées au-delà du total (ex. 151/150)
-    for (let j = 1; j <= (s.secret || 0); j++) CATALOG.push({ set: s.id, num: s.size + j, rarity: 'secret' });
+    let num = 1;
+    BANDS.forEach(function (b) { for (let i = 0; i < b[1]; i++) CATALOG.push({ set: s.id, num: num++, rarity: b[0] }); });
   });
   const SAMPLE_BOARD = [
     ['NeoFaker', 1240, 9, 310], ['Sp1ke', 1105, 8, 296], ['MidOrFeed', 980, 6, 288], ['Lunaa', 870, 5, 260],
@@ -712,6 +713,13 @@
     '<div><h3>Séries d\'événement</h3><div class="set-meta"><span>Disponibles seulement pendant un event e-sport</span><span>Aucun event en cours</span></div></div></div>';
   function renderHome() {
     const s = SETS[0];
+    $('#odds').innerHTML = RAR.map(function (r) {
+      return '<div class="odd" style="--r:' + r.color + '"><span class="odd-name">' + r.name + '</span><span class="odd-pct">' + r.odds + '</span><span class="odd-note">' + r.note + '</span></div>';
+    }).join('');
+    $('#homeLegend').innerHTML = RAR.map(function (r) {
+      const have = CATALOG.filter(function (c) { return c.rarity === r.id && S.cards[c.set + '-' + c.num]; }).length;
+      return '<span style="--r:' + r.color + '"><i></i>' + r.name + 's ' + have + '</span>';
+    }).join('');
     $('#homeGames').innerHTML = RAR.slice().reverse().map(function (r) {
       const total = CATALOG.filter(function (c) { return c.set === s.id && c.rarity === r.id; }).length;
       const have = CATALOG.filter(function (c) { return c.set === s.id && c.rarity === r.id && S.cards[c.set + '-' + c.num]; }).length;
