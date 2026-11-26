@@ -28,7 +28,8 @@ window.ORIGINES = {
     21: { img: 'assets/cartes/021.png', color: '#c46a4a', map: true },
     22: { img: 'assets/cartes/022.png', color: '#e3b23c', map: true },
     23: { img: 'assets/cartes/023.png', color: '#7f8f7a', map: true },
-    24: { img: 'assets/cartes/024.png', color: '#a08a55', map: true }
+    24: { img: 'assets/cartes/024.png', color: '#a08a55', map: true },
+    25: { img: 'assets/cartes/025.png', color: '#5a7fa8', map: true }
   },
   cards: [
     ['aAa', 'C', 'Logo de club', 'Multi-jeux', null, 'Club français historique'],
