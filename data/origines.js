@@ -96,7 +96,20 @@ window.ORIGINES = {
     "La Lanxess Arena": {"img": "assets/cartes/la-lanxess-arena.png", "color": "#7a3fb0", "map": true},
     "DreamHack — Jönköping": {"img": "assets/cartes/dreamhack-jonkoping.png", "color": "#b0302a", "map": true},
     "BlizzCon": {"img": "assets/cartes/blizzcon.png", "color": "#3a7fc0", "dark": true},
-    "Madlife": {"img": "assets/cartes/madlife.jpg", "color": "#2a3f8a", "photo": true}
+    "Madlife": {"img": "assets/cartes/madlife.jpg", "color": "#2a3f8a", "photo": true},
+    "Doublelift": {"img": "assets/cartes/doublelift.jpg", "color": "#1f3a6a", "photo": true},
+    "Ruler": {"img": "assets/cartes/ruler.jpg", "color": "#aa8a3a", "photo": true},
+    "Rookie": {"img": "assets/cartes/rookie.jpg", "color": "#2a3f8a", "photo": true},
+    "TheShy": {"img": "assets/cartes/theshy.jpg", "color": "#3a3a40", "photo": true},
+    "Chovy": {"img": "assets/cartes/chovy.jpg", "color": "#aa8a3a", "photo": true},
+    "Xyp9x": {"img": "assets/cartes/xyp9x.jpg", "color": "#e2161e", "photo": true},
+    "NiKo": {"img": "assets/cartes/niko.jpg", "color": "#1f8a4a", "photo": true},
+    "dupreeh": {"img": "assets/cartes/dupreeh.jpg", "color": "#f5c935", "photo": true},
+    "gla1ve": {"img": "assets/cartes/gla1ve.jpg", "color": "#e0a020", "photo": true},
+    "ScreaM": {"img": "assets/cartes/scream.jpg", "color": "#3a3a40", "photo": true},
+    "Miracle-": {"img": "assets/cartes/miracle.jpg", "color": "#2a4f9a", "photo": true},
+    "Ceb": {"img": "assets/cartes/ceb.jpg", "color": "#1f3a4a", "photo": true},
+    "Ana": {"img": "assets/cartes/ana.jpg", "color": "#1f3a4a", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
