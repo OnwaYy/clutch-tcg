@@ -374,7 +374,11 @@
   .cc-band.fr::before { background: linear-gradient(#2a5bb3 33.3%, #ffffff 33.3% 66.6%, #e0453a 66.6%); }
   .cc-band h3 { font: italic 700 calc(var(--u) * 7.6)/1.05 'Oswald', sans-serif; text-wrap: balance; }
   .cc-band p { font: 600 calc(var(--u) * 3) 'Barlow', sans-serif; letter-spacing: .14em; text-transform: uppercase; opacity: .72; margin-top: calc(var(--u) * 1); }
-  .cc-band p.cc-story { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: calc(var(--u) * 3.2); line-height: 1.3; opacity: .9; margin-top: calc(var(--u) * 1.4); text-wrap: pretty; }
+  .cc-band p.cc-story { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: calc(var(--u) * 3); line-height: 1.25; opacity: .9; margin-top: calc(var(--u) * .8); text-wrap: pretty;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .cc-band.has-story { padding-top: calc(var(--u) * 2); padding-bottom: calc(var(--u) * 1.8); }
+  .cc-band.has-story h3 { font-size: calc(var(--u) * 7); }
+  .cc-band h3 small { font: 600 calc(var(--u) * 2.8) 'Barlow', sans-serif; font-style: normal; letter-spacing: .12em; text-transform: uppercase; opacity: .7; margin-left: calc(var(--u) * 1); white-space: nowrap; }
   .cc-foot { display: flex; justify-content: space-between; align-items: center; gap: calc(var(--u) * 2); padding: 0 calc(var(--u) * 1); font: 600 calc(var(--u) * 3) 'Barlow', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--foot); }
   .cc-foot > span:first-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cc-set { display: flex; align-items: center; gap: calc(var(--u) * 1.4); color: var(--foot-strong); white-space: nowrap; }
@@ -942,8 +946,8 @@
       (c.img ? '<img' + (c.map ? ' class="is-map' + (c.fade ? ' is-fade' : '') + '"' : c.player ? ' class="is-player"' : c.photo ? ' class="is-photo"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
       '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>' +
       '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-stamp">ÉDITION 1</span>' + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
-      '<div class="cc-band' + (fr ? ' fr' : '') + '"><h3>' + esc(title) + '</h3><p>' + esc(subLine) + '</p>' + (story ? '<p class="cc-story">' + esc(story) + '</p>' : '') + '</div>' +
-      '<div class="cc-foot"><span>' + esc(c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + n3(c.num) + '/' + s.size + '<i></i></span></div></div>';
+      '<div class="cc-band' + (fr ? ' fr' : '') + (story ? ' has-story' : '') + '">' + (story ? '<h3>' + esc(title) + '</h3><p class="cc-story">' + esc(story) + '</p>' : '<h3>' + esc(title) + '</h3><p>' + esc(subLine) + '</p>') + '</div>' +
+      '<div class="cc-foot"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + n3(c.num) + '/' + s.size + '<i></i></span></div></div>';
   }
   // Finition selon la rareté
   const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic' };
