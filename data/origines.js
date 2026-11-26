@@ -152,7 +152,7 @@ window.ORIGINES = {
     "Invictus Gaming — Le premier sacre chinois": {"img": "assets/cartes/invictus-gaming-le-premier-sacre-chinois.jpg", "color": "#3a6fd8", "photo": true},
     "Team Spirit — Le miracle de TI10": {"img": "assets/cartes/team-spirit-le-miracle-de-ti10.jpg", "color": "#d6a93a", "photo": true},
     "Taipei Assassins — Le hold-up": {"img": "assets/cartes/taipei-assassins-le-hold-up.jpg", "color": "#c8102e", "photo": true},
-    "ROX Tigers — Les Tigres": {"img": "assets/cartes/rox-tigers-les-tigres-de-2016.jpg", "color": "#e0a43a", "photo": true}
+    "ROX Tigers — Les Tigres": {"img": "assets/cartes/rox-tigers-les-tigres.jpg", "color": "#e0a43a", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
