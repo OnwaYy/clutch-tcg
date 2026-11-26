@@ -151,7 +151,8 @@ window.ORIGINES = {
     "Evil Geniuses — Champions de TI5": {"img": "assets/cartes/evil-geniuses-champions-de-ti5.jpg", "color": "#1d3c6e", "photo": true},
     "Invictus Gaming — Le premier sacre chinois": {"img": "assets/cartes/invictus-gaming-le-premier-sacre-chinois.jpg", "color": "#3a6fd8", "photo": true},
     "Team Spirit — Le miracle de TI10": {"img": "assets/cartes/team-spirit-le-miracle-de-ti10.jpg", "color": "#d6a93a", "photo": true},
-    "Taipei Assassins — Le hold-up": {"img": "assets/cartes/taipei-assassins-le-hold-up.jpg", "color": "#c8102e", "photo": true}
+    "Taipei Assassins — Le hold-up": {"img": "assets/cartes/taipei-assassins-le-hold-up.jpg", "color": "#c8102e", "photo": true},
+    "ROX Tigers — Les Tigres": {"img": "assets/cartes/rox-tigers-les-tigres-de-2016.jpg", "color": "#e0a43a", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
@@ -292,7 +293,7 @@ window.ORIGINES = {
     ["Worlds 2017 — Nid d'Oiseau", "E", "Événement", "League of Legends", 2017, "Samsung Galaxy bat SK Telecom T1 en finale, à Pékin"],
     ["Worlds 2019 — Paris", "E", "Événement", "League of Legends", 2019, "FunPlus Phoenix bat G2 Esports 3-0 en finale, à Paris"],
     ["TI4 — KeyArena", "E", "Événement", "Dota 2", 2014, "Newbee remporte The International et l'Aegis, à Seattle"],
-    ["ROX Tigers — Les Tigres de 2016", "L", "Équipe", "League of Legends", 2016, "Champions de LCK, ils poussent SK Telecom T1 jusqu'au 5e match en demi-finale des Worlds"],
+    ["ROX Tigers — Les Tigres", "L", "Équipe", "League of Legends", 2016, "Champions de LCK, ils poussent SK Telecom T1 jusqu'au 5e match en demi-finale des Worlds"],
     ["Le dragon des Worlds 2017", "L", "Moment", "League of Legends", 2017, "Un dragon en réalité augmentée survole le Nid d'Oiseau pendant la cérémonie d'ouverture"],
     ["Luminosity — Le premier Major brésilien", "L", "Moment", "Counter-Strike", 2016, "Le Brésil soulève son premier Major de CS:GO, à la MLG Columbus"],
     ["Fortnite World Cup — Arthur Ashe Stadium", "L", "Événement", "Fortnite", 2019, "Le stade de l'US Open de tennis, à New York, accueille la finale et ses 30 millions de dollars de prix"],
