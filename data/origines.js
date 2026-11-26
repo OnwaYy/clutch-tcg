@@ -145,7 +145,13 @@ window.ORIGINES = {
     "Le dragon des Worlds 2017": {"img": "assets/cartes/le-dragon-des-worlds-2017.jpg", "color": "#2a3f8a", "photo": true},
     "Luminosity — Le premier Major brésilien": {"img": "assets/cartes/luminosity-le-premier-major-bresilien.jpg", "color": "#1f6fd1", "photo": true},
     "Jaedong": {"img": "assets/cartes/jaedong.jpg", "color": "#1f3a8a", "photo": true},
-    "Faker": {"img": "assets/cartes/faker.png", "color": "#e2012d", "player": true}
+    "SK Telecom T1 — Le doublé mondial": {"img": "assets/cartes/sk-telecom-t1-le-double-mondial.jpg", "color": "#e2012d", "photo": true},
+    "Faker": {"img": "assets/cartes/faker.png", "color": "#e2012d", "player": true},
+    "Fortnite World Cup — Arthur Ashe Stadium": {"img": "assets/cartes/fortnite-world-cup-arthur-ashe-stadium.jpg", "color": "#5b3df5", "photo": true},
+    "Evil Geniuses — Champions de TI5": {"img": "assets/cartes/evil-geniuses-champions-de-ti5.jpg", "color": "#1d3c6e", "photo": true},
+    "Invictus Gaming — Le premier sacre chinois": {"img": "assets/cartes/invictus-gaming-le-premier-sacre-chinois.jpg", "color": "#3a6fd8", "photo": true},
+    "Team Spirit — Le miracle de TI10": {"img": "assets/cartes/team-spirit-le-miracle-de-ti10.jpg", "color": "#d6a93a", "photo": true},
+    "Taipei Assassins — Le hold-up": {"img": "assets/cartes/taipei-assassins-le-hold-up.jpg", "color": "#c8102e", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
