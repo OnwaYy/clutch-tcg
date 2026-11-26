@@ -351,6 +351,45 @@
   .cc.e-epic .cc-foot { color: #b9a3e0; }
   .cc.e-epic .cc-set { color: #f1d9ff; }
   .cc.e-epic .cc-set i { background: #b57bff; }
+
+  /* ---------- Légendaire : full art, cadre or, holo doré, reflet qui balaie ---------- */
+  .cc.l-legend { padding: 1.6%; background: linear-gradient(135deg, #fff2c4 0%, #d4a23a 18%, #7a4f12 34%, #ffe08a 50%, #a8741d 66%, #fff3c9 82%, #c8901f 100%); background-size: 240% 240%; background-position: var(--mx, 50%) var(--my, 50%); }
+  .cc.l-legend .cc-panel { position: relative; padding: 0; gap: 0; border-radius: 4.4% / 3.15%; overflow: hidden; background: #120c06; }
+  .cc.l-legend .cc-photo { grid-row: 1 / -1; grid-column: 1; border-radius: 0; box-shadow: none; }
+  .cc.l-legend .cc-photo::before, .cc.l-legend .cc-ghost { display: none; }
+  .cc.l-legend .cc-panel::before { content: ""; grid-row: 1 / -1; grid-column: 1; align-self: end; height: 62%; z-index: 2; pointer-events: none;
+    background: linear-gradient(to top, rgba(12,7,2,.97) 0%, rgba(12,7,2,.88) 28%, rgba(12,7,2,.55) 55%, rgba(12,7,2,.18) 80%, rgba(12,7,2,0) 100%); }
+  .cc.l-legend .cc-band, .cc.l-legend .cc-foot { grid-column: 1; z-index: 3; }
+  .cc.l-legend .cc-band { grid-row: 2; }
+  .cc.l-legend .cc-foot { grid-row: 3; }
+  .cc.l-legend .cc-band { background: none; padding: 0 calc(var(--u) * 5.5) calc(var(--u) * 1.4); }
+  .cc.l-legend .cc-band::before, .cc.l-legend .cc-band::after { display: none; }
+  .cc.l-legend .cc-band h3 { font-size: calc(var(--u) * 8.6); background: linear-gradient(180deg, #fff6d6 0%, #f3cf6a 50%, #c08a25 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 calc(var(--u) * .4) 0 rgba(0,0,0,.6)); }
+  .cc.l-legend .cc-band p { color: #f4e6c4; opacity: .95; }
+  .cc.l-legend .cc-foot { padding: calc(var(--u) * 1.6) calc(var(--u) * 5.5) calc(var(--u) * 4.4); color: #d9bf86; border-top: 1px solid rgba(255,214,120,.25); margin: 0 calc(var(--u) * 4); padding-left: calc(var(--u) * 1.5); padding-right: calc(var(--u) * 1.5); }
+  .cc.l-legend .cc-set { color: #ffe7a8; }
+  .cc.l-legend .cc-set i { background: #f2c25b; box-shadow: 0 0 calc(var(--u) * 1.5) #f2c25b; }
+  .cc.l-legend .cc-num { z-index: 4; top: calc(var(--u) * 4.5); left: calc(var(--u) * 4.5); background: linear-gradient(135deg, #fff2c4, #d4a23a 45%, #8a5a14); color: #1c1206; box-shadow: 0 calc(var(--u) * .6) calc(var(--u) * 2) rgba(0,0,0,.5); }
+  .cc.l-legend .cc-tag { z-index: 4; top: calc(var(--u) * 5); right: calc(var(--u) * 4.5); }
+  .cc.l-legend .cc-stamp { z-index: 4; bottom: auto; top: calc(var(--u) * 13); right: calc(var(--u) * 4.5); transform: rotate(-8deg); border-color: #ffe08a; color: #ffe08a; mix-blend-mode: normal; background: rgba(20,12,4,.55); }
+  /* holo doré */
+  .cc.l-legend .cc-photo::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: repeating-linear-gradient(115deg, #fff4c8 0%, #f2c25b 7%, #ff9f6b 14%, #ffe59a 21%, #fff 26%, #fff4c8 30%);
+    background-size: 280% 280%; background-position: var(--mx, 50%) var(--my, 50%); mix-blend-mode: soft-light; opacity: .45; }
+  .cc.big.l-legend .cc-photo::after { opacity: calc(.3 + var(--o, 0) * .35); transition: opacity .2s; }
+  /* cadre gravé intérieur */
+  .cc.l-legend::after { content: ""; position: absolute; inset: 3.4%; border-radius: 3.6% / 2.6%; z-index: 5; pointer-events: none;
+    border: 1px solid rgba(255,228,150,.75); box-shadow: 0 0 0 1px rgba(0,0,0,.35), inset 0 0 calc(var(--u) * 3) rgba(255,200,90,.15); }
+  /* reflet qui balaie la carte (en grand seulement) */
+  .cc.big.l-legend .cc-panel > .cc-glint { position: absolute; inset: 0; z-index: 6; pointer-events: none; mix-blend-mode: overlay;
+    background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.75) 50%, transparent 60%) no-repeat; background-size: 250% 100%;
+    animation: glint 3.6s ease-in-out infinite; }
+  @keyframes glint { 0% { background-position: 150% 0; } 55%, 100% { background-position: -50% 0; } }
+  .cc.big.l-legend::before { content: ""; position: absolute; inset: -4px; border-radius: inherit; z-index: -1; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(255,200,90,.55), transparent); filter: blur(14px); animation: halo 3s ease-in-out infinite; }
+  @keyframes halo { 50% { opacity: .55; } }
+  @media (prefers-reduced-motion: reduce) { .cc.big.l-legend .cc-panel > .cc-glint, .cc.big.l-legend::before { animation: none; } }
   .cc-panel { height: 100%; border-radius: inherit; padding: calc(var(--u) * 3.4); overflow: hidden; display: grid; grid-template-rows: 1fr auto auto; gap: calc(var(--u) * 2.6); background: linear-gradient(160deg, var(--p1), var(--p2)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
   .cc-photo { position: relative; border-radius: calc(var(--u) * 2.4); overflow: hidden; display: grid; place-items: center; min-height: 0;
     background: linear-gradient(115deg, transparent 58%, rgba(255,255,255,.14) 58% 72%, transparent 72%), radial-gradient(80% 70% at 45% 40%, var(--ph1), var(--ph2)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
@@ -950,7 +989,7 @@
       '<div class="cc-foot"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + n3(c.num) + '/' + s.size + '<i></i></span></div></div>';
   }
   // Finition selon la rareté
-  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic' };
+  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend' };
   const finish = function (c) { return FINISH[c.rarity] || ''; };
   function ownedSlot(c) {
     return '<button class="cc mini ' + finish(c) + '" data-card="' + c.num + '" style="' + cardStyle(c) + '" aria-label="' + esc(c.name) + '">' + cardInner(c) + '</button>';
@@ -961,6 +1000,7 @@
     el.className = 'cc big ' + finish(c);
     el.style.cssText = cardStyle(c);
     el.innerHTML = cardInner(c) + '<span class="cc-holo"></span><span class="cc-glare"></span>';
+    if (c.rarity === 'legend') el.querySelector('.cc-panel').insertAdjacentHTML('beforeend', '<span class="cc-glint"></span>');
     $('#bigRarity').textContent = r.name + (c.rarity !== 'common' ? ' · design à venir, modèle commune en attendant' : '');
     const mo = $('#cardModal'); mo.classList.add('open'); mo.setAttribute('aria-hidden', 'false');
     tiltReset();
