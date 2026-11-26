@@ -930,12 +930,15 @@
   function cardInner(c) {
     const s = setById(c.set);
     const fr = /fran[cç]/i.test((c.note || '') + ' ' + c.name);
-    const sub = [c.note, c.year].filter(Boolean).join(' · ') || c.type;
+    // « Nom — Sous-titre » : le nom en gros, le sous-titre en dessous
+    const parts = c.name.split(' — ');
+    const title = parts[0];
+    const sub = parts[1] ? parts[1] + (c.year ? ' · ' + c.year : '') : ([c.note, c.year].filter(Boolean).join(' · ') || c.type);
     return '<div class="cc-panel"><div class="cc-photo"><span class="cc-ghost">' + n3(c.num) + '</span>' +
       (c.img ? '<img' + (c.map ? ' class="is-map' + (c.fade ? ' is-fade' : '') + '"' : c.player ? ' class="is-player"' : c.photo ? ' class="is-photo"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
       '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>' +
       '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-stamp">ÉDITION 1</span>' + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
-      '<div class="cc-band' + (fr ? ' fr' : '') + '"><h3>' + esc(c.name) + '</h3><p>' + esc(sub) + '</p></div>' +
+      '<div class="cc-band' + (fr ? ' fr' : '') + '"><h3>' + esc(title) + '</h3><p>' + esc(sub) + '</p></div>' +
       '<div class="cc-foot"><span>' + esc(c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + n3(c.num) + '/' + s.size + '<i></i></span></div></div>';
   }
   // Finition selon la rareté
