@@ -70,7 +70,17 @@ window.ORIGINES = {
     "Fortnite": {"img": "assets/cartes/fortnite.png", "color": "#7b4dd6"},
     "Valorant": {"img": "assets/cartes/valorant.png", "color": "#ff4655"},
     "Street Fighter": {"img": "assets/cartes/street-fighter.png", "color": "#d4402a", "dark": true},
-    "Dota 2": {"img": "assets/cartes/dota-2.png", "color": "#b0281a", "dark": true}
+    "Dota 2": {"img": "assets/cartes/dota-2.png", "color": "#b0281a", "dark": true},
+    "Fnatic": {"img": "assets/cartes/fnatic.png", "color": "#f58c1b"},
+    "Team Liquid": {"img": "assets/cartes/team-liquid.png", "color": "#8fa6c8"},
+    "G2 Esports": {"img": "assets/cartes/g2-esports.png", "color": "#c8c9cf"},
+    "Cloud9": {"img": "assets/cartes/cloud9.png", "color": "#1e9be0"},
+    "Natus Vincere": {"img": "assets/cartes/natus-vincere.png", "color": "#f5e10a"},
+    "Team Vitality": {"img": "assets/cartes/team-vitality.png", "color": "#f5c935"},
+    "T1": {"img": "assets/cartes/t1.png", "color": "#e2012d"},
+    "Gen.G": {"img": "assets/cartes/gen-g.png", "color": "#aa8a3a"},
+    "FaZe Clan": {"img": "assets/cartes/faze-clan.png", "color": "#e2012d"},
+    "Astralis": {"img": "assets/cartes/astralis.png", "color": "#e2161e"}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
