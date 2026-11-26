@@ -301,7 +301,7 @@
   .cc-photo::before { content: ""; position: absolute; right: -8%; bottom: -10%; width: 55%; aspect-ratio: 1; background: radial-gradient(circle, rgba(28,27,34,.16) 1.1px, transparent 1.5px) 0 0 / calc(var(--u) * 2.4) calc(var(--u) * 2.4); -webkit-mask-image: radial-gradient(circle at 70% 70%, #000, transparent 70%); mask-image: radial-gradient(circle at 70% 70%, #000, transparent 70%); }
   .cc-ghost { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * -3); font: 800 calc(var(--u) * 38)/1 'Barlow Condensed', sans-serif; color: transparent; -webkit-text-stroke: calc(var(--u) * .45) var(--ghost, rgba(28,27,34,.24)); }
   .cc-photo img { position: relative; width: 84%; max-height: 66%; object-fit: contain; filter: drop-shadow(0 calc(var(--u) * 2.4) calc(var(--u) * 2.4) rgba(28,27,34,.22)); }
-  .cc-photo img.is-map { width: 86%; max-height: 76%; margin-top: 12%; filter: drop-shadow(0 calc(var(--u) * 1.2) calc(var(--u) * 1.6) rgba(28,27,34,.35)); }
+  .cc-photo img.is-map { border-radius: calc(var(--u) * 2); width: 86%; max-height: 76%; margin-top: 12%; filter: drop-shadow(0 calc(var(--u) * 1.2) calc(var(--u) * 1.6) rgba(28,27,34,.35)); }
   .cc-photo img.is-fade { width: 80%; max-height: 80%; margin-top: 10%; filter: none; mix-blend-mode: multiply; }
   .cc-todo { position: relative; display: grid; justify-items: center; gap: calc(var(--u) * 1); font: 600 calc(var(--u) * 3.4) 'Barlow', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: rgba(28,27,34,.55); }
   .cc-todo b { font: 800 calc(var(--u) * 22)/1 'Barlow Condensed', sans-serif; letter-spacing: 0; color: rgba(28,27,34,.75); }
