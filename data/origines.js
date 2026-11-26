@@ -50,11 +50,7 @@ window.ORIGINES = {
     "yay": {"img": "assets/cartes/yay.png", "color": "#c8202a", "player": true},
     "Crimsix": {"img": "assets/cartes/crimsix.png", "color": "#5cb82f", "player": true},
     "KuroKy": {"img": "assets/cartes/kuroky.png", "color": "#2f8be0", "player": true},
-    "Shroud": {"img": "assets/cartes/shroud.png", "color": "#2aa8e0", "player": true},
-    "WCG 2001 — Séoul": {"img": "assets/cartes/wcg-2001-seoul.jpg", "color": "#3a3a8c", "photo": true},
-    "Major de Katowice 2014": {"img": "assets/cartes/major-de-katowice-2014.jpg", "color": "#f26b1d", "photo": true},
-    "ESL One Cologne 2014": {"img": "assets/cartes/esl-one-cologne-2014.jpg", "color": "#c9a24a", "photo": true},
-    "MLG Columbus 2016": {"img": "assets/cartes/mlg-columbus-2016.jpg", "color": "#3d6fd6", "photo": true}
+    "Shroud": {"img": "assets/cartes/shroud.png", "color": "#2aa8e0", "player": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
@@ -103,10 +99,10 @@ window.ORIGINES = {
     ["Crimsix", "C", "Joueur", "Call of Duty", null, "Vétéran américain de Call of Duty"],
     ["KuroKy", "C", "Joueur", "Dota 2", null, "Joueur allemand de Dota 2"],
     ["Shroud", "C", "Joueur", "Counter-Strike", null, "Du pro au streaming"],
-    ["WCG 2001 — Séoul", "C", "Événement", "Multi-jeux", 2001, "La première édition"],
-    ["Major de Katowice 2014", "C", "Événement", "Counter-Strike", 2014, "Le Major CS:GO en Pologne"],
-    ["ESL One Cologne 2014", "C", "Événement", "Counter-Strike", 2014, "Le premier Major à Cologne"],
-    ["MLG Columbus 2016", "C", "Événement", "Counter-Strike", 2016, "Le premier Major aux États-Unis"],
+    ["Virtus.pro", "C", "Logo de club", "Multi-jeux", null, "Club russe"],
+    ["OpTic Gaming", "C", "Logo de club", "Multi-jeux", null, "Club américain, la « Green Wall »"],
+    ["Evil Geniuses", "C", "Logo de club", "Multi-jeux", null, "Club nord-américain fondé en 1999"],
+    ["Team Secret", "C", "Logo de club", "Dota 2", null, "Club européen de Dota 2"],
     ["Quake", "P", "Jeu", "Quake", 1996, "Le berceau du jeu compétitif"],
     ["StarCraft: Brood War", "P", "Jeu", "StarCraft", 1998, "Le sport national coréen"],
     ["Counter-Strike", "P", "Jeu", "Counter-Strike", 1999, "Le FPS compétitif de référence"],
