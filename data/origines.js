@@ -36,7 +36,17 @@ window.ORIGINES = {
     "100 Thieves": {"img": "assets/cartes/100-thieves.png", "color": "#e83232"},
     "FURIA": {"img": "assets/cartes/furia.png", "color": "#9a9aa2"},
     "MIBR": {"img": "assets/cartes/mibr.png", "color": "#c8c9cf"},
-    "Team EnVyUs": {"img": "assets/cartes/team-envyus.png", "color": "#3d6fb6"}
+    "Team EnVyUs": {"img": "assets/cartes/team-envyus.png", "color": "#3d6fb6"},
+    "ESL Pro League": {"img": "assets/cartes/esl-pro-league.png", "color": "#c8c9cf"},
+    "BLAST Premier": {"img": "assets/cartes/blast-premier.png", "color": "#c8c9cf"},
+    "Overwatch League": {"img": "assets/cartes/overwatch-league.png", "color": "#f99e1a"},
+    "Call of Duty League": {"img": "assets/cartes/call-of-duty-league.png", "color": "#c8c9cf"},
+    "Sneaky": {"img": "assets/cartes/sneaky.png", "color": "#2aa8e0", "player": true},
+    "Bwipo": {"img": "assets/cartes/bwipo.png", "color": "#f07a1a", "player": true},
+    "Stewie2K": {"img": "assets/cartes/stewie2k.png", "color": "#1b2a4a", "player": true},
+    "Twistzz": {"img": "assets/cartes/twistzz.png", "color": "#e3262e", "player": true},
+    "ropz": {"img": "assets/cartes/ropz.png", "color": "#f2c230", "player": true},
+    "Hiko": {"img": "assets/cartes/hiko.png", "color": "#2b6fb5", "player": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
