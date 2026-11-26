@@ -80,7 +80,22 @@ window.ORIGINES = {
     "T1": {"img": "assets/cartes/t1.png", "color": "#e2012d"},
     "Gen.G": {"img": "assets/cartes/gen-g.png", "color": "#aa8a3a"},
     "FaZe Clan": {"img": "assets/cartes/faze-clan.png", "color": "#e2012d"},
-    "Astralis": {"img": "assets/cartes/astralis.png", "color": "#e2161e"}
+    "Astralis": {"img": "assets/cartes/astralis.png", "color": "#e2161e"},
+    "Evo — Las Vegas": {"img": "assets/cartes/evo-las-vegas.png", "color": "#2a4fb0", "map": true},
+    "OGN": {"img": "assets/cartes/ogn.png", "color": "#1fb5a6"},
+    "Twitch": {"img": "assets/cartes/twitch.png", "color": "#6441a5"},
+    "Anders Blume": {"img": "assets/cartes/anders-blume.png", "color": "#1e2a44", "player": true},
+    "Tasteless & Artosis": {"img": "assets/cartes/tasteless-artosis.png", "color": "#2c3e8c", "player": true},
+    "Perkz": {"img": "assets/cartes/perkz.png", "color": "#d4a64a", "player": true},
+    "Bjergsen": {"img": "assets/cartes/bjergsen.png", "color": "#c8c9cf", "player": true},
+    "Arteezy": {"img": "assets/cartes/arteezy.png", "color": "#1f3a6a", "player": true},
+    "Gumayusi": {"img": "assets/cartes/gumayusi.png", "color": "#e2012d", "player": true},
+    "Ninjas in Pyjamas": {"img": "assets/cartes/ninjas-in-pyjamas.png", "color": "#a8c800", "dark": true},
+    "SK Gaming": {"img": "assets/cartes/sk-gaming.png", "color": "#c8c9cf"},
+    "IEM Katowice — Le Spodek": {"img": "assets/cartes/iem-katowice-le-spodek.png", "color": "#6f8fb5", "map": true},
+    "La Lanxess Arena": {"img": "assets/cartes/la-lanxess-arena.png", "color": "#7a3fb0", "map": true},
+    "DreamHack — Jönköping": {"img": "assets/cartes/dreamhack-jonkoping.png", "color": "#b0302a", "map": true},
+    "BlizzCon": {"img": "assets/cartes/blizzcon.png", "color": "#3a7fc0", "dark": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
