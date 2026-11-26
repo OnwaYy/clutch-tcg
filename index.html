@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clutch TCG</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700;800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  body { margin: 0; }
+  img { max-width: 100%; }
+
+  /* Layout : barre de jeu en haut, zone booster en héros, puis colonnes quêtes / collection / extensions */
+  :root {
+    color-scheme: dark;
+    --bg: #0b0a14;
+    --panel: #141224;
+    --panel-2: #1b1830;
+    --line: #2b2745;
+    --fg: #ece8f7;
+    --muted: #9a93b8;
+    --gold: #f2c25b;
+    --gold-deep: #b9822a;
+    --c-common: #a7a3b8;
+    --c-rare: #4fa8ff;
+    --c-epic: #b46bff;
+    --c-legend: #f2c25b;
+    --ok: #5fd39a;
+    --f-display: 'Oxanium', 'Segoe UI', system-ui, sans-serif;
+    --f-body: 'Barlow', 'Segoe UI', system-ui, sans-serif;
+    --f-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background:
+      radial-gradient(1200px 500px at 70% -10%, rgba(242,194,91,.10), transparent 60%),
+      radial-gradient(900px 500px at 0% 20%, rgba(124,74,255,.12), transparent 60%),
+      var(--bg);
+    color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.5;
+    min-height: 100vh;
+  }
+  body::before { content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--bg); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left,0px)); padding-right: max(16px, env(safe-area-inset-right,0px)); }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  h1,h2,h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; letter-spacing: .01em; }
+  .eyebrow { font-family: var(--f-display); font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+
+  /* ---------- Barre du haut ---------- */
+  header {
+    position: sticky; top: env(safe-area-inset-top,0px); z-index: 20;
+    background: rgba(11,10,20,.86); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar { display: flex; align-items: center; gap: 24px; height: 64px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 800; font-size: 20px; letter-spacing: .12em; }
+  .logo-mark { width: 28px; height: 28px; position: relative; }
+  .logo-mark::before, .logo-mark::after { content:""; position:absolute; width:18px; height:24px; border-radius:3px; border:2px solid var(--gold); }
+  .logo-mark::before { left:0; top:4px; transform: rotate(-12deg); opacity:.55; }
+  .logo-mark::after { right:0; top:0; transform: rotate(8deg); background: linear-gradient(160deg, rgba(242,194,91,.35), transparent); }
+  .logo b { color: var(--gold); }
+  nav { display: flex; gap: 4px; flex: 1; }
+  nav a {
+    font-family: var(--f-display); font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none; padding: 8px 12px; border-radius: 6px; position: relative;
+  }
+  nav a:hover { color: var(--fg); background: var(--panel); }
+  nav a[aria-current="page"] { color: var(--fg); }
+  nav a[aria-current="page"]::after { content:""; position:absolute; left:12px; right:12px; bottom:-14px; height:2px; background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+  .wallet { display: flex; align-items: center; gap: 8px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px;
+    background: var(--panel); border: 1px solid var(--line); font-family: var(--f-mono); font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .coin { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff1c4, var(--gold) 45%, var(--gold-deep)); box-shadow: 0 0 6px rgba(242,194,91,.5); }
+  .shard { width: 12px; height: 12px; transform: rotate(45deg); background: linear-gradient(135deg, #e9d4ff, var(--c-epic)); }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center;
+    background: linear-gradient(135deg, #2a2050, #17132a); border: 1px solid var(--line);
+    font-family: var(--f-display); font-weight: 800; font-size: 14px; color: var(--gold);
+  }
+  .menu-btn { display: none; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; width: 38px; height: 38px; }
+
+  /* ---------- Héros booster ---------- */
+  .hero { padding-block: 40px 28px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+  .hero-copy { display: grid; gap: 18px; min-width: 0; }
+  .set-tag { display: inline-flex; align-items: center; gap: 8px; width: fit-content; padding: 5px 10px; border-radius: 6px; background: rgba(242,194,91,.1); border: 1px solid rgba(242,194,91,.35); color: var(--gold); font-family: var(--f-display); font-weight: 700; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(95,211,154,.6); animation: ping 2s infinite; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 8px rgba(95,211,154,0); } 100% { box-shadow: 0 0 0 0 rgba(95,211,154,0); } }
+  .hero h1 { font-size: clamp(34px, 5.4vw, 60px); line-height: 1.02; font-weight: 800; text-transform: uppercase; }
+  .hero h1 span { color: var(--gold); text-shadow: 0 0 24px rgba(242,194,91,.35); }
+  .hero p { margin: 0; color: var(--muted); max-width: 48ch; font-size: 16px; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn {
+    border: 0; border-radius: 10px; padding: 14px 22px; font-family: var(--f-display); font-weight: 800;
+    letter-spacing: .08em; text-transform: uppercase; font-size: 15px; display: inline-flex; align-items: center; gap: 10px;
+  }
+  .btn-gold { background: linear-gradient(180deg, #ffd97f, var(--gold) 50%, var(--gold-deep)); color: #1d1300; box-shadow: 0 8px 24px -8px rgba(242,194,91,.7), inset 0 1px 0 rgba(255,255,255,.5); }
+  .btn-gold:hover { filter: brightness(1.08); }
+  .btn-gold small { font-family: var(--f-mono); font-weight: 500; font-size: 12px; letter-spacing: 0; opacity: .8; }
+  .btn-ghost { background: var(--panel); border: 1px solid var(--line); color: var(--fg); }
+  .btn-ghost:hover { border-color: var(--gold); }
+  .free { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); width: fit-content; max-width: 100%; }
+  .free .eyebrow { color: var(--ok); }
+  .timer { font-family: var(--f-mono); font-size: 18px; font-variant-numeric: tabular-nums; }
+  .free-bar { width: 120px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .free-bar i { display: block; height: 100%; width: 62%; background: var(--ok); }
+
+  /* Booster (sachet, pas une carte) */
+  .stage { position: relative; display: grid; place-items: center; min-height: 420px; perspective: 900px; }
+  .stage::before { content:""; position:absolute; width: 360px; max-width: 90%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(242,194,91,.28), rgba(124,74,255,.12) 50%, transparent 70%); filter: blur(10px); }
+  .stage::after { content:""; position:absolute; bottom: 30px; width: 220px; height: 30px; border-radius: 50%; background: radial-gradient(rgba(0,0,0,.65), transparent 70%); }
+  .pack {
+    position: relative; width: 230px; max-width: 70%; aspect-ratio: 23 / 36; border-radius: 6px;
+    background:
+      linear-gradient(115deg, transparent 30%, rgba(255,255,255,.28) 45%, transparent 60%) 0 0 / 300% 100% no-repeat,
+      linear-gradient(160deg, #2b1d5e 0%, #4b2a8c 35%, #1a1238 70%, #0f0b22 100%);
+    box-shadow: 0 30px 50px -20px rgba(0,0,0,.9), inset 0 0 0 1px rgba(242,194,91,.5);
+    transform: rotateY(-14deg) rotateX(6deg); transition: transform .4s;
+    animation: float 4s ease-in-out infinite, foil 5s linear infinite; z-index: 1;
+  }
+  .pack:hover { transform: rotateY(0) rotateX(0) scale(1.03); }
+  @keyframes float { 50% { translate: 0 -10px; } }
+  @keyframes foil { from { background-position: 120% 0, 0 0; } to { background-position: -120% 0, 0 0; } }
+  .pack::before, .pack::after { content:""; position:absolute; left:0; right:0; height: 16px; background: repeating-linear-gradient(90deg, #8c6420 0 6px, #f2c25b 6px 12px); }
+  .pack::before { top: 0; clip-path: polygon(0 0,100% 0,100% 60%,97% 100%,94% 60%,91% 100%,88% 60%,85% 100%,82% 60%,79% 100%,76% 60%,73% 100%,70% 60%,67% 100%,64% 60%,61% 100%,58% 60%,55% 100%,52% 60%,49% 100%,46% 60%,43% 100%,40% 60%,37% 100%,34% 60%,31% 100%,28% 60%,25% 100%,22% 60%,19% 100%,16% 60%,13% 100%,10% 60%,7% 100%,4% 60%,0 100%); border-radius: 6px 6px 0 0; }
+  .pack::after { bottom: 0; transform: scaleY(-1); clip-path: polygon(0 0,100% 0,100% 60%,97% 100%,94% 60%,91% 100%,88% 60%,85% 100%,82% 60%,79% 100%,76% 60%,73% 100%,70% 60%,67% 100%,64% 60%,61% 100%,58% 60%,55% 100%,52% 60%,49% 100%,46% 60%,43% 100%,40% 60%,37% 100%,34% 60%,31% 100%,28% 60%,25% 100%,22% 60%,19% 100%,16% 60%,13% 100%,10% 60%,7% 100%,4% 60%,0 100%); border-radius: 6px 6px 0 0; }
+  .pack-inner { position: absolute; inset: 22px 14px; display: grid; align-content: space-between; justify-items: center; text-align: center; }
+  .pack-emblem { width: 92px; aspect-ratio: 1; margin-top: 14px; border-radius: 50%; display: grid; place-items: center;
+    background: conic-gradient(from 0deg, #f2c25b, #b46bff, #4fa8ff, #5fd39a, #f2c25b); padding: 3px; }
+  .pack-emblem div { width: 100%; height: 100%; border-radius: 50%; background: #120c2a; display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: 30px; color: var(--gold); }
+  .pack-title { font-family: var(--f-display); font-weight: 800; font-size: 22px; letter-spacing: .1em; line-height: 1.1; }
+  .pack-title small { display: block; font-size: 11px; letter-spacing: .3em; color: var(--gold); margin-top: 4px; }
+  .pack-count { font-family: var(--f-mono); font-size: 11px; color: var(--muted); border-top: 1px solid rgba(242,194,91,.35); padding-top: 8px; width: 100%; }
+  .pack.shake { animation: shake .5s; }
+  @keyframes shake { 20%,60% { translate: -6px 0; rotate: -2deg; } 40%,80% { translate: 6px 0; rotate: 2deg; } }
+
+  /* ---------- Bandeau taux de drop ---------- */
+  .odds { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+  .odd { padding: 14px 16px; display: grid; gap: 4px; border-right: 1px solid var(--line); position: relative; }
+  .odd:last-child { border-right: 0; }
+  .odd::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--r); }
+  .odd-name { font-family: var(--f-display); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--r); }
+  .odd-pct { font-family: var(--f-mono); font-size: 22px; font-variant-numeric: tabular-nums; }
+  .odd-note { color: var(--muted); font-size: 13px; }
+
+  /* ---------- Grille principale ---------- */
+  .main { display: grid; grid-template-columns: 1fr 1.35fr; gap: 20px; padding-block: 28px 48px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 16px; align-content: start; min-width: 0; }
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .panel-head h2 { font-size: 18px; text-transform: uppercase; letter-spacing: .06em; }
+  .panel-head a { color: var(--muted); font-size: 13px; text-decoration: none; }
+  .panel-head a:hover { color: var(--gold); }
+
+  .quest { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .quest:first-of-type { border-top: 0; padding-top: 0; }
+  .quest-name { font-weight: 600; }
+  .quest-reward { font-family: var(--f-mono); font-size: 13px; display: inline-flex; align-items: center; gap: 6px; color: var(--gold); }
+  .quest-bar { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; }
+  .track { flex: 1; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .track i { display: block; height: 100%; background: var(--gold); border-radius: 3px; }
+  .quest.done .track i { background: var(--ok); }
+  .quest-num { font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; }
+  .claim { background: var(--ok); color: #062615; border: 0; border-radius: 6px; padding: 4px 10px; font-family: var(--f-display); font-weight: 800; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+
+  .games { display: grid; gap: 12px; }
+  .game { display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center; padding: 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid transparent; }
+  .game:hover { border-color: var(--line); }
+  .game-ico { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: 14px; background: var(--g); color: #0b0a14; }
+  .game-name { font-weight: 600; }
+  .game-sub { color: var(--muted); font-size: 13px; }
+  .game .track { margin-top: 6px; height: 5px; }
+  .game .track i { background: var(--g); }
+  .game-pct { font-family: var(--f-mono); font-size: 14px; font-variant-numeric: tabular-nums; }
+  .rarity-mix { display: flex; height: 8px; border-radius: 4px; overflow: hidden; }
+  .rarity-mix span { display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+  .legend i { width: 8px; height: 8px; border-radius: 2px; background: var(--r); }
+
+  .sets { grid-column: 1 / -1; }
+  .set-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .set { position: relative; border-radius: 12px; padding: 18px; min-height: 150px; display: grid; align-content: space-between; gap: 18px; overflow: hidden; border: 1px solid var(--line); background: var(--panel-2); }
+  .set::before { content:""; position:absolute; inset:0; background: var(--bgimg); opacity: .9; }
+  .set > * { position: relative; }
+  .set h3 { font-size: 20px; text-transform: uppercase; letter-spacing: .04em; }
+  .set-meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+  .status { font-family: var(--f-display); font-weight: 700; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+  .status.on { background: rgba(95,211,154,.15); color: var(--ok); }
+  .status.soon { background: rgba(79,168,255,.15); color: var(--c-rare); }
+  .status.off { background: rgba(154,147,184,.15); color: var(--muted); }
+
+  .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom,0px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+    background: var(--panel-2); border: 1px solid var(--gold); color: var(--fg); padding: 12px 18px; border-radius: 10px; transition: .25s; z-index: 30; max-width: calc(100% - 32px); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  footer .wrap { padding-block: 20px; display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 8px; padding-block: 24px 20px; }
+    .stage { min-height: 340px; order: -1; }
+    .main { grid-template-columns: 1fr; }
+    .set-list { grid-template-columns: 1fr; }
+    .odds { grid-template-columns: repeat(2, 1fr); }
+    .odd:nth-child(2) { border-right: 0; }
+    .odd:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  }
+  @media (max-width: 760px) {
+    nav { display: none; }
+    .menu-btn { display: grid; place-items: center; }
+    .bar { gap: 12px; justify-content: space-between; }
+    .chip.shards { display: none; }
+    nav.open { display: grid; position: absolute; top: 64px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--line); padding: 8px max(16px, env(safe-area-inset-left,0px)); }
+    nav a[aria-current="page"]::after { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .pack, .live-dot { animation: none; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <div class="logo"><div class="logo-mark" aria-hidden="true"></div>CLUTCH<b>TCG</b></div>
+    <nav id="nav" aria-label="Navigation principale">
+      <a href="#" aria-current="page">Accueil</a>
+      <a href="#">Boosters</a>
+      <a href="#">Collection</a>
+      <a href="#">Échanges</a>
+      <a href="#">Classement</a>
+    </nav>
+    <div class="wallet">
+      <span class="chip" title="Pièces"><i class="coin"></i>12 450</span>
+      <span class="chip shards" title="Éclats"><i class="shard"></i>320</span>
+      <div class="avatar" title="Profil">IP</div>
+      <button class="menu-btn" id="menuBtn" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero">
+    <div class="hero-copy">
+      <span class="set-tag"><i class="live-dot"></i>Extension en cours · Worlds 2026</span>
+      <h1>Ouvre. Collectionne.<br><span>Trouve les légendes.</span></h1>
+      <p>Chaque booster contient 5 cartes de joueurs, d'équipes et de moments e-sport. Les champions du monde se cachent dans les légendaires.</p>
+      <div class="cta-row">
+        <button class="btn btn-gold" id="openBtn">Ouvrir un booster <small><i class="coin" style="display:inline-block;vertical-align:-2px"></i> 500</small></button>
+        <button class="btn btn-ghost">Voir l'extension</button>
+      </div>
+      <div class="free">
+        <div>
+          <div class="eyebrow">Booster gratuit dans</div>
+          <div class="timer" id="timer">03:12:45</div>
+        </div>
+        <div class="free-bar" aria-hidden="true"><i></i></div>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="pack" id="pack" aria-label="Booster Worlds 2026">
+        <div class="pack-inner">
+          <div class="pack-emblem"><div>W26</div></div>
+          <div class="pack-title">WORLDS<small>BOOSTER</small></div>
+          <div class="pack-count">5 CARTES · 1 RARE MINIMUM</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" aria-label="Taux d'obtention">
+    <div class="odds">
+      <div class="odd" style="--r:var(--c-common)"><span class="odd-name">Commune</span><span class="odd-pct">70 %</span><span class="odd-note">Joueurs pros, équipes</span></div>
+      <div class="odd" style="--r:var(--c-rare)"><span class="odd-name">Rare</span><span class="odd-pct">22 %</span><span class="odd-note">Stars, cadre argenté</span></div>
+      <div class="odd" style="--r:var(--c-epic)"><span class="odd-name">Épique</span><span class="odd-pct">7 %</span><span class="odd-note">MVP, effet holo</span></div>
+      <div class="odd" style="--r:var(--c-legend)"><span class="odd-name">Légendaire</span><span class="odd-pct">1 %</span><span class="odd-note">Champions du monde</span></div>
+    </div>
+  </section>
+
+  <section class="wrap main">
+    <div class="panel">
+      <div class="panel-head"><h2>Quêtes du jour</h2><span class="eyebrow">2 / 3</span></div>
+      <div class="quest done">
+        <span class="quest-name">Ouvrir 1 booster</span>
+        <span class="quest-reward"><i class="coin"></i>+100</span>
+        <div class="quest-bar"><div class="track"><i style="width:100%"></i></div><button class="claim">Récupérer</button></div>
+      </div>
+      <div class="quest">
+        <span class="quest-name">Obtenir 3 cartes rares</span>
+        <span class="quest-reward"><i class="coin"></i>+250</span>
+        <div class="quest-bar"><div class="track"><i style="width:66%"></i></div><span class="quest-num">2 / 3</span></div>
+      </div>
+      <div class="quest">
+        <span class="quest-name">Compléter 1 équipe LCK</span>
+        <span class="quest-reward"><i class="shard"></i>+40</span>
+        <div class="quest-bar"><div class="track"><i style="width:40%"></i></div><span class="quest-num">2 / 5</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Ma collection</h2><a href="#">Tout voir →</a></div>
+      <div class="rarity-mix" aria-hidden="true">
+        <span style="width:64%;background:var(--c-common)"></span>
+        <span style="width:25%;background:var(--c-rare)"></span>
+        <span style="width:9%;background:var(--c-epic)"></span>
+        <span style="width:2%;background:var(--c-legend)"></span>
+      </div>
+      <div class="legend">
+        <span style="--r:var(--c-common)"><i></i>Communes 118</span>
+        <span style="--r:var(--c-rare)"><i></i>Rares 46</span>
+        <span style="--r:var(--c-epic)"><i></i>Épiques 17</span>
+        <span style="--r:var(--c-legend)"><i></i>Légendaires 3</span>
+      </div>
+      <div class="games">
+        <div class="game" style="--g:#e0b44c">
+          <div class="game-ico">LoL</div>
+          <div><div class="game-name">League of Legends</div><div class="game-sub">96 / 240 cartes</div><div class="track"><i style="width:40%"></i></div></div>
+          <span class="game-pct">40 %</span>
+        </div>
+        <div class="game" style="--g:#f28a3a">
+          <div class="game-ico">CS2</div>
+          <div><div class="game-name">Counter-Strike 2</div><div class="game-sub">54 / 200 cartes</div><div class="track"><i style="width:27%"></i></div></div>
+          <span class="game-pct">27 %</span>
+        </div>
+        <div class="game" style="--g:#ff5a6a">
+          <div class="game-ico">VAL</div>
+          <div><div class="game-name">Valorant</div><div class="game-sub">34 / 180 cartes</div><div class="track"><i style="width:19%"></i></div></div>
+          <span class="game-pct">19 %</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel sets">
+      <div class="panel-head"><h2>Extensions</h2><a href="#">Calendrier →</a></div>
+      <div class="set-list">
+        <div class="set" style="--bgimg: radial-gradient(400px 200px at 100% 0%, rgba(242,194,91,.25), transparent 70%)">
+          <div><span class="status on">Disponible</span></div>
+          <div><h3>Worlds 2026</h3><div class="set-meta"><span>LoL · 120 cartes</span><span>Fin dans 18 j</span></div></div>
+        </div>
+        <div class="set" style="--bgimg: radial-gradient(400px 200px at 100% 0%, rgba(242,138,58,.22), transparent 70%)">
+          <div><span class="status soon">Bientôt</span></div>
+          <div><h3>Major de Cologne</h3><div class="set-meta"><span>CS2 · 100 cartes</span><span>Dans 6 j</span></div></div>
+        </div>
+        <div class="set" style="--bgimg: radial-gradient(400px 200px at 100% 0%, rgba(255,90,106,.2), transparent 70%)">
+          <div><span class="status off">Terminée</span></div>
+          <div><h3>Champions 2026</h3><div class="set-meta"><span>Valorant · 90 cartes</span><span>Plus en boutique</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><span>Clutch TCG · prototype</span><span>Données d'exemple</span></div></footer>
+<div class="toast" id="toast" role="status">L'ouverture arrive bientôt : les cartes ne sont pas encore prêtes.</div>
+
+<script>
+  // Compte à rebours du booster gratuit
+  (function () {
+    let s = 3 * 3600 + 12 * 60 + 45;
+    const el = document.getElementById('timer');
+    setInterval(function () {
+      s = s > 0 ? s - 1 : 4 * 3600;
+      const h = String(Math.floor(s / 3600)).padStart(2, '0');
+      const m = String(Math.floor(s % 3600 / 60)).padStart(2, '0');
+      const sec = String(s % 60).padStart(2, '0');
+      el.textContent = h + ':' + m + ':' + sec;
+    }, 1000);
+  })();
+
+  // Bouton ouvrir : secoue le booster
+  const pack = document.getElementById('pack'), toast = document.getElementById('toast');
+  document.getElementById('openBtn').addEventListener('click', function () {
+    pack.classList.remove('shake'); void pack.offsetWidth; pack.classList.add('shake');
+    toast.classList.add('show'); clearTimeout(toast._t);
+    toast._t = setTimeout(function () { toast.classList.remove('show'); }, 2400);
+  });
+  pack.addEventListener('animationend', function (e) { if (e.animationName === 'shake') pack.classList.remove('shake'); });
+
+  // Menu mobile
+  const nav = document.getElementById('nav'), menuBtn = document.getElementById('menuBtn');
+  menuBtn.addEventListener('click', function () {
+    const open = nav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open);
+  });
+</script>
+
+</body>
+</html>
