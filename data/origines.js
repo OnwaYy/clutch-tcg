@@ -31,7 +31,12 @@ window.ORIGINES = {
     24: { img: 'assets/cartes/024.png', color: '#a08a55', map: true },
     25: { img: 'assets/cartes/025.png', color: '#5a7fa8', map: true },
     26: { img: 'assets/cartes/026.png', color: '#7c9a6b', map: true },
-    27: { img: 'assets/cartes/027.png', color: '#2b4c9b', player: true }
+    27: { img: 'assets/cartes/027.png', color: '#2b4c9b', player: true },
+    28: { img: 'assets/cartes/028.png', color: '#2b4c9b', player: true },
+    29: { img: 'assets/cartes/029.png', color: '#2b4c9b', player: true },
+    30: { img: 'assets/cartes/030.png', color: '#2b4c9b', player: true },
+    31: { img: 'assets/cartes/031.png', color: '#ff0477', player: true },
+    32: { img: 'assets/cartes/032.png', color: '#ff5900', player: true }
   },
   cards: [
     ['aAa', 'C', 'Logo de club', 'Multi-jeux', null, 'Club français historique'],
@@ -66,7 +71,7 @@ window.ORIGINES = {
     ['Caliste', 'C', 'Joueur', 'League of Legends', null, 'ADC français'],
     ['Adam', 'C', 'Joueur', 'League of Legends', null, 'Top laner français'],
     ['Upset', 'C', 'Joueur', 'League of Legends', null, null],
-    ['Hylissang', 'C', 'Joueur', 'League of Legends', null, null],
+    ['Vetheo', 'C', 'Joueur', 'League of Legends', null, 'Mid laner français'],
     ['Mikyx', 'C', 'Joueur', 'League of Legends', null, null],
     ['Wunder', 'C', 'Joueur', 'League of Legends', null, null],
     ['Jankos', 'C', 'Joueur', 'League of Legends', null, 'Le roi du first blood'],
