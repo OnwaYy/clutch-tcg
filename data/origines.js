@@ -25,7 +25,10 @@ window.ORIGINES = {
     "Upset": {"img": "assets/cartes/upset.png", "color": "#ff5900", "player": true},
     "Mikyx": {"img": "assets/cartes/mikyx.png", "color": "#d4a64a", "player": true},
     "Wunder": {"img": "assets/cartes/wunder.png", "color": "#d4a64a", "player": true},
-    "Jankos": {"img": "assets/cartes/jankos.png", "color": "#d4a64a", "player": true}
+    "Jankos": {"img": "assets/cartes/jankos.png", "color": "#d4a64a", "player": true},
+    "Team Dignitas": {"img": "assets/cartes/team-dignitas.png", "color": "#f5c400", "dark": true},
+    "Counter Logic Gaming": {"img": "assets/cartes/counter-logic-gaming.png", "color": "#1f7bc1"},
+    "MOUZ": {"img": "assets/cartes/mouz.png", "color": "#e0201b"}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
