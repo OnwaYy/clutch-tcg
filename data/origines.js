@@ -54,7 +54,8 @@ window.ORIGINES = {
     "Virtus.pro": {"img": "assets/cartes/virtus-pro.png", "color": "#ff5100"},
     "OpTic Gaming": {"img": "assets/cartes/optic-gaming.png", "color": "#93c54b"},
     "Evil Geniuses": {"img": "assets/cartes/evil-geniuses.png", "color": "#283a73"},
-    "Team Secret": {"img": "assets/cartes/team-secret.png", "color": "#c8c9cf"}
+    "Team Secret": {"img": "assets/cartes/team-secret.png", "color": "#c8c9cf"},
+    "Quake": {"img": "assets/cartes/quake.png", "color": "#8a5a2b"}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
