@@ -368,7 +368,7 @@
   .cc.l-legend .cc-band h3 { font-size: calc(var(--u) * 8.6); background: linear-gradient(180deg, #fff6d6 0%, #f3cf6a 50%, #c08a25 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
     filter: drop-shadow(0 calc(var(--u) * .4) 0 rgba(0,0,0,.6)); }
   .cc.l-legend .cc-band p { color: #f4e6c4; opacity: .95; }
-  .cc.l-legend .cc-foot { padding: calc(var(--u) * 1.6) calc(var(--u) * 1.5) calc(var(--u) * 6); color: #d9bf86; border-top: 1px solid rgba(255,214,120,.25); margin: 0 calc(var(--u) * 10); }
+  .cc.l-legend .cc-foot { padding: calc(var(--u) * 1.6) calc(var(--u) * 1.5) calc(var(--u) * 5.4); color: #d9bf86; border-top: 1px solid rgba(255,214,120,.25); margin: 0 calc(var(--u) * 7); }
   .cc.l-legend .cc-set { color: #ffe7a8; }
   .cc.l-legend .cc-set i { background: #f2c25b; box-shadow: 0 0 calc(var(--u) * 1.5) #f2c25b; }
   .cc.l-legend .cc-num { z-index: 4; top: calc(var(--u) * 4.5); left: calc(var(--u) * 4.5); background: linear-gradient(135deg, #fff2c4, #d4a23a 45%, #8a5a14); color: #1c1206; box-shadow: 0 calc(var(--u) * .6) calc(var(--u) * 2) rgba(0,0,0,.5); }
@@ -377,14 +377,15 @@
 
   /* Légendaire : finitions */
   .cc.l-legend { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.10) 0 1px, transparent 1px 3px), linear-gradient(135deg, #fff2c4 0%, #d4a23a 18%, #7a4f12 34%, #ffe08a 50%, #a8741d 66%, #fff3c9 82%, #c8901f 100%); background-size: auto, 240% 240%; background-position: 0 0, var(--mx, 50%) var(--my, 50%); }
-  .cc.l-legend .cc-corner { position: absolute; width: 22%; aspect-ratio: 1; z-index: 6; pointer-events: none; background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23fff4c8%27/%3E%3Cstop%20offset%3D%27.45%27%20stop-color%3D%27%23e2b04a%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%238a5a14%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27url%28%23g%29%27%20stroke-linecap%3D%27round%27%3E%3Cpath%20d%3D%27M6%2070%20V14%20Q6%206%2014%206%20H70%27%20stroke-width%3D%274%27/%3E%3Cpath%20d%3D%27M14%2052%20V20%20Q14%2014%2020%2014%20H52%27%20stroke-width%3D%271.6%27/%3E%3Cpath%20d%3D%27M6%2030%20Q20%2030%2022%2018%20Q24%208%2034%206%27%20stroke-width%3D%272%27/%3E%3Cpath%20d%3D%27M22%2018%20Q30%2022%2026%2032%20Q22%2040%2030%2044%27%20stroke-width%3D%271.4%27/%3E%3Cpath%20d%3D%27M18%2022%20Q22%2030%2032%2026%20Q40%2022%2044%2030%27%20stroke-width%3D%271.4%27/%3E%3C/g%3E%3Cpath%20d%3D%27M22%2022%20L30%2014%20L38%2022%20L30%2030%20Z%27%20transform%3D%27translate%28-8%20-8%29%27%20fill%3D%27url%28%23g%29%27%20stroke%3D%27%234a2f08%27%20stroke-width%3D%271%27/%3E%3Ccircle%20cx%3D%2770%27%20cy%3D%276%27%20r%3D%273%27%20fill%3D%27url%28%23g%29%27/%3E%3Ccircle%20cx%3D%276%27%20cy%3D%2770%27%20r%3D%273%27%20fill%3D%27url%28%23g%29%27/%3E%3C/svg%3E") center / contain no-repeat; filter: drop-shadow(0 1px 1px rgba(0,0,0,.7)) drop-shadow(0 0 calc(var(--u) * 1.5) rgba(255,200,90,.45)); }
-  .cc.l-legend .cc-corner.tl { top: 2.2%; left: 2.2%; }
-  .cc.l-legend .cc-corner.tr { top: 2.2%; right: 2.2%; transform: scaleX(-1); }
-  .cc.l-legend .cc-corner.bl { bottom: 1.6%; left: 2.2%; transform: scaleY(-1); }
-  .cc.l-legend .cc-corner.br { bottom: 1.6%; right: 2.2%; transform: scale(-1); }
-  .cc.l-legend .cc-num { top: calc(var(--u) * 10); left: calc(var(--u) * 8); }
-  .cc.l-legend .cc-tag { top: calc(var(--u) * 10.5); right: calc(var(--u) * 8); }
-  .cc.l-legend .cc-stamp { top: calc(var(--u) * 18); right: calc(var(--u) * 8); }
+  /* Cadre intérieur à coins coupés (style HUD) */
+  .cc.l-legend .cc-hud { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 6; pointer-events: none; overflow: visible; filter: drop-shadow(0 0 calc(var(--u) * 1.2) rgba(255,200,90,.5)); }
+  .cc.l-legend .cc-hud .thin { fill: none; stroke: #f6d77c; stroke-width: 1; vector-effect: non-scaling-stroke; opacity: .85; }
+  .cc.l-legend .cc-hud .bold { fill: none; stroke: url(#hudGold); stroke-width: 3.5; vector-effect: non-scaling-stroke; stroke-linecap: square; }
+  .cc.l-legend .cc-hud .gem { fill: url(#hudGold); stroke: #3a2406; stroke-width: .8; vector-effect: non-scaling-stroke; }
+  .cc.l-legend::after { display: none; }
+  .cc.l-legend .cc-num { top: calc(var(--u) * 7.5); left: calc(var(--u) * 7.5); }
+  .cc.l-legend .cc-tag { top: calc(var(--u) * 8); right: calc(var(--u) * 7.5); }
+  .cc.l-legend .cc-stamp { top: calc(var(--u) * 15.5); right: calc(var(--u) * 7.5); }
   .cc.l-legend .cc-crest { display: flex; align-items: center; gap: calc(var(--u) * 1.6); margin-bottom: calc(var(--u) * 1); font: 700 calc(var(--u) * 2.8) 'Oswald', sans-serif; letter-spacing: .32em; color: #f6d77c; text-shadow: 0 1px 0 rgba(0,0,0,.6); }
   .cc.l-legend .cc-crest::before, .cc.l-legend .cc-crest::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #f6d77c); }
   .cc.l-legend .cc-crest::after { background: linear-gradient(90deg, #f6d77c, transparent); }
@@ -518,6 +519,7 @@
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><linearGradient id="hudGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4c8"/><stop offset=".5" stop-color="#e2b04a"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient></defs>
   <symbol id="sym-ori" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4.5 L17.5 15 H6.5 Z" fill="currentColor"/><circle cx="12" cy="18.6" r="1.7" fill="currentColor"/></symbol>
 </svg>
 
@@ -1009,7 +1011,14 @@
   // Finition selon la rareté
   const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend' };
   const finish = function (c) { return FINISH[c.rarity] || ''; };
-  const corners = function (c) { return c.rarity === 'legend' ? '<span class="cc-corner tl"></span><span class="cc-corner tr"></span><span class="cc-corner bl"></span><span class="cc-corner br"></span>' : ''; };
+  // Cadre HUD des légendaires : coins coupés, accents dorés sur les angles, losanges au centre
+  const HUD = '<svg class="cc-hud" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">' +
+    '<polygon class="thin" points="9,3.6 91,3.6 96.4,7.4 96.4,132.6 91,136.4 9,136.4 3.6,132.6 3.6,7.4"/>' +
+    '<polyline class="bold" points="3.6,16 3.6,7.4 9,3.6 22,3.6"/><polyline class="bold" points="78,3.6 91,3.6 96.4,7.4 96.4,16"/>' +
+    '<polyline class="bold" points="3.6,124 3.6,132.6 9,136.4 22,136.4"/><polyline class="bold" points="78,136.4 91,136.4 96.4,132.6 96.4,124"/>' +
+    '<polygon class="gem" points="50,1.9 52.6,3.6 50,5.3 47.4,3.6"/><polygon class="gem" points="50,134.7 52.6,136.4 50,138.1 47.4,136.4"/>' +
+    '</svg>';
+  const corners = function (c) { return c.rarity === 'legend' ? HUD : ''; };
   function ownedSlot(c) {
     return '<button class="cc mini ' + finish(c) + '" data-card="' + c.num + '" style="' + cardStyle(c) + '" aria-label="' + esc(c.name) + '">' + cardInner(c) + corners(c) + '</button>';
   }
