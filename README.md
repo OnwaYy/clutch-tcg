@@ -9,10 +9,12 @@ Jeu de cartes à collectionner sur le thème de l'e-sport, sur navigateur : joue
 
 ## Séries
 
-- **Origines** (symbole ORI, tampon Édition 1) : série de base qui retrace les grands moments de l'e-sport. 150 cartes + 25 secrètes, numérotées jusqu'à 175/150.
+- **Origines** (symbole ORI, tampon Édition 1) : les 175 joueurs, clubs, jeux et moments qui ont fait l'e-sport, de 1972 à aujourd'hui, tous jeux et tous pays. 150 cartes + 25 secrètes, numérotées jusqu'à 175/150.
   - Numérotées (001 à 150) : 50 communes, 45 peu communes, 25 rares, 18 épiques, 12 légendaires.
   - Secrètes (151 à 175) : 25 cartes secrètes, hors numérotation.
 - **Séries d'événement** : sortent uniquement pendant les events.
+
+Les visuels sont dans `assets/cartes/` (nommés d'après la carte). Ceux des cartes retirées d'Origines sont gardés dans `assets/cartes/retirees/`.
 
 ## Lancer
 

@@ -682,7 +682,7 @@
   // Nombre de cartes par rareté, dans l'ordre de numérotation (proportions inspirées de Pokémon 151)
   const RCODE = { C: 'common', P: 'uncommon', R: 'rare', E: 'epic', L: 'legend', S: 'secret' };
   const CATALOG = (window.ORIGINES ? window.ORIGINES.cards : []).map(function (c, i) {
-    const art = (window.ORIGINES.art || {})[i + 1] || {};
+    const art = (window.ORIGINES.art || {})[c[0]] || {};
     return { set: 'ori', num: i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null, dark: !!art.dark, map: !!art.map, fade: !!art.fade, player: !!art.player };
   });
   if (false) SETS.forEach(function (s) {
