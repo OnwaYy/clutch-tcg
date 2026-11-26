@@ -289,7 +289,7 @@ window.ORIGINES = {
     ["ROX Tigers — Les Tigres de 2016", "L", "Équipe", "League of Legends", 2016, "Champions de LCK, ils poussent SK Telecom T1 jusqu'au 5e match en demi-finale des Worlds"],
     ["Le dragon des Worlds 2017", "L", "Moment", "League of Legends", 2017, "Un dragon en réalité augmentée survole le Nid d'Oiseau pendant la cérémonie d'ouverture"],
     ["Luminosity — Le premier Major brésilien", "L", "Moment", "Counter-Strike", 2016, "Le Brésil soulève son premier Major de CS:GO, à la MLG Columbus"],
-    ["Ninja × Drake — Le stream record", "L", "Moment", "Fortnite", 2018, "Ninja joue à Fortnite avec Drake sur Twitch, devant plus de 600 000 spectateurs en direct, un record"],
+    ["Fortnite World Cup — Arthur Ashe Stadium", "L", "Événement", "Fortnite", 2019, "Le stade de l'US Open de tennis, à New York, accueille la finale et ses 30 millions de dollars de prix"],
     ["Evil Geniuses — Champions de TI5", "L", "Moment", "Dota 2", 2015, "Evil Geniuses remporte TI5 et plus de 6 millions de dollars"],
     ["Invictus Gaming — Le premier sacre chinois", "L", "Moment", "League of Legends", 2018, "Invictus Gaming offre à la Chine son premier titre mondial, à Incheon"],
     ["Team Spirit — Le miracle de TI10", "L", "Moment", "Dota 2", 2021, "Partie du bas du tableau, Team Spirit bat PSG.LGD en finale de TI10"],
