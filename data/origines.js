@@ -9,7 +9,11 @@ window.ORIGINES = {
     2: { img: 'assets/cartes/002.png', color: '#d9361a' },
     3: { img: 'assets/cartes/003.png', color: '#24408f', dark: true },
     4: { img: 'assets/cartes/004.png', color: '#c8202f' },
-    5: { img: 'assets/cartes/005.png', color: '#7b78f5' }
+    5: { img: 'assets/cartes/005.png', color: '#7b78f5' },
+    6: { img: 'assets/cartes/006.png', color: '#f2c12e' },
+    7: { img: 'assets/cartes/007.png', color: '#bfc0c6' },
+    8: { img: 'assets/cartes/008.png', color: '#ff0477', dark: true },
+    9: { img: 'assets/cartes/009.png', color: '#a51c30' }
   },
   cards: [
     ['aAa', 'C', 'Logo de club', 'Multi-jeux', null, 'Club français historique'],
