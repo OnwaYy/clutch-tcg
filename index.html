@@ -277,10 +277,14 @@
   .modal-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center; font-size: 13px; text-align: center; }
   .cc { display: block; width: 100%; aspect-ratio: 63 / 88; container-type: inline-size; border-radius: 5% / 3.58%; padding: 0; border: 0; font: inherit; text-align: left; position: relative;
     background: none; box-shadow: 0 24px 50px -16px rgba(0,0,0,.9); color: #1c1b22; }
-  .cc.mini { content-visibility: auto; contain-intrinsic-size: auto 150px auto 210px; cursor: pointer; box-shadow: 0 10px 20px -10px rgba(0,0,0,.8); transition: transform .18s, box-shadow .18s; }
+  .cc.mini { cursor: pointer; box-shadow: 0 10px 20px -10px rgba(0,0,0,.8); transition: transform .18s, box-shadow .18s; }
+  .cc.mini { contain: layout paint style; }
+  .cc.mini .cc-ghost, .cc.mini .cc-photo::before { display: none; }
+  .cc.mini .cc-photo img { filter: none; }
+  .cc.mini .cc-stamp { transform: rotate(-10deg) translateZ(0); }
   .cc.mini:hover { transform: translateY(-4px) rotate(-.6deg); box-shadow: 0 18px 28px -12px rgba(0,0,0,.9), 0 0 0 2px var(--rr); }
   .tilt { perspective: 1000px; padding: 12px; touch-action: none; }
-  .cc.big { --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%; --o: 0;
+  .cc.big { isolation: isolate; --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%; --o: 0;
     width: min(84vw, 340px, calc((100vh - 140px) * .716));
     transform: rotateX(var(--rx)) rotateY(var(--ry)); transition: transform .12s ease-out; transform-style: preserve-3d; will-change: transform; }
   .cc-holo, .cc-glare { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
@@ -745,9 +749,10 @@
       freeTimer: ft.ready ? 'Disponible' : ft.text, freeLabel: ft.ready ? 'Booster gratuit' : 'Booster gratuit dans',
       questCount: QUESTS.filter(function (q) { return S.quests[q.id].claimed; }).length + ' / ' + QUESTS.length
     };
-    $$('[data-bind]').forEach(function (el) { const k = el.dataset.bind; if (k in vals) el.textContent = vals[k]; });
-    $$('[data-bind-width="freePct"]').forEach(function (el) { el.style.width = ft.pct + '%'; });
-    $$('[data-action="claim-free"]').forEach(function (b) { b.hidden = !ft.ready; });
+    // On ne touche au DOM que si la valeur a changé (évite de recalculer la page chaque seconde)
+    $$('[data-bind]').forEach(function (el) { const k = el.dataset.bind; if (k in vals && el.textContent !== String(vals[k])) el.textContent = vals[k]; });
+    $$('[data-bind-width="freePct"]').forEach(function (el) { const w = ft.pct.toFixed(1) + '%'; if (el.style.width !== w) el.style.width = w; });
+    $$('[data-action="claim-free"]').forEach(function (b) { if (b.hidden !== !ft.ready) b.hidden = !ft.ready; });
   }
 
   function freeState() {
