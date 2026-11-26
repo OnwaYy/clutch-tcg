@@ -296,7 +296,7 @@
     mix-blend-mode: overlay; opacity: var(--o); transition: opacity .25s; }
   @media (prefers-reduced-motion: reduce) { .cc.big { transform: none; } }
 
-  /* ---------- Peu commune : options de finition (en test) ---------- */
+  /* ---------- Peu commune : bordure argent + détails argent + holo très léger ---------- */
   /* 1. Bordure argentée */
   .cc.u-silver { padding: 1.6%; background: linear-gradient(125deg, #f7f9fc 0%, #a9b1bf 22%, #eef1f6 42%, #8d96a6 62%, #f2f4f8 82%, #a2aab8 100%); }
   .cc.u-silver .cc-panel { border-radius: 4.2% / 3%; }
@@ -308,11 +308,13 @@
     background: repeating-linear-gradient(115deg, #ff5ea8 0%, #ffd25e 7%, #6dffb5 14%, #5ec8ff 21%, #b07bff 28%, #ff5ea8 35%);
     background-size: 280% 280%; background-position: var(--mx, 50%) var(--my, 50%); mix-blend-mode: hard-light; opacity: .45; }
   .cc.u-holo .cc-photo img, .cc.u-holo .cc-num, .cc.u-holo .cc-tag, .cc.u-holo .cc-stamp { z-index: 1; }
+  .cc.u-soft .cc-photo::after { opacity: .14; }
+  .cc.big.u-soft .cc-photo::after { opacity: calc(.08 + var(--o, 0) * .14); transition: opacity .2s; }
   /* 3. Détails en argent */
   .cc.u-foil .cc-num { background: linear-gradient(135deg, #f4f6fa, #a7afbd 45%, #e9edf3 60%, #8f98a8); color: #1c1b22; box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 2px 6px rgba(0,0,0,.25); }
   .cc.u-foil .cc-stamp { border-color: #8f98a8; color: #5d6676; mix-blend-mode: normal; background: linear-gradient(135deg, rgba(255,255,255,.75), rgba(200,206,216,.75)); }
   .cc.u-foil .cc-ghost { -webkit-text-stroke-color: rgba(150,158,172,.75); }
-  .cc.u-foil .cc-set { background: linear-gradient(90deg, #e9edf3, #8f98a8, #e9edf3); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .cc.u-foil .cc-set { background: linear-gradient(90deg, #3f4756, #8f98a8, #3f4756); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .cc.u-foil .cc-set svg { color: #a7afbd; }
   .cc.u-foil .cc-band::before { background: linear-gradient(#f4f6fa, #8f98a8 50%, #e9edf3); }
   .cc-panel { height: 100%; border-radius: inherit; padding: calc(var(--u) * 3.4); overflow: hidden; display: grid; grid-template-rows: 1fr auto auto; gap: calc(var(--u) * 2.6); background: linear-gradient(160deg, var(--p1), var(--p2)); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
@@ -902,12 +904,16 @@
       '<div class="cc-band' + (fr ? ' fr' : '') + '"><h3>' + esc(c.name) + '</h3><p>' + esc(sub) + '</p></div>' +
       '<div class="cc-foot"><span>' + esc(c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + n3(c.num) + '/' + s.size + '<i></i></span></div></div>';
   }
+  // Finition selon la rareté
+  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft' };
+  const finish = function (c) { return FINISH[c.rarity] || ''; };
   function ownedSlot(c) {
-    return '<button class="cc mini" data-card="' + c.num + '" style="' + cardStyle(c) + '" aria-label="' + esc(c.name) + '">' + cardInner(c) + '</button>';
+    return '<button class="cc mini ' + finish(c) + '" data-card="' + c.num + '" style="' + cardStyle(c) + '" aria-label="' + esc(c.name) + '">' + cardInner(c) + '</button>';
   }
   function openCard(num) {
     const c = CATALOG[num - 1], r = RAR.find(function (x) { return x.id === c.rarity; });
     const el = $('#bigCard');
+    el.className = 'cc big ' + finish(c);
     el.style.cssText = cardStyle(c);
     el.innerHTML = cardInner(c) + '<span class="cc-holo"></span><span class="cc-glare"></span>';
     $('#bigRarity').textContent = r.name + (c.rarity !== 'common' ? ' · design à venir, modèle commune en attendant' : '');
