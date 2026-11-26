@@ -302,6 +302,7 @@
   .cc-ghost { position: absolute; left: calc(var(--u) * 4); bottom: calc(var(--u) * -3); font: 800 calc(var(--u) * 38)/1 'Barlow Condensed', sans-serif; color: transparent; -webkit-text-stroke: calc(var(--u) * .45) var(--ghost, rgba(28,27,34,.24)); }
   .cc-photo img { position: relative; width: 84%; max-height: 66%; object-fit: contain; filter: drop-shadow(0 calc(var(--u) * 2.4) calc(var(--u) * 2.4) rgba(28,27,34,.22)); }
   .cc-photo img.is-map { width: 86%; max-height: 76%; margin-top: 12%; filter: drop-shadow(0 calc(var(--u) * 1.2) calc(var(--u) * 1.6) rgba(28,27,34,.35)); }
+  .cc-photo img.is-fade { width: 100%; max-height: 100%; margin-top: 6%; filter: none; mix-blend-mode: multiply; }
   .cc-todo { position: relative; display: grid; justify-items: center; gap: calc(var(--u) * 1); font: 600 calc(var(--u) * 3.4) 'Barlow', sans-serif; letter-spacing: .14em; text-transform: uppercase; color: rgba(28,27,34,.55); }
   .cc-todo b { font: 800 calc(var(--u) * 22)/1 'Barlow Condensed', sans-serif; letter-spacing: 0; color: rgba(28,27,34,.75); }
   .cc-num { position: absolute; top: calc(var(--u) * 3.2); left: calc(var(--u) * 3.2); background: #1c1b22; color: #fff; border-radius: calc(var(--u) * 2); padding: calc(var(--u) * 1.4) calc(var(--u) * 2.6) calc(var(--u) * 1.2); display: grid; line-height: 1; }
@@ -681,7 +682,7 @@
   const RCODE = { C: 'common', P: 'uncommon', R: 'rare', E: 'epic', L: 'legend', S: 'secret' };
   const CATALOG = (window.ORIGINES ? window.ORIGINES.cards : []).map(function (c, i) {
     const art = (window.ORIGINES.art || {})[i + 1] || {};
-    return { set: 'ori', num: i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null, dark: !!art.dark, map: !!art.map };
+    return { set: 'ori', num: i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null, dark: !!art.dark, map: !!art.map, fade: !!art.fade };
   });
   if (false) SETS.forEach(function (s) {
     let num = 1;
@@ -873,7 +874,7 @@
     const fr = /fran[cç]/i.test((c.note || '') + ' ' + c.name);
     const sub = [c.note, c.year].filter(Boolean).join(' · ') || c.type;
     return '<div class="cc-panel"><div class="cc-photo"><span class="cc-ghost">' + n3(c.num) + '</span>' +
-      (c.img ? '<img' + (c.map ? ' class="is-map"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
+      (c.img ? '<img' + (c.map ? ' class="is-map' + (c.fade ? ' is-fade' : '') + '"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
       '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>' +
       '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-stamp">ÉDITION 1</span></div>' +
       '<div class="cc-band' + (fr ? ' fr' : '') + '"><h3>' + esc(c.name) + '</h3><p>' + esc(sub) + '</p></div>' +
