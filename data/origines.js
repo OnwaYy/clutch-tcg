@@ -138,7 +138,8 @@ window.ORIGINES = {
     "TenZ": {"img": "assets/cartes/tenz.jpg", "color": "#c8202a", "photo": true},
     "Armada": {"img": "assets/cartes/armada.jpg", "color": "#1f6a3a", "photo": true},
     "Justin Wong": {"img": "assets/cartes/justin-wong.jpg", "color": "#2a3fb0", "photo": true},
-    "Sentinels — Masters Reykjavík": {"img": "assets/cartes/sentinels-masters-reykjavik.jpg", "color": "#ce0037", "photo": true}
+    "Sentinels — Masters Reykjavík": {"img": "assets/cartes/sentinels-masters-reykjavik.jpg", "color": "#ce0037", "photo": true},
+    "Worlds 2013 — Staples Center": {"img": "assets/cartes/worlds-2013-staples-center.jpg", "color": "#e2012d", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
