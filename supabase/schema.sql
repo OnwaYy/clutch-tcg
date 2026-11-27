@@ -427,3 +427,17 @@ revoke all on function public.suis_testeur() from public, anon;
 revoke all on function public.test_boosters(int) from public, anon;
 grant execute on function public.suis_testeur() to authenticated;
 grant execute on function public.test_boosters(int) to authenticated;
+
+-- Outil de test TEMPORAIRE : recevoir un exemplaire de chaque carte (comptes testeurs uniquement).
+-- À supprimer avant la sortie : drop function public.test_toutes_cartes();
+create or replace function public.test_toutes_cartes() returns int
+language plpgsql security definer set search_path = '' as $$
+declare u uuid := public._moi(); n int;
+begin
+  if not exists (select 1 from public.testeurs where joueur = u) then raise exception 'Réservé aux testeurs.'; end if;
+  insert into public.collection (joueur, carte) select u, c.id from public.cartes c on conflict (joueur, carte) do nothing;
+  get diagnostics n = row_count;
+  return n;
+end $$;
+revoke all on function public.test_toutes_cartes() from public, anon;
+grant execute on function public.test_toutes_cartes() to authenticated;

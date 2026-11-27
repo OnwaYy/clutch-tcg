@@ -108,7 +108,8 @@
       classement: function () { const d = load(); if (!d) return []; let sc = 0, lg = 0, n = 0; Object.keys(d.col).forEach(function (id) { const c = BY_ID[id]; if (!c) return; n++; sc += RAR.find(function (r) { return r.id === c.rarity; }).pts; if (RORDER[c.rarity] >= 3) lg++; }); return [{ pseudo: d.pseudo, score: sc, legendaires: lg, cartes: n }]; },
       pseudo_libre: function (a) { return NAME_OK.test(a.p); },
       suis_testeur: function () { return !!load(); },
-      test_boosters: function (a) { const d = me(); d.boosters += a.n; save(d); return d.boosters; }
+      test_boosters: function (a) { const d = me(); d.boosters += a.n; save(d); return d.boosters; },
+      test_toutes_cartes: function () { const d = me(); let n = 0; CATALOG.forEach(function (c) { if (!d.col[c.id]) { d.col[c.id] = 1; n++; } }); save(d); return n; }
     };
     return api;
   })();
@@ -1029,6 +1030,11 @@
     if (t.dataset.closeModal !== undefined) { closeModal(t.closest('.modal')); return; }
     if (t.id === 'wheelSpin') { spinWheel(); return; }
     if (t.dataset.op === 'skip') { showSummary(); return; }
+    if (t.dataset.testCartes !== undefined) {
+      t.disabled = true;
+      try { const n = await rpc('test_toutes_cartes'); toast(n ? n + ' cartes ajoutées : ta collection est complète.' : 'Tu as déjà toutes les cartes.'); await refresh(); } catch (err) { toast(err.message, true); }
+      t.disabled = false; return;
+    }
     if (t.dataset.testBoosters) {
       t.disabled = true;
       try { await rpc('test_boosters', { n: +t.dataset.testBoosters }); toast('+' + t.dataset.testBoosters + ' booster' + (+t.dataset.testBoosters > 1 ? 's' : '') + ' ajouté' + (+t.dataset.testBoosters > 1 ? 's' : '') + '.'); bump('#packChip'); await refresh(); } catch (err) { toast(err.message, true); }
