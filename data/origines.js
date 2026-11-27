@@ -148,6 +148,7 @@ window.ORIGINES = {
     "SK Telecom T1 — Le doublé mondial": {"img": "assets/cartes/sk-telecom-t1-le-double-mondial.jpg", "color": "#e2012d", "photo": true},
     "Zen — Le prodige de Rocket League": {"img": "assets/cartes/zen-le-prodige-de-rocket-league.jpg", "color": "#f5c935", "photo": true},
     "donk — Le prodige de Spirit": {"img": "assets/cartes/donk-le-prodige-de-spirit.jpg", "color": "#f2c25b", "photo": true},
+    "NiP — Les 87-0": {"img": "assets/cartes/nip-les-87-0.jpg", "color": "#c9a24a", "photo": true},
     "Faker": {"img": "assets/cartes/faker.png", "color": "#e2012d", "player": true},
     "Fortnite World Cup — Arthur Ashe Stadium": {"img": "assets/cartes/fortnite-world-cup-arthur-ashe-stadium.jpg", "color": "#5b3df5", "photo": true},
     "Evil Geniuses — Champions de TI5": {"img": "assets/cartes/evil-geniuses-champions-de-ti5.jpg", "color": "#1d3c6e", "photo": true},
