@@ -239,12 +239,12 @@
   // ---------- Secrètes : encre invisible, révélée par la lumière ----------
   // Ce que révèle la lumière sur chaque secrète : un détail lié à la carte
   const UV_TXT = {
-    151: 'Jönköping · 2011', 152: '1 000 000 $ · 2011', 153: 'Düsseldorf · 2023', 154: 'MVP à 17 ans',
-    155: 'SlayerS_BoxeR', 156: '« God » · KT Rolster', 157: 'Orc · 4Kings', 158: '87 – 0',
-    159: '4 Majors · 2017-2019', 160: 'Vancouver · Shanghai', 161: 'BlizzCon 2018', 162: '3 000 000 $ · 16 ans',
-    163: 'RLCS S5 · S6 · S7', 164: 'Paris · Austin · Budapest', 165: 'Cluj 2015 → Budapest 2025', 166: 'Stockholm 2021',
+    151: 'Joué au milieu d\'une LAN party', 152: 'Dendi & Puppey, champions', 153: 'Avec Alpha54 et Radosin', 154: 'Né en 2007',
+    155: 'SlayerS_`BoxeR`', 156: '« God » · KT Rolster', 157: 'Le roi des Orcs · 4Kings', 158: 'GeT_RiGhT & f0rest',
+    159: 'Londres · Katowice · Berlin', 160: 'Vancouver · Shanghai', 161: 'Le Zerg finlandais qui a battu la Corée', 162: 'Arthur Ashe · New York',
+    163: 'Gale Force · Dignitas · Vitality', 164: 'Nº1 mondial HLTV 2019 & 2020', 165: '8 ans entre deux Majors', 166: 'Sans perdre une seule map',
     167: 'Accor Arena · 2023', 168: 'Faker l\'a soulevée 6 fois', 169: 'Gagnée 2 fois par OG', 170: 'Astralis l\'a soulevé 4 fois',
-    171: '30 séries d\'affilée', 172: '2013 → 2025', 173: 'San Francisco · 2022', 174: 'Coach devenu champion', 175: 'The French Monster'
+    171: 'apEX · ZywOo · ropz · flameZ · mezii', 172: '13 · 15 · 16 · 23 · 24 · 25', 173: 'Champion après 9 ans de carrière', 174: 'Coach devenu champion', 175: 'The French Monster'
   };
   function uvLayer(c) {
     let seed = c.id * 7919 % 2147483647 || 1; const r = function () { seed = seed * 16807 % 2147483647; return seed / 2147483647; };
