@@ -354,7 +354,7 @@ window.ORIGINES = {
     ["Vitality — La saison record", "S", "Moment", "Counter-Strike", 2025, "Deux Majors, Austin et Budapest, et un record de 30 séries gagnées d'affilée"],
     ["T1 — Logo 6 étoiles", "S", "Logo de club", "League of Legends", 2025, "Six titres mondiaux"],
     ["Deft — Le rêve de DRX", "S", "Moment", "League of Legends", 2022, "Sortie des play-ins, DRX bat T1 en finale des Worlds 2022"],
-    ["Spacewar! — Le tout premier tournoi", "S", "Moment", "Spacewar!", 1972, "Stanford, le premier tournoi de jeu vidéo"],
+    ["Ceb — Le Français de OG", "S", "Joueur", "Dota 2", "2018-2019", "Le Français double champion de The International avec OG, en 2018 et 2019"],
     ["Gotaga — Le Roi de Call of Duty", "S", "Joueur", "Call of Duty", null, "La légende française de CoD"]
   ],
   // GOAT : une seule carte, sans numéro, hors des 175
