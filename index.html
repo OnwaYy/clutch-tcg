@@ -648,6 +648,15 @@
   .op-pack.drag .pk-guide, .op-pack.torn .pk-guide { display: none; }
   .op-pack.drag .pack { animation: none; }
   .op-pack.charge .pack { animation: charge .35s ease-in-out infinite; }
+  /* Signe d'une GOAT dans le booster : fente arc-en-ciel et booster qui pulse */
+  .opener.goatpk .op-pack .pk-slit { background: linear-gradient(90deg, #ff7eb6, #ffd36b, #ffffff, #6fd0ff, #b996ff, #ff7eb6) 0 0 / 200% 100%; animation: prism 1s linear infinite;
+    box-shadow: 0 0 12px 4px #ffd36b, 0 0 30px 10px rgba(185,150,255,.75), 0 0 70px 22px rgba(111,208,255,.5); opacity: calc(var(--tp) * 8 + .25); }
+  .opener.goatpk .op-pack.torn .pk-slit { height: 7px; box-shadow: 0 0 20px 8px #ffd36b, 0 -30px 90px 30px rgba(185,150,255,.7), 0 -10px 60px 20px rgba(255,126,182,.6); }
+  @keyframes prism { to { background-position: -200% 0; } }
+  .opener.goatpk .op-pack .pack { animation: float 3.4s ease-in-out infinite, goatpulse 1.1s ease-in-out infinite; }
+  .opener.goatpk .op-pack.charge .pack { animation: charge .25s ease-in-out infinite, goatpulse .6s ease-in-out infinite; }
+  @keyframes goatpulse { 0%, 100% { filter: drop-shadow(0 24px 26px rgba(0,0,0,.7)) drop-shadow(0 0 16px rgba(255,211,107,.55)); } 50% { filter: drop-shadow(0 24px 26px rgba(0,0,0,.7)) drop-shadow(0 0 34px rgba(255,211,107,.9)) drop-shadow(0 0 60px rgba(185,150,255,.7)); } }
+  .opener.goatpk .op-glow { opacity: 1; background: radial-gradient(circle, rgba(255,211,107,.35), rgba(185,150,255,.22) 40%, transparent 65%); }
   @keyframes charge { 0%,100% { rotate: -1.5deg; } 50% { rotate: 1.5deg; } }
   .op-pack.torn .pack { animation: none; }
   .op-pack.torn .pk-shine { display: none; }
@@ -1125,6 +1134,6 @@
 <script src="data/origines.js?v=de4fd81f"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=e7396120"></script>
+<script src="js/app.js?v=0132846a"></script>
 </body>
 </html>

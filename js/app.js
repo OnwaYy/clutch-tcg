@@ -663,7 +663,7 @@
   function openerShow() {
     opener.hidden = false; document.body.style.overflow = 'hidden'; fxInit(); FX.ps = [];
     Object.assign(OP, { phase: 'pack', res: null, req: null, err: null, list: [], idx: 0, busy: false, tearing: false, tp: 0, emit: null });
-    opener.classList.remove('dark', 'rays'); setRc('#ffffff');
+    opener.classList.remove('dark', 'rays', 'goatpk'); setRc('#ffffff');
     opReveal.classList.remove('hush'); $('#opChips').innerHTML = '';
     opPack.getAnimations().concat(opReveal.getAnimations()).forEach(function (an) { an.cancel(); });
     opPack.hidden = false; opPack.className = 'op-pack'; opPack.style.setProperty('--tp', 0);
@@ -686,7 +686,7 @@
   // Le tirage part dès qu'on touche le booster : la lueur de la déchirure prend la couleur de la meilleure carte
   function ensureReq() {
     if (OP.req) return OP.req;
-    OP.req = rpc('ouvrir_booster').then(function (res) { OP.res = res; $$('#rigSeg button').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); setRc(RC[bestRarity(res)]); refresh(); return res; }, function (e) { OP.err = e; throw e; });
+    OP.req = rpc('ouvrir_booster').then(function (res) { OP.res = res; opener.classList.toggle('goatpk', bestRarity(res) === 'goat'); $$('#rigSeg button').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); setRc(RC[bestRarity(res)]); refresh(); return res; }, function (e) { OP.err = e; throw e; });
     OP.req.catch(function () {});
     return OP.req;
   }
@@ -755,15 +755,23 @@
     const best = bestRarity(res);
     opPack.classList.remove('charge'); opPack.classList.add('torn'); $('#opHint').textContent = '';
     const p = centerOf(opPack.querySelector('.pack'), .07);
-    burst(p[0], p[1], FXC[best], RORDER[best] >= 3 ? 80 : 36, RORDER[best] >= 3 ? 9 : 6);
-    flash(RORDER[best] >= 2 ? RC[best] : 'rgba(255,255,255,.55)');
+    if (best === 'goat') {
+      // GOAT : rayons prismatiques, double flash, ondes de choc et grosse gerbe arc-en-ciel
+      $('#opRays').classList.add('goat'); opener.classList.add('rays');
+      flash('#ffd36b'); setTimeout(function () { flash('#ffffff'); }, 160);
+      wave('#opWave'); wave('#opWave2', 180); shake();
+      burst(p[0], p[1], FXC.goat, 170, 14);
+    } else {
+      burst(p[0], p[1], FXC[best], RORDER[best] >= 3 ? 80 : 36, RORDER[best] >= 3 ? 9 : 6);
+      flash(RORDER[best] >= 2 ? RC[best] : 'rgba(255,255,255,.55)');
+    }
     // La bande s'envole, le sachet disparaît aussitôt et les cartes sont là
     tween(500, easeOut, function (k) { renderTear(1, k); });
     OP.busy = true;
     await sleep(120);
     const packEl = opPack.querySelector('.pack'); packEl.style.animation = 'none';
     opPack.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(1.06)' }], { duration: 260, easing: 'ease-out', fill: 'forwards' });
-    buildReveal(res);
+    buildReveal(res); opener.classList.remove('rays', 'goatpk');
     const show = opReveal.animate([{ opacity: 0, transform: 'scale(.92)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 300, easing: 'cubic-bezier(.2,.9,.3,1.1)' });
     await show.finished;
     opPack.hidden = true; OP.busy = false;
@@ -787,7 +795,7 @@
     const v = Math.min(1, dx / (tearDrag.w * .85));
     if (v > OP.tp) {
       setTp(v);
-      if (Math.random() < .6) { spawn(r.left + r.width * v, r.top + r.height * .058, ['#ffffff', getComputedStyle(opener).getPropertyValue('--rc').trim() || '#fff'], (Math.random() - .3) * 3, -Math.random() * 3, 2 + Math.random() * 2, .03, .15); fxRun(); }
+      if (Math.random() < .6) { spawn(r.left + r.width * v, r.top + r.height * .058, opener.classList.contains('goatpk') ? FXC.goat : ['#ffffff', getComputedStyle(opener).getPropertyValue('--rc').trim() || '#fff'], (Math.random() - .3) * 3, -Math.random() * 3, 2 + Math.random() * 2, .03, .15); fxRun(); }
     }
     if (OP.tp >= 1) { tearDrag = null; opPack.classList.remove('drag'); tearPack(); }
   });
