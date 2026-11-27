@@ -767,6 +767,82 @@
   a.seller { color: inherit; text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
   a.seller:hover { color: var(--gold); }
 
+  /* ---------- Amis & échanges ---------- */
+  .nav-badge { position: absolute; top: 0; right: 0; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--bad); color: #fff; font: 700 11px/18px var(--f-mono); text-align: center; letter-spacing: 0; }
+  .am-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .am-head p { max-width: 560px; margin-top: 8px; }
+  .am-add { display: flex; gap: 8px; }
+  .am-add .input { width: 220px; }
+  .am-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 22px; align-items: start; }
+  .am-list, .ex-list { display: grid; gap: 10px; }
+  .am-sec { font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 6px 0 -2px; }
+  .am-row { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); }
+  .am-row.new { border-color: rgba(242,194,91,.5); }
+  .am-row .avatar { width: 42px; height: 42px; }
+  .am-who { flex: 1; min-width: 0; display: grid; gap: 4px; justify-items: start; }
+  .am-who a { color: var(--fg); font-weight: 700; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+  .am-who a:hover { color: var(--gold); }
+  .am-act { display: flex; gap: 6px; flex: none; }
+  .am-x { width: 32px; height: 32px; padding: 0; border-radius: 8px; background: transparent; border: 1px solid var(--line); color: var(--muted); font-size: 16px; }
+  .am-x:hover { color: var(--bad); border-color: var(--bad); }
+  .am-empty { color: var(--muted); font-size: 14px; padding: 18px 4px; text-align: center; }
+  .ex-item { border-radius: 14px; background: var(--panel-2); border: 1px solid var(--line); padding: 14px; display: grid; gap: 12px; }
+  .ex-item.todo { border-color: rgba(242,194,91,.55); box-shadow: inset 3px 0 0 var(--gold); }
+  .ex-top { display: flex; align-items: center; gap: 10px; }
+  .ex-top .avatar { width: 34px; height: 34px; }
+  .ex-top b a { color: var(--fg); text-decoration: none; } .ex-top b a:hover { color: var(--gold); }
+  .ex-top small { color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; }
+  .ex-cols { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; }
+  .ex-col { display: grid; gap: 6px; min-width: 0; }
+  .ex-col > span { font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .ex-arrow { font-size: 20px; color: var(--gold); }
+  .ex-cards { display: flex; gap: 6px; flex-wrap: wrap; min-height: 60px; align-items: center; }
+  .ex-cards .cc.mini { --u: .5px; width: 50px; border-radius: 4px; box-shadow: 0 4px 10px -4px rgba(0,0,0,.8); }
+  .ex-cards .none { color: var(--dim); font-size: 13px; }
+  .ex-bot { display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+  .ex-bot .warn { margin-right: auto; color: var(--bad); font-size: 13px; }
+  .ex-st { margin-right: auto; font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line-2); color: var(--muted); }
+  .ex-st.acceptee { color: var(--ok); border-color: rgba(95,211,154,.45); }
+  .ex-st.refusee, .ex-st.annulee { color: #c98a8a; }
+  /* Fenêtre de composition */
+  .ex-box { position: relative; width: min(1180px, 100%); height: min(860px, calc(100vh - 32px)); display: grid; grid-template-rows: auto 1fr auto; gap: 14px; padding: 22px 24px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 20px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.95); overflow: hidden; }
+  .ex-box-head { display: flex; align-items: center; gap: 12px; padding-right: 40px; }
+  .ex-box-head .avatar { width: 40px; height: 40px; }
+  .ex-box-head h2 { font-size: 22px; font-weight: 800; }
+  .ex-sides { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; min-height: 0; }
+  .ex-side { display: grid; grid-template-rows: auto auto auto 1fr; gap: 10px; min-height: 0; padding: 14px; border-radius: 14px; background: var(--panel-2); border: 1px solid var(--line); }
+  .ex-side-head { display: flex; align-items: center; justify-content: space-between; gap: 6px 10px; flex-wrap: wrap; }
+  .ex-side-head h3 { font-size: 16px; font-weight: 800; }
+  .check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); cursor: pointer; }
+  .ex-slots { display: grid; grid-template-columns: repeat(5, minmax(0, 70px)); gap: 8px; }
+  .ex-slot { aspect-ratio: 63/88; border-radius: 6px; border: 1px dashed var(--line-2); background: rgba(0,0,0,.2); position: relative; padding: 0; }
+  .ex-slot .cc.mini { --u: .72px; width: 100%; pointer-events: none; }
+  .ex-slot:not(:empty)::after { content: "×"; position: absolute; top: -6px; right: -6px; z-index: 9; width: 20px; height: 20px; border-radius: 50%; background: var(--bad); color: #fff; font: 700 14px/20px var(--f-body); text-align: center; }
+  .ex-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ex-tools .input { width: 170px; padding: 8px 12px; }
+  .ex-tools .seg button { padding: 5px 9px; font-size: 12px; }
+  .ex-pick { overflow: auto; min-height: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; align-content: start; padding: 4px 4px 4px 2px; }
+  .ex-pc { position: relative; padding: 0; background: none; border: 0; }
+  .ex-pc .cc.mini { --u: .84px; width: 100%; pointer-events: none; transition: transform .1s; }
+  .ex-pc:hover .cc.mini { transform: translateY(-3px); }
+  .ex-pc[disabled] { opacity: .35; }
+  .ex-pc .n { position: absolute; z-index: 9; right: -4px; bottom: -4px; font: 700 11px var(--f-mono); padding: 2px 5px; border-radius: 6px; background: rgba(8,9,12,.9); color: var(--gold); border: 1px solid var(--gold); }
+  .ex-pc .nw { position: absolute; z-index: 9; left: -4px; top: -4px; font: 800 9px var(--f-display); letter-spacing: .08em; padding: 2px 5px; border-radius: 5px; background: var(--ok); color: #06140c; }
+  .ex-box-foot { display: flex; align-items: center; gap: 10px; justify-content: flex-end; padding-top: 12px; border-top: 1px solid var(--line); }
+  .ex-box-foot #exHint { margin-right: auto; font-size: 13px; }
+  @media (max-width: 900px) {
+    .am-grid { grid-template-columns: 1fr; }
+    .am-add, .am-add .input { width: 100%; }
+    .ex-box { padding: 18px 12px; height: calc(100vh - 24px); }
+    .ex-sides { grid-template-columns: minmax(0, 1fr); overflow-y: auto; overflow-x: hidden; align-content: start; }
+    .ex-side { grid-template-rows: auto auto auto auto; min-height: auto; padding: 12px; }
+    .ex-pick { max-height: 320px; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); }
+    .ex-tools .input { width: 100%; }
+    .ex-box-foot #exHint { display: none; }
+    .ex-box-head h2 { font-size: 18px; }
+    .ex-cols { grid-template-columns: 1fr; } .ex-arrow { transform: rotate(90deg); justify-self: center; }
+  }
+
   /* Fenêtre « Personnaliser » */
   .pf-box { position: relative; width: min(980px, 100%); max-height: calc(100vh - 32px); display: grid; grid-template-rows: auto auto auto auto 1fr auto; gap: 14px; padding: 24px 26px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 20px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.95); overflow: hidden; }
   .pf-box-head { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding-right: 40px; }
@@ -1159,6 +1235,7 @@
       <a href="#boosters" data-link="boosters">Boutique</a>
       <a href="#classement" data-link="classement">Classement</a>
       <a href="#marche" data-link="marche">Marché</a>
+      <a href="#amis" data-link="amis">Amis<span class="nav-badge" data-notifs hidden></span></a>
     </nav>
     <div class="wallet">
       <span class="chip" id="coinChip" title="Pièces" data-auth hidden><i class="coin"></i><span data-bind="coins">0</span></span>
@@ -1345,6 +1422,27 @@
       </div>
     </div>
   </div>
+  <!-- ================= AMIS & ÉCHANGES ================= -->
+  <div data-view="amis" class="wrap page" hidden>
+    <div class="page-head am-head">
+      <div><h1>Amis</h1><p class="muted">Ajoute tes amis et échange des cartes avec eux, carte contre carte. Rien ne bouge tant que ton ami n'a pas accepté.</p></div>
+      <form id="amiForm" class="am-add" novalidate autocomplete="off">
+        <input class="input" id="amiInput" maxlength="16" placeholder="Pseudo d'un joueur" spellcheck="false">
+        <button class="btn btn-gold" type="submit">Ajouter</button>
+      </form>
+    </div>
+    <div class="am-grid">
+      <section class="panel">
+        <div class="panel-head"><h2>Échanges</h2><div class="seg" id="exTabs"><button type="button" data-ex-tab="cours" aria-pressed="true">En cours</button><button type="button" data-ex-tab="histo" aria-pressed="false">Historique</button></div></div>
+        <div id="exList" class="ex-list"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h2>Mes amis</h2><span class="eyebrow" id="amCount"></span></div>
+        <div id="amList" class="am-list"></div>
+      </section>
+    </div>
+  </div>
+
   <!-- ================= PROFIL PUBLIC ================= -->
   <div data-view="joueur" class="wrap page" hidden>
     <div id="pfPublic"></div>
@@ -1361,6 +1459,29 @@
 </div>
 
 <!-- Fiche marché d'une carte -->
+<div class="modal" id="exModal" aria-hidden="true">
+  <div class="modal-bg" data-ex-close></div>
+  <div class="ex-box" role="dialog" aria-label="Proposer un échange">
+    <button class="x" type="button" data-ex-close aria-label="Fermer">×</button>
+    <div class="ex-box-head"><span id="exWho"></span><h2>Proposer un échange</h2></div>
+    <div class="ex-sides">
+      <section class="ex-side" data-side="donne">
+        <div class="ex-side-head"><h3>Tu donnes <span class="muted" data-count>0/5</span></h3><label class="check"><input type="checkbox" data-only> Doubles seulement</label></div>
+        <div class="ex-slots" data-slots></div>
+        <div class="ex-tools"><input class="input" type="search" placeholder="Chercher…" data-q spellcheck="false"><div class="seg" data-rar></div></div>
+        <div class="ex-pick" data-pick></div>
+      </section>
+      <section class="ex-side" data-side="demande">
+        <div class="ex-side-head"><h3>Tu reçois <span class="muted" data-count>0/5</span></h3><label class="check"><input type="checkbox" data-only> Que je n'ai pas</label></div>
+        <div class="ex-slots" data-slots></div>
+        <div class="ex-tools"><input class="input" type="search" placeholder="Chercher…" data-q spellcheck="false"><div class="seg" data-rar></div></div>
+        <div class="ex-pick" data-pick></div>
+      </section>
+    </div>
+    <div class="ex-box-foot"><span class="muted" id="exHint">Choisis jusqu'à 5 cartes de chaque côté.</span><button class="btn btn-ghost btn-sm" type="button" data-ex-close>Annuler</button><button class="btn btn-gold" type="button" id="exSend">Envoyer la proposition</button></div>
+  </div>
+</div>
+
 <div class="modal" id="pfModal" aria-hidden="true">
   <div class="modal-bg" data-pf-close></div>
   <div class="pf-box" role="dialog" aria-label="Personnaliser mon profil">
@@ -1518,6 +1639,6 @@
 <script src="data/origines.js?v=43e1d476"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=bf0fcda8"></script>
+<script src="js/app.js?v=36bd2a64"></script>
 </body>
 </html>

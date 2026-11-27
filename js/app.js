@@ -86,6 +86,18 @@
       });
       mkSave(m); return m;
     }
+    const BOTS = ['Nyx', 'Kevin', 'Lea_99', 'Shadow'];
+    function botCol(p) { let seed = 0; for (let i = 0; i < p.length; i++) seed = (seed * 31 + p.charCodeAt(i)) % 2147483647; seed = seed || 7; const r = function () { seed = seed * 16807 % 2147483647; return seed / 2147483647; }; const col = {}; CATALOG.forEach(function (c) { if (r() < (c.rarity === 'goat' ? .3 : .45)) col[c.id] = 1 + (r() < .3 ? 1 : 0); }); return col; }
+    function has(col, ids) { const n = {}; ids.forEach(function (x) { n[x] = (n[x] || 0) + 1; }); return Object.keys(n).every(function (k) { return (col[k] || 0) >= n[k]; }); }
+    function move(col, ids, sgn) { ids.forEach(function (x) { col[x] = (col[x] || 0) + sgn; if (col[x] <= 0) delete col[x]; }); }
+    // Première visite : un ami, une demande reçue et une proposition reçue, pour tout voir
+    function soc(d) {
+      if (d.amis) return d;
+      d.amis = { Kevin: 'ami', Nyx: 'recue' }; d.ex = []; d.exN = 0;
+      const mine = Object.keys(d.col).map(Number), kc = botCol('Kevin'), theirs = Object.keys(kc).map(Number).filter(function (x) { return !d.col[x]; }).sort(function (a, b) { return RORDER[BY_ID[b].rarity] - RORDER[BY_ID[a].rarity]; });
+      if (theirs.length) d.ex.push({ id: ++d.exN, sens: 'recu', pseudo: 'Kevin', donne: theirs.slice(0, 1), demande: mine.slice(0, 2), statut: 'attente', cree_le: new Date(Date.now() - 600e3).toISOString() });
+      return d;
+    }
     function quest(d, id, n) { d.q[id] = d.q[id] || { p: 0, ok: false }; d.q[id].p += n; }
     function owned(d, rar) { return CATALOG.filter(function (c) { return c.rarity !== 'goat' && (!rar || c.rarity === rar); }).filter(function (c) { return d.col[c.id]; }).length; }
     function total(rar) { return CATALOG.filter(function (c) { return c.rarity !== 'goat' && (!rar || c.rarity === rar); }).length; }
@@ -97,7 +109,7 @@
         const d = me(); save(d); const now = Date.now();
         return { pseudo: d.pseudo, pieces: d.pieces, boosters: d.boosters, ouverts: d.ouverts, achetes: d.achetes, depense: d.depense, cree_le: d.cree, maintenant: new Date(now).toISOString(),
           prochain_gratuit: new Date(d.lastFree ? d.lastFree + 3600e3 : now - 1000).toISOString(), prochaine_roue: new Date(d.lastWheel ? d.lastWheel + 86400e3 : now - 1000).toISOString(),
-          prix: { un: 200, cinq: 900 }, collection: d.col, avatar: d.avatar || null, vitrine: d.vitrine || [], banniere: d.ban || 'g-nuit', titre: d.titre || 'recrue', titres: titresDe(d.col, d.ouverts, 0),
+          prix: { un: 200, cinq: 900 }, collection: d.col, avatar: d.avatar || null, vitrine: d.vitrine || [], banniere: d.ban || 'g-nuit', titre: d.titre || 'recrue', titres: titresDe(d.col, d.ouverts, 0), notifs: (function () { const x = soc(d); return Object.keys(x.amis).filter(function (k) { return x.amis[k] === 'recue'; }).length + x.ex.filter(function (y) { return y.sens === 'recu' && y.statut === 'attente'; }).length; })(),
           quetes: QS.map(function (q) { const st = d.q[q[0]] || { p: 0, ok: false }; return { id: q[0], nom: q[1], objectif: q[2], pieces: q[3], boosters: q[4], progres: Math.min(st.p, q[2]), recuperee: st.ok }; }),
           recompenses: RW.map(function (r) { return { id: r[0], nom: r[1], rarete: r[2], pieces: r[3], boosters: r[4], total: total(r[2]), possede: owned(d, r[2]), recuperee: !!d.rw[r[0]] }; }) };
       },
@@ -153,6 +165,38 @@
         const pr = {}; let sc = 0, n = 0; Object.keys(d.col).forEach(function (id) { const c = BY_ID[id]; if (!c) return; n++; pr[c.rarity] = (pr[c.rarity] || 0) + 1; sc += RAR.find(function (r) { return r.id === c.rarity; }).pts; });
         return { pseudo: d.pseudo, cree_le: d.cree, ouverts: d.ouverts, avatar: d.col[d.avatar] ? d.avatar : null, vitrine: (d.vitrine || []).filter(function (x) { return d.col[x]; }), banniere: d.ban || 'g-nuit', titre: d.titre || 'recrue', titres: titresDe(d.col, d.ouverts, 0), score: sc, cartes: n, par_rarete: pr, ventes: 0, rang: 1, joueurs: 1 };
       },
+      // Amis et échanges de démo : quelques joueurs fictifs qui acceptent tout
+      mes_amis: function () { const d = soc(me()); return Object.keys(d.amis).map(function (p) { return { pseudo: p, etat: d.amis[p], titre: p === 'Nyx' ? 'legendes' : 'collectionneur', avatar: null, depuis: new Date().toISOString() }; }); },
+      demander_ami: function (a) { const d = soc(me()), p = BOTS.find(function (b) { return b.toLowerCase() === String(a.p_pseudo).toLowerCase(); }); if (!p) throw new Error('Aucun joueur ne s\'appelle « ' + a.p_pseudo + ' ».'); if (d.amis[p] === 'ami') throw new Error('Vous êtes déjà amis.'); d.amis[p] = 'ami'; save(d); return 'ami'; },
+      repondre_ami: function (a) { const d = soc(me()); if (d.amis[a.p_pseudo] !== 'recue') throw new Error('Demande introuvable.'); if (a.p_ok) d.amis[a.p_pseudo] = 'ami'; else delete d.amis[a.p_pseudo]; save(d); },
+      retirer_ami: function (a) { const d = soc(me()); delete d.amis[a.p_pseudo]; d.ex.forEach(function (x) { if (x.pseudo === a.p_pseudo && x.statut === 'attente') { x.statut = 'annulee'; x.fini_le = new Date().toISOString(); } }); save(d); },
+      collection_ami: function (a) { const d = soc(me()); if (d.amis[a.p_pseudo] !== 'ami') throw new Error('Vous n\'êtes pas amis.'); return botCol(a.p_pseudo); },
+      proposer_echange: function (a) {
+        const d = soc(me()); if (d.amis[a.p_pseudo] !== 'ami') throw new Error('Tu ne peux échanger qu\'avec tes amis.');
+        if (a.p_donne.length > 5 || a.p_demande.length > 5) throw new Error('5 cartes maximum de chaque côté.');
+        if (!has(d.col, a.p_donne)) throw new Error('Tu ne possèdes pas toutes les cartes proposées.');
+        d.ex.unshift({ id: ++d.exN, sens: 'envoye', pseudo: a.p_pseudo, donne: a.p_donne.slice(), demande: a.p_demande.slice(), statut: 'attente', cree_le: new Date().toISOString() }); save(d); return d.exN;
+      },
+      mes_echanges: function () {
+        const d = soc(me());
+        d.ex.forEach(function (x) {   // les joueurs fictifs acceptent au bout de quelques secondes
+          if (x.sens === 'envoye' && x.statut === 'attente' && Date.now() - Date.parse(x.cree_le) > 4000) {
+            if (has(d.col, x.donne)) { move(d.col, x.donne, -1); move(d.col, x.demande, 1); x.statut = 'acceptee'; } else x.statut = 'annulee';
+            x.fini_le = new Date().toISOString();
+          }
+        });
+        save(d);
+        return d.ex.map(function (x) { return Object.assign({}, x, { avatar: null, possible: x.statut === 'attente' ? has(d.col, x.sens === 'recu' ? x.demande : x.donne) : null }); });
+      },
+      repondre_echange: function (a) {
+        const d = soc(me()), x = d.ex.find(function (y) { return y.id === a.p_id && y.sens === 'recu' && y.statut === 'attente'; });
+        if (!x) throw new Error('Échange introuvable ou déjà traité.');
+        x.fini_le = new Date().toISOString();
+        if (!a.p_ok) { x.statut = 'refusee'; save(d); return { statut: 'refusee' }; }
+        if (!has(d.col, x.demande)) { x.statut = 'annulee'; save(d); return { statut: 'annulee', raison: 'Une des cartes n\'est plus disponible : l\'échange est annulé.' }; }
+        move(d.col, x.demande, -1); move(d.col, x.donne, 1); x.statut = 'acceptee'; save(d); return { statut: 'acceptee' };
+      },
+      annuler_echange: function (a) { const d = soc(me()), x = d.ex.find(function (y) { return y.id === a.p_id && y.sens === 'envoye' && y.statut === 'attente'; }); if (!x) throw new Error('Échange introuvable ou déjà traité.'); x.statut = 'annulee'; x.fini_le = new Date().toISOString(); save(d); },
       test_toutes_cartes: function () { const d = me(); let n = 0; CATALOG.forEach(function (c) { if (!d.col[c.id]) { d.col[c.id] = 1; n++; } }); save(d); return n; }
     };
     return api;
@@ -494,6 +538,7 @@
   function avatarHTML(id, pseudo, cls) { const a = avatarParts(id, pseudo); return '<span class="avatar' + (cls ? ' ' + cls : '') + a.cls + '" style="' + a.style + '">' + a.html + '</span>'; }
   function myAvatar() { return S && S.avatar && owns(S.avatar) ? S.avatar : null; }
   function renderMe() {
+    $$('[data-notifs]').forEach(function (b) { const n = S && S.notifs || 0; b.hidden = !n; b.textContent = n > 9 ? '9+' : n; });
     const id = myAvatar(), key = id + '|' + (S && S.pseudo);
     $$('[data-avatar-me]').forEach(function (el) {
       if (el._k === key) return; el._k = key;
@@ -525,7 +570,7 @@
         '<div class="pf-id">' + titleChip(P.titre) + '<h1>' + esc(P.pseudo) + '</h1>' +
           '<div class="pf-meta"><span>Inscrit le <b>' + new Date(P.cree_le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</b></span>' +
           (P.rang ? '<span><b>#' + fmt(P.rang) + '</b> sur ' + fmt(P.joueurs) + ' joueur' + (P.joueurs > 1 ? 's' : '') + '</span>' : '') + '</div></div>' +
-        '<div class="pf-actions">' + (mine ? '<button class="btn btn-gold btn-sm" type="button" data-pf-open="avatar">Personnaliser</button>' : isMe ? '<a class="btn btn-gold btn-sm" href="#profil">Modifier</a>' : '') + share + '</div>' +
+        '<div class="pf-actions">' + (mine ? '<button class="btn btn-gold btn-sm" type="button" data-pf-open="avatar">Personnaliser</button>' : isMe ? '<a class="btn btn-gold btn-sm" href="#profil">Modifier</a>' : '<span data-pf-friend="' + esc(P.pseudo) + '"></span>') + share + '</div>' +
       '</div>' +
       '<div class="pf-stats">' +
         '<div class="gold"><b>' + (P.rang ? '#' + fmt(P.rang) : '—') + '</b><span>Classement</span></div>' +
@@ -569,7 +614,7 @@
     try { P = await rpc('profil_public', { p_pseudo: pseudo }); } catch (e) { toast(e.message, true); }
     if (location.hash.slice(1).split('/')[0] !== 'joueur') return;
     if (!P) { el.innerHTML = '<div class="pf-404"><h1>Joueur introuvable</h1><p class="muted">Aucun joueur ne s\'appelle « ' + esc(pseudo) + ' ».</p><a class="btn btn-light" href="#classement">Voir le classement</a></div>'; return; }
-    PF.pub = P; el.innerHTML = profileHTML(P, false);
+    PF.pub = P; el.innerHTML = profileHTML(P, false); fillFriendBtn();
   }
 
   // ---------- Fenêtre « Personnaliser » ----------
@@ -664,24 +709,164 @@
     const row = e.target.closest('tr[data-player]'); if (row) { location.hash = '#joueur/' + encodeURIComponent(row.dataset.player); }
   });
 
+  // =====================================================================
+  // Amis & échanges directs (carte contre carte)
+  // =====================================================================
+  const AM = { list: null, ex: null, tab: 'cours', busy: false };
+  const timeAgo = function (d) { const x = (now() - Date.parse(d)) / 1000; return x < 60 ? 'à l\'instant' : x < 3600 ? 'il y a ' + Math.floor(x / 60) + ' min' : x < 86400 ? 'il y a ' + Math.floor(x / 3600) + ' h' : 'il y a ' + Math.floor(x / 86400) + ' j'; };
+  const plink = function (p) { return '#joueur/' + encodeURIComponent(p); };
+  function miniCard(id, zoom) {
+    const c = BY_ID[id]; if (!c) return '';
+    const tag = zoom ? 'button' : 'div';
+    return '<' + tag + ' class="cc mini ' + finish(c) + '"' + (zoom ? ' type="button" data-card="' + c.num + '" aria-label="' + esc(c.name) + '"' : '') + ' style="' + cardStyle(c) + '">' + cardInner(c) + corners(c) + '</' + tag + '>';
+  }
+  async function loadAmis() {
+    if (!USER) return;
+    try { const r = await Promise.all([rpc('mes_amis'), rpc('mes_echanges')]); AM.list = r[0] || []; AM.ex = r[1] || []; }
+    catch (e) { toast(e.message, true); AM.list = AM.list || []; AM.ex = AM.ex || []; }
+    renderAmis();
+  }
+  function renderAmis() {
+    if (!AM.list) { $('#amList').innerHTML = $('#exList').innerHTML = '<p class="am-empty">Chargement…</p>'; return; }
+    const by = function (e) { return AM.list.filter(function (a) { return a.etat === e; }); };
+    const rec = by('recue'), amis = by('ami'), env = by('envoyee');
+    const who = function (a) { return avatarHTML(a.avatar, a.pseudo) + '<div class="am-who"><a href="' + plink(a.pseudo) + '">' + esc(a.pseudo) + '</a>' + (a.titre && a.titre !== 'recrue' ? titleChip(a.titre, 1) : '') + '</div>'; };
+    let h = '';
+    if (rec.length) h += '<div class="am-sec">Demandes reçues</div>' + rec.map(function (a) { return '<div class="am-row new">' + who(a) + '<div class="am-act"><button class="btn btn-gold btn-sm" type="button" data-am-ok="' + esc(a.pseudo) + '">Accepter</button><button class="btn btn-ghost btn-sm" type="button" data-am-no="' + esc(a.pseudo) + '">Refuser</button></div></div>'; }).join('');
+    if (amis.length) h += (rec.length ? '<div class="am-sec">Amis</div>' : '') + amis.map(function (a) { return '<div class="am-row">' + who(a) + '<div class="am-act"><button class="btn btn-gold btn-sm" type="button" data-ex-new="' + esc(a.pseudo) + '">Échanger</button><button class="am-x" type="button" data-am-del="' + esc(a.pseudo) + '" title="Retirer de mes amis">×</button></div></div>'; }).join('');
+    if (env.length) h += '<div class="am-sec">Demandes envoyées</div>' + env.map(function (a) { return '<div class="am-row">' + who(a) + '<div class="am-act"><span class="muted" style="font-size:13px">En attente</span><button class="am-x" type="button" data-am-del="' + esc(a.pseudo) + '" title="Annuler la demande">×</button></div></div>'; }).join('');
+    $('#amList').innerHTML = h || '<p class="am-empty">Pas encore d\'amis. Ajoute un joueur avec son pseudo, ou depuis son profil dans le classement.</p>';
+    $('#amCount').textContent = amis.length ? amis.length + ' ami' + (amis.length > 1 ? 's' : '') : '';
+    $$('#exTabs button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.exTab === AM.tab); });
+    const list = AM.ex.filter(function (x) { return AM.tab === 'cours' ? x.statut === 'attente' : x.statut !== 'attente'; });
+    const cards = function (ids) { return ids && ids.length ? ids.map(function (id) { return miniCard(id, true); }).join('') : '<span class="none">Rien</span>'; };
+    const ST = { acceptee: 'Échange fait', refusee: 'Refusé', annulee: 'Annulé' };
+    $('#exList').innerHTML = list.length ? list.map(function (x) {
+      const recu = x.sens === 'recu', give = recu ? x.demande : x.donne, get = recu ? x.donne : x.demande, todo = recu && x.statut === 'attente';
+      const p = '<b><a href="' + plink(x.pseudo) + '">' + esc(x.pseudo) + '</a></b>';
+      let bot;
+      if (x.statut === 'attente' && recu) bot = (x.possible === false ? '<span class="warn">Une des cartes n\'est plus disponible.</span>' : '') + '<button class="btn btn-ghost btn-sm" type="button" data-ex-no="' + x.id + '">Refuser</button>' + (x.possible === false ? '' : '<button class="btn btn-gold btn-sm" type="button" data-ex-ok="' + x.id + '">Accepter l\'échange</button>');
+      else if (x.statut === 'attente') bot = (x.possible === false ? '<span class="warn">Une des cartes n\'est plus disponible.</span>' : '<span class="muted" style="margin-right:auto;font-size:13px">En attente de sa réponse</span>') + '<button class="btn btn-ghost btn-sm" type="button" data-ex-cancel="' + x.id + '">Annuler</button>';
+      else bot = '<span class="ex-st ' + x.statut + '">' + ST[x.statut] + '</span><small class="muted">' + timeAgo(x.fini_le || x.cree_le) + '</small>';
+      return '<div class="ex-item' + (todo ? ' todo' : '') + '"><div class="ex-top">' + avatarHTML(x.avatar, x.pseudo) + '<span>' + (recu ? p + ' te propose un échange' : 'Proposé à ' + p) + '</span><small>' + timeAgo(x.cree_le) + '</small></div>' +
+        '<div class="ex-cols"><div class="ex-col"><span>Tu donnes</span><div class="ex-cards">' + cards(give) + '</div></div><div class="ex-arrow">⇄</div><div class="ex-col"><span>Tu reçois</span><div class="ex-cards">' + cards(get) + '</div></div></div>' +
+        '<div class="ex-bot">' + bot + '</div></div>';
+    }).join('') : '<p class="am-empty">' + (AM.tab === 'cours' ? 'Aucun échange en cours. Clique sur « Échanger » à côté d\'un ami pour lui proposer des cartes.' : 'Aucun échange ces 30 derniers jours.') + '</p>';
+  }
+  async function amAct(fn, args, ok) {
+    if (AM.busy) return; AM.busy = true;
+    try { const r = await rpc(fn, args); if (ok) toast(typeof ok === 'function' ? ok(r) : ok); await refresh(); await loadAmis(); fillFriendBtn(); }
+    catch (e) { toast(e.message, true); }
+    AM.busy = false;
+  }
+  $('#amiForm').addEventListener('submit', function (e) {
+    e.preventDefault(); const v = $('#amiInput').value.trim(); if (!v) return;
+    amAct('demander_ami', { p_pseudo: v }, function (r) { $('#amiInput').value = ''; return r === 'ami' ? 'Vous êtes maintenant amis !' : 'Demande envoyée à ' + v + '.'; });
+  });
+  document.addEventListener('click', function (e) {
+    const t = e.target.closest('[data-am-ok], [data-am-no], [data-am-del], [data-am-add], [data-ex-new], [data-ex-ok], [data-ex-no], [data-ex-cancel], [data-ex-tab]'); if (!t) return;
+    const d = t.dataset;
+    if (d.exTab) { AM.tab = d.exTab; renderAmis(); return; }
+    if (d.amAdd) { if (!USER) { openAuth('login'); return; } amAct('demander_ami', { p_pseudo: d.amAdd }, function (r) { return r === 'ami' ? 'Vous êtes maintenant amis !' : 'Demande d\'ami envoyée.'; }); return; }
+    if (d.amOk) { amAct('repondre_ami', { p_pseudo: d.amOk, p_ok: true }, 'Vous êtes maintenant amis !'); return; }
+    if (d.amNo) { amAct('repondre_ami', { p_pseudo: d.amNo, p_ok: false }, 'Demande refusée.'); return; }
+    if (d.amDel) {
+      if (!t.classList.contains('sure')) { t.classList.add('sure'); t.textContent = '?'; t.title = 'Clique encore pour confirmer'; setTimeout(function () { t.classList.remove('sure'); t.textContent = '×'; }, 2500); return; }
+      amAct('retirer_ami', { p_pseudo: d.amDel }, 'C\'est fait.'); return;
+    }
+    if (d.exNew) { openEx(d.exNew); return; }
+    if (d.exOk) { amAct('repondre_echange', { p_id: +d.exOk, p_ok: true }, function (r) { return r && r.statut === 'acceptee' ? 'Échange réussi ! Les cartes sont dans ta collection.' : (r && r.raison) || 'Échange annulé.'; }); return; }
+    if (d.exNo) { amAct('repondre_echange', { p_id: +d.exNo, p_ok: false }, 'Échange refusé.'); return; }
+    if (d.exCancel) { amAct('annuler_echange', { p_id: +d.exCancel }, 'Proposition annulée.'); return; }
+  });
+  // Bouton d'amitié sur un profil public
+  async function fillFriendBtn() {
+    const el = $('[data-pf-friend]'); if (!el) return;
+    const p = el.dataset.pfFriend;
+    if (!USER) { el.innerHTML = '<button class="btn btn-gold btn-sm" type="button" data-am-add="' + esc(p) + '">Ajouter en ami</button>'; return; }
+    if (!AM.list) { try { AM.list = await rpc('mes_amis'); } catch (e) { AM.list = []; } }
+    const a = AM.list.find(function (x) { return x.pseudo.toLowerCase() === p.toLowerCase(); });
+    el.innerHTML = !a ? '<button class="btn btn-gold btn-sm" type="button" data-am-add="' + esc(p) + '">Ajouter en ami</button>'
+      : a.etat === 'ami' ? '<button class="btn btn-gold btn-sm" type="button" data-ex-new="' + esc(p) + '">Proposer un échange</button>'
+      : a.etat === 'recue' ? '<button class="btn btn-gold btn-sm" type="button" data-am-ok="' + esc(p) + '">Accepter en ami</button>'
+      : '<button class="btn btn-dark btn-sm" type="button" disabled>Demande envoyée</button>';
+  }
+
+  // ---------- Fenêtre « Proposer un échange » ----------
+  const EX = { who: '', theirs: {}, donne: [], demande: [], f: { donne: { q: '', rar: 'all', only: false }, demande: { q: '', rar: 'all', only: false } } };
+  async function openEx(p) {
+    if (!USER || !S) { openAuth('login'); return; }
+    EX.who = p; EX.donne = []; EX.demande = []; EX.theirs = null;
+    ['donne', 'demande'].forEach(function (k) { EX.f[k] = { q: '', rar: 'all', only: false }; });
+    $$('#exModal [data-q]').forEach(function (i) { i.value = ''; }); $$('#exModal [data-only]').forEach(function (i) { i.checked = false; });
+    const a = AM.list && AM.list.find(function (x) { return x.pseudo === p; });
+    $('#exWho').innerHTML = avatarHTML(a ? a.avatar : null, p);
+    $('#exModal h2').textContent = 'Échange avec ' + p;
+    renderEx(); openModal('#exModal');
+    try { EX.theirs = await rpc('collection_ami', { p_pseudo: p }); } catch (e) { toast(e.message, true); closeModal($('#exModal')); return; }
+    renderEx();
+  }
+  function renderEx() {
+    ['donne', 'demande'].forEach(function (side) {
+      const box = $('#exModal [data-side="' + side + '"]'), sel = EX[side], f = EX.f[side];
+      const col = side === 'donne' ? (S.collection || {}) : (EX.theirs || {});
+      box.querySelector('[data-count]').textContent = sel.length + '/5';
+      let sl = ''; for (let i = 0; i < 5; i++) sl += sel[i] ? '<button class="ex-slot" type="button" data-ex-rm="' + side + ':' + i + '" title="Retirer">' + miniCard(sel[i]) + '</button>' : '<div class="ex-slot"></div>';
+      box.querySelector('[data-slots]').innerHTML = sl;
+      box.querySelector('[data-rar]').innerHTML = [['all', 'Toutes']].concat(RAR.slice().reverse().map(function (r) { return [r.id, RLABEL[r.id] || r.name]; })).filter(function (r) { return r[0] === 'all' || CATALOG.some(function (c) { return c.rarity === r[0]; }); })
+        .map(function (r) { return '<button type="button" data-ex-rar="' + side + ':' + r[0] + '" aria-pressed="' + (f.rar === r[0]) + '">' + r[1] + '</button>'; }).join('');
+      if (side === 'demande' && !EX.theirs) { box.querySelector('[data-pick]').innerHTML = '<p class="am-empty">Chargement de sa collection…</p>'; return; }
+      const q = f.q.trim().toLowerCase();
+      const list = CATALOG.filter(function (c) { const n = col[c.id] || 0; return n > 0 && (f.rar === 'all' || c.rarity === f.rar) && (!q || (c.name + ' ' + c.game).toLowerCase().indexOf(q) >= 0) && (!f.only || (side === 'donne' ? n >= 2 : !owns(c.id))); }).sort(rankSort);
+      box.querySelector('[data-pick]').innerHTML = list.length ? list.map(function (c) {
+        const n = col[c.id], left = n - sel.filter(function (x) { return x === c.id; }).length;
+        return '<button class="ex-pc" type="button" data-ex-add="' + side + ':' + c.id + '"' + (left <= 0 || sel.length >= 5 ? ' disabled' : '') + ' title="' + esc(c.name) + '">' + miniCard(c.id) + (n > 1 ? '<span class="n">×' + n + '</span>' : '') + (side === 'demande' && !owns(c.id) ? '<span class="nw">NOUVELLE</span>' : '') + '</button>';
+      }).join('') : '<p class="am-empty">' + (side === 'donne' ? 'Aucune carte ici.' : 'Rien à afficher.') + '</p>';
+    });
+    const n = EX.donne.length + EX.demande.length;
+    $('#exSend').disabled = !n || !EX.theirs;
+    $('#exHint').textContent = !n ? 'Choisis jusqu\'à 5 cartes de chaque côté.' : !EX.demande.length ? 'Tu offres ces cartes sans rien demander en retour.' : !EX.donne.length ? 'Tu demandes ces cartes sans rien donner en retour.' : 'Ton ami recevra la proposition et pourra l\'accepter ou la refuser.';
+  }
+  $('#exModal').addEventListener('click', function (e) {
+    const t = e.target.closest('button, .modal-bg'); if (!t) return;
+    const d = t.dataset;
+    if (d.exClose !== undefined) { closeModal($('#exModal')); return; }
+    const keep = function (side) { const pk = $('#exModal [data-side="' + side + '"] [data-pick]'), st = pk.scrollTop; renderEx(); pk.scrollTop = st; };
+    if (d.exAdd) { const a = d.exAdd.split(':'); if (EX[a[0]].length < 5) EX[a[0]].push(+a[1]); keep(a[0]); return; }
+    if (d.exRm) { const a = d.exRm.split(':'); EX[a[0]].splice(+a[1], 1); keep(a[0]); return; }
+    if (d.exRar) { const a = d.exRar.split(':'); EX.f[a[0]].rar = a[1]; renderEx(); return; }
+  });
+  $$('#exModal [data-q]').forEach(function (i) { i.addEventListener('input', function () { EX.f[i.closest('[data-side]').dataset.side].q = i.value; renderEx(); }); });
+  $$('#exModal [data-only]').forEach(function (i) { i.addEventListener('change', function () { EX.f[i.closest('[data-side]').dataset.side].only = i.checked; renderEx(); }); });
+  $('#exSend').addEventListener('click', async function () {
+    const btn = this; busy(btn, true, 'Envoi…');
+    try {
+      await rpc('proposer_echange', { p_pseudo: EX.who, p_donne: EX.donne, p_demande: EX.demande });
+      closeModal($('#exModal')); toast('Proposition envoyée à ' + EX.who + '.'); AM.tab = 'cours';
+      if (!$('[data-view="amis"]').hidden) loadAmis();
+    } catch (err) { toast(err.message, true); }
+    busy(btn, false);
+  });
+
   function renderAll() { renderAuthState(); renderBinds(); renderQuests(); renderHome(); renderBoosters(); renderCollection(); renderBoard(); renderMe(); }
 
   // =====================================================================
   // Navigation
   // =====================================================================
-  const VIEWS = ['accueil', 'boosters', 'collection', 'marche', 'classement', 'profil', 'joueur'];
-  const TITLES = { accueil: 'Accueil', boosters: 'Boosters', collection: 'Collection', marche: 'Marché', classement: 'Classement', profil: 'Profil', joueur: 'Joueur' };
+  const VIEWS = ['accueil', 'boosters', 'collection', 'marche', 'classement', 'amis', 'profil', 'joueur'];
+  const TITLES = { accueil: 'Accueil', boosters: 'Boosters', collection: 'Collection', marche: 'Marché', classement: 'Classement', profil: 'Profil', joueur: 'Joueur', amis: 'Amis' };
   function route() {
     let v = location.hash.slice(1); if (v === 'echanges') v = 'marche';
     let who = ''; if (v.indexOf('joueur/') === 0) { try { who = decodeURIComponent(v.slice(7)); } catch (e) { who = v.slice(7); } v = 'joueur'; }
     let view = VIEWS.indexOf(v) >= 0 && (v !== 'joueur' || who) ? v : 'accueil';
-    const needLogin = view === 'profil' && !USER; if (needLogin) view = 'accueil';
+    const needLogin = (view === 'profil' || view === 'amis') && !USER; if (needLogin) view = 'accueil';
     $$('[data-view]').forEach(function (el) { el.hidden = el.dataset.view !== view; });
     $$('[data-link]').forEach(function (a) { if (a.dataset.link === view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-    $$('#wheelModal.open, #authModal.open, #pfModal.open').forEach(closeModal); closeCard();
+    $$('#wheelModal.open, #authModal.open, #pfModal.open, #exModal.open').forEach(closeModal); closeCard();
     if ($('#mkModal').classList.contains('open')) closeMk();
     if (view === 'profil' && S) { $('#pseudoInput').value = S.pseudo || ''; loadMine(); }
     if (view === 'joueur') loadPublic(who);
+    if (view === 'amis') { renderAmis(); loadAmis(); }
     if (view === 'classement') loadBoard();
     if (view === 'marche') loadMarket();
     if (needLogin) openAuth('login');
@@ -709,7 +894,7 @@
   // =====================================================================
   async function setUser(u) {
     USER = u ? { email: u.email } : null;
-    $('#testPanel').hidden = true; PF.mine = null;
+    $('#testPanel').hidden = true; PF.mine = null; AM.list = AM.ex = null;
     if (!USER) { S = null; renderAll(); return; }
     closeModal($('#authModal'));
     await refresh();
@@ -1571,6 +1756,7 @@
     if ($('#cardModal').classList.contains('open')) { closeCard(); return; }
     if ($('#mkModal').classList.contains('open')) { closeMk(); return; }
     if ($('#pfModal').classList.contains('open')) { closePf(); return; }
+    if ($('#exModal').classList.contains('open')) { closeModal($('#exModal')); return; }
     const m = $('#authModal.open, #wheelModal.open'); if (m) closeModal(m);
   });
 
