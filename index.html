@@ -698,12 +698,19 @@
   .op-wave.go { animation: wave .9s cubic-bezier(.1,.6,.3,1) forwards; }
   @keyframes wave { from { opacity: 1; scale: .1; } to { opacity: 0; scale: 3.2; } }
   .op-clue { position: absolute; left: 50%; top: 46%; translate: -50% -50%; z-index: 8; width: 92vw; text-align: center; pointer-events: none; font-family: var(--f-display); font-weight: 900; font-stretch: 125%; text-transform: uppercase; line-height: 1;
-    font-size: clamp(30px, 7vw, 76px); color: #fff; text-shadow: 0 0 26px var(--rc), 0 0 60px var(--rc); opacity: 0; }
-  .op-clue small { display: block; font-family: var(--f-mono); font-weight: 500; font-stretch: 100%; font-size: clamp(11px, 1.4vw, 14px); letter-spacing: .3em; color: color-mix(in srgb, var(--rc) 70%, #fff); text-shadow: none; margin-bottom: 14px; }
-  .op-clue.in { animation: cluein .55s cubic-bezier(.2,.9,.3,1) forwards; }
+    font-size: clamp(42px, 9.5vw, 120px); color: #fff; text-shadow: 0 0 26px var(--rc), 0 0 70px var(--rc), 0 6px 0 rgba(0,0,0,.4); opacity: 0; }
+  .op-clue.long { font-size: clamp(34px, 6.6vw, 84px); }
+  .op-clue small { display: block; font-family: var(--f-mono); font-weight: 500; font-stretch: 100%; font-size: clamp(12px, 1.6vw, 17px); letter-spacing: .34em; color: color-mix(in srgb, var(--rc) 70%, #fff); text-shadow: none; margin-bottom: 14px; }
+  .op-clue.in { animation: cluein .42s cubic-bezier(.2,1.2,.3,1) forwards; }
   .op-clue.outc { animation: clueout .3s ease-in forwards; }
-  @keyframes cluein { from { opacity: 0; letter-spacing: .4em; filter: blur(8px); scale: 1.15; } to { opacity: 1; letter-spacing: .02em; filter: blur(0); scale: 1; } }
-  @keyframes clueout { from { opacity: 1; } to { opacity: 0; scale: .92; filter: blur(6px); } }
+  @keyframes cluein { from { opacity: 0; filter: blur(10px); scale: 2.6; } 60% { opacity: 1; filter: blur(0); scale: .96; } to { opacity: 1; filter: blur(0); scale: 1; } }
+  @keyframes clueout { from { opacity: 1; } to { opacity: 0; scale: .5; translate: -50% calc(-50% - 22vh); filter: blur(4px); } }
+  .op-chips { position: absolute; left: 50%; top: 9%; translate: -50% 0; z-index: 8; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: min(92vw, 760px); pointer-events: none; }
+  .op-chip { font-family: var(--f-display); font-weight: 900; font-stretch: 112%; font-size: clamp(12px, 1.6vw, 16px); letter-spacing: .06em; text-transform: uppercase; padding: 6px 12px; border-radius: 8px;
+    color: #fff; background: rgba(0,0,0,.5); border: 1px solid color-mix(in srgb, var(--rc) 70%, transparent); box-shadow: 0 0 16px -4px var(--rc); animation: chipin .45s cubic-bezier(.2,1.5,.4,1) backwards; }
+  .op-chip small { font-family: var(--f-mono); font-weight: 500; font-size: .72em; letter-spacing: .14em; color: color-mix(in srgb, var(--rc) 75%, #fff); margin-right: 6px; }
+  @keyframes chipin { from { opacity: 0; scale: .4; translate: 0 18px; } }
+  .op-chips.fade { transition: opacity .4s; opacity: 0; }
   .op-tap { position: absolute; left: 50%; bottom: 12%; translate: -50% 0; z-index: 8; font-family: var(--f-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.4); pointer-events: none; }
   .rv.tense .rv-in { animation: tense .5s ease-in-out infinite; }
   @keyframes tense { 0%, 100% { translate: 0 0; rotate: 0deg; } 20% { translate: -3px 1px; rotate: -1deg; } 40% { translate: 3px -2px; rotate: 1deg; } 60% { translate: -2px 2px; rotate: -.6deg; } 80% { translate: 2px -1px; rotate: .8deg; } }
@@ -715,6 +722,7 @@
   .op-banner { transition: opacity .35s, transform .35s; position: absolute; z-index: 8; left: 50%; top: 0; translate: -50% 0; font-family: var(--f-display); font-weight: 900; font-stretch: 125%; font-size: clamp(34px, 7vw, 64px); text-transform: uppercase; line-height: 1; white-space: nowrap; pointer-events: none;
     color: var(--rc); text-shadow: 0 0 30px var(--rc), 0 4px 0 rgba(0,0,0,.5); opacity: 0; transform: scale(2.2); }
   .op-banner.show { animation: banner .8s cubic-bezier(.16,1.3,.3,1) forwards; }
+  .op-banner small { display: block; margin-top: 8px; font-size: .5em; letter-spacing: .12em; color: #fff; -webkit-text-fill-color: #fff; text-shadow: 0 0 24px rgba(255,217,138,.9); }
   .op-banner.goat { background: linear-gradient(90deg, #ff7eb6, #ffd36b, #fff, #6fd0ff, #b996ff); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 0 20px rgba(255,255,255,.6)); }
   @keyframes banner { to { opacity: 1; transform: scale(1); } }
   .op-banner.show.out { animation: bannerout .3s ease-in forwards; }
@@ -1077,6 +1085,7 @@
   <div class="op-wave" id="opWave"></div>
   <div class="op-wave" id="opWave2"></div>
   <div class="op-clue" id="opClue"></div>
+  <div class="op-chips" id="opChips"></div>
   <div class="op-stage" id="opStage">
     <p class="op-hint" id="opHint"></p>
     <div class="op-main" id="opMain">
@@ -1115,6 +1124,6 @@
 <script src="data/origines.js?v=6c4c9bf5"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=8f138173"></script>
+<script src="js/app.js?v=b60967d8"></script>
 </body>
 </html>

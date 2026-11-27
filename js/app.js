@@ -591,6 +591,9 @@
       const dx = x - cx, dy = y - cy, n = Math.hypot(dx, dy) || 1;
       if (Math.random() < .7) spawn(x, y, OP.crackle, dx / n * (1 + Math.random() * 2.5), dy / n * (1 + Math.random() * 2.5), 1.4 + Math.random() * 2, .045 + Math.random() * .04, 0);
     }
+    if (OP.rain) {
+      for (let i = 0; i < 3; i++) spawn(Math.random() * FX.w, -10, ['#f2c25b', '#ffd36b', '#ffffff', '#ff7eb6', '#6fd0ff'], (Math.random() - .5) * 1.5, 1 + Math.random() * 2.5, 5 + Math.random() * 5, .0035 + Math.random() * .003, .03);
+    }
     if (OP.emit) {
       const r = opReveal.getBoundingClientRect();
       for (let i = 0; i < 2; i++) {
@@ -607,7 +610,7 @@
       return true;
     });
     ctx.globalAlpha = 1;
-    if (FX.ps.length || OP.emit || OP.crackle) fxRun();
+    if (FX.ps.length || OP.emit || OP.crackle || OP.rain) fxRun();
   }
   function centerOf(el, fy) { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height * (fy == null ? .5 : fy)]; }
 
@@ -638,12 +641,19 @@
   }
   // Attente qu'un toucher peut écourter (pour passer les indices)
   function sleepH(ms) { return new Promise(function (done) { const t0 = performance.now(); (function chk() { if (OP.hurry || performance.now() - t0 >= ms) done(); else requestAnimationFrame(chk); })(); }); }
-  async function clue(text, sub, ms) {
+  // Un indice arrive en claquant au centre, puis se range en étiquette au-dessus de la carte
+  async function clue(text, sub, ms, chip) {
     if (!text) return;
+    text = String(text);
     const el = $('#opClue'); el.innerHTML = (sub ? '<small>' + esc(sub) + '</small>' : '') + esc(text);
-    el.className = 'op-clue'; void el.offsetWidth; el.classList.add('in');
-    await sleepH(ms); el.classList.remove('in'); el.classList.add('outc'); await sleepH(260); el.className = 'op-clue';
+    el.className = 'op-clue' + (text.length > 12 ? ' long' : ''); void el.offsetWidth; el.classList.add('in');
+    setTimeout(function () { const r = OP.list[OP.idx] ? OP.list[OP.idx].c.rarity : 'legend'; flash(RC[r] || '#fff'); shake(); burst(FX.w / 2, FX.h * .46, FXC[r] || FXC.legend, 34, 9); }, 230);
+    await sleepH(ms); el.classList.remove('in'); el.classList.add('outc');
+    if (chip !== false) { const chips = $('#opChips'); chips.classList.remove('fade'); chips.insertAdjacentHTML('beforeend', '<span class="op-chip">' + (sub ? '<small>' + esc(sub) + '</small>' : '') + esc(text) + '</span>'); }
+    await sleepH(300); el.className = 'op-clue';
   }
+  // Palmarès mis en avant pendant le walkout des GOAT
+  const GOAT_HOOK = { Faker: '6× champion du monde', ZywOo: '3× champion du Major' };
   function wave(id, delay) { setTimeout(function () { const w = $(id); w.classList.remove('go'); void w.offsetWidth; w.classList.add('go'); }, delay || 0); }
 
   // ---------- Ouverture ----------
@@ -651,7 +661,7 @@
     opener.hidden = false; document.body.style.overflow = 'hidden'; fxInit(); FX.ps = [];
     Object.assign(OP, { phase: 'pack', res: null, req: null, err: null, list: [], idx: 0, busy: false, tearing: false, tp: 0, emit: null });
     opener.classList.remove('dark', 'rays'); setRc('#ffffff');
-    opReveal.classList.remove('hush');
+    opReveal.classList.remove('hush'); $('#opChips').innerHTML = '';
     opPack.getAnimations().concat(opReveal.getAnimations()).forEach(function (an) { an.cancel(); });
     opPack.hidden = false; opPack.className = 'op-pack'; opPack.style.setProperty('--tp', 0);
     opPack.innerHTML = packHTML(SETS[0]).replace(/<\/div>$/, '<div class="pk-strip"></div><i class="pk-slit"></i><i class="pk-guide"></i></div>');
@@ -663,7 +673,7 @@
     requestAnimationFrame(buildStrip);
     setTimeout(function () { opPack.focus({ preventScroll: true }); }, 50);
   }
-  function openerHide() { OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
+  function openerHide() { OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; OP.rain = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
   async function startOpen() {
     if (!USER) { openAuth('signup'); return; }
     if (!S || S.boosters < 1) { toast('Tu n\'as plus de booster. Récupère le gratuit, tourne la roue ou achètes-en un.', true); location.hash = '#boosters'; return; }
@@ -821,7 +831,7 @@
     cardTilt.cur = { x: 0, y: 0, o: 0 }; cardTilt.tgt = { x: 0, y: 0, o: 0 };
   }
   const NAMES = { epic: 'Épique', legend: 'Légendaire', secret: 'Secrète', goat: 'GOAT' };
-  function showBanner(r) { const b = $('#opBanner'); b.textContent = NAMES[r]; b.className = 'op-banner' + (r === 'goat' ? ' goat' : ''); void b.offsetWidth; b.classList.add('show'); }
+  function showBanner(r, sub) { const b = $('#opBanner'); b.innerHTML = esc(NAMES[r]) + (sub ? '<small>' + esc(sub) + '</small>' : ''); b.className = 'op-banner' + (r === 'goat' ? ' goat' : ''); void b.offsetWidth; b.classList.add('show'); }
   async function revealCur() {
     const el = $$('.rv', opReveal)[OP.idx]; if (!el || OP.busy) return;
     OP.busy = true; OP.hurry = false; OP.seq = true;
@@ -831,12 +841,24 @@
     if (lvl >= 3) {
       // Walkout : écran noir, indices un par un, puis la carte se charge d'énergie
       opener.classList.add('dark');
-      if (r !== 'legend') {
-        opReveal.classList.add('hush'); $('#opHint').textContent = ''; await sleepH(450);
-        await clue(c.game, 'Jeu', 950);
-        if (r === 'goat') { if (c.year) await clue(c.year, 'Époque', 900); await clue('Greatest of all time', 'Rareté', 1150); }
-        opReveal.classList.remove('hush'); await sleepH(380);
+      $('#opHint').textContent = ''; $('#opChips').innerHTML = '';
+      if (r === 'goat') {
+        // Battements de cœur dans le noir avant les indices
+        el.classList.add('beat');
+        for (let i = 0; i < 3; i++) { await sleepH(460); flash('rgba(255,217,138,.28)'); }
+        el.classList.remove('beat');
       }
+      // Les indices : jeu, époque, catégorie… puis la rareté
+      opReveal.classList.add('hush'); await sleepH(420);
+      await clue(c.game, 'Jeu', 1000);
+      if (c.year) await clue(c.year, r === 'legend' ? 'Année' : 'Époque', 950);
+      if (r !== 'legend' && c.type) await clue(c.type, 'Catégorie', 900);
+      if (r === 'secret') await clue('Carte secrète', 'Rareté', 1000);
+      if (r === 'goat') {
+        if (GOAT_HOOK[c.name]) await clue(GOAT_HOOK[c.name], 'Palmarès', 1150);
+        await clue('Greatest of all time', 'Rareté', 1300);
+      }
+      opReveal.classList.remove('hush'); await sleepH(380);
       el.classList.add('lift', 'tense', 'charging');
       implode(FXC[r], r === 'goat' ? 140 : 90, 950);
       await sleepH(r === 'goat' ? 1150 : 980);
@@ -856,10 +878,14 @@
     await sleep(dur * .4);
     const p = centerOf(opReveal);
     if (lvl >= 3) {
-      opener.classList.remove('dark'); flash('#ffffff'); setTimeout(function () { flash(col); }, 140);
+      opener.classList.remove('dark'); $('#opChips').classList.add('fade'); flash('#ffffff'); setTimeout(function () { flash(col); }, 140);
       wave('#opWave'); wave('#opWave2', 160); shake();
-      burst(p[0], p[1], FXC[r], r === 'goat' ? 220 : 140, r === 'goat' ? 18 : 15);
-      opener.classList.add('rays'); OP.emit = FXC[r]; el.classList.add('big-r'); el.classList.remove('lift'); showBanner(r);
+      burst(p[0], p[1], FXC[r], r === 'goat' ? 240 : 140, r === 'goat' ? 19 : 15);
+      opener.classList.add('rays'); OP.emit = FXC[r]; el.classList.add('big-r'); el.classList.remove('lift'); showBanner(r, r === 'goat' ? c.name : null);
+      if (r === 'goat') {
+        setTimeout(function () { flash('#ffd36b'); wave('#opWave'); shake(); burst(p[0], p[1], FXC.goat, 160, 22); }, 420);
+        setTimeout(function () { flash('#ffffff'); wave('#opWave2'); shake(); burst(p[0], p[1], ['#f2c25b', '#fff1c4', '#ffffff'], 140, 26); OP.rain = true; fxRun(); }, 850);
+      }
     } else if (lvl === 2) {
       flash('rgba(180,107,255,.75)'); wave('#opWave'); burst(p[0], p[1], FXC.epic, 70, 11); el.classList.add('big-r'); showBanner('epic');
     } else burst(p[0], p[1], FXC[r], 18, 6);
@@ -874,7 +900,7 @@
   // La carte part dans la direction du lancer, avec la vitesse du geste
   async function throwCard(dir, from, vel) {
     const el = $$('.rv', opReveal)[OP.idx]; if (!el || OP.busy) return;
-    OP.busy = true; OP.emit = null; OP.sway = false; OP.crackle = null; hideBanner(); opener.classList.remove('rays', 'dark');
+    OP.busy = true; OP.emit = null; OP.sway = false; OP.crackle = null; OP.rain = false; hideBanner(); opener.classList.remove('rays', 'dark'); $('#opChips').classList.add('fade');
     const d = dir || (OP.idx % 2 ? 1 : -1), f = from || { x: 0, y: 0, r: 0 };
     const tx = d * (window.innerWidth * .6 + 300), ty = f.y - 80 - Math.abs(vel || 0) * 40;
     el.classList.add('dragging');
@@ -934,7 +960,7 @@
   // ---------- Récapitulatif ----------
   function showSummary() {
     const res = OP.res; if (!res || OP.phase === 'sum') return;
-    OP.phase = 'sum'; OP.emit = null; OP.busy = false; OP.crackle = null; OP.sway = false;
+    OP.phase = 'sum'; OP.emit = null; OP.busy = false; OP.crackle = null; OP.sway = false; OP.rain = false; $('#opChips').innerHTML = '';
     opener.classList.remove('rays', 'dark'); hideBanner();
     opReveal.hidden = true; $('#opCount').hidden = true;
     $('#opCards').innerHTML = OP.list.map(function (x, k) {
