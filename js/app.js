@@ -665,6 +665,40 @@
     img.classList.remove('kb'); void img.offsetWidth; img.classList.add('kb');
   }
   function photoOff() { $('#opPhoto').classList.remove('on'); }
+  // Le dossier GOAT : chaque info arrive sur une photo (polaroïd), puis va s'épingler autour de la carte
+  async function dossier(c) {
+    const box = $('#opDossier'); box.innerHTML = ''; box.className = 'op-dossier';
+    const own = GOAT_PHOTOS[c.name] || [];
+    const pool = CATALOG.filter(function (x) { return x.game === c.game && x.img && x.id !== c.id && x.rarity !== 'goat'; })
+      .sort(function (a, b) { return RORDER[b.rarity] - RORDER[a.rarity] || Math.random() - .5; });
+    const trophy = pool.find(function (x) { return /troph|coupe|aegis|major|champion|sacre|doubl/i.test(x.name); });
+    const rest = pool.filter(function (x) { return x !== trophy; }).map(function (x) { return x.img; });
+    const pick = function (i, alt) { return own[i] || alt || rest[i % Math.max(1, rest.length)] || c.img; };
+    const items = [
+      ['Jeu', c.game, pick(0, rest[0])], ['Époque', c.year, pick(1, rest[1])], ['Catégorie', c.type, pick(2, rest[2])],
+      ['Palmarès', GOAT_HOOK[c.name], pick(3, trophy && trophy.img)], ['Rareté', 'Greatest of all time', own[4] || c.img]
+    ].filter(function (x) { return x[1]; });
+    items.forEach(function (x) { const im = new Image(); im.src = x[2]; });
+    const W = window.innerWidth, H = window.innerHeight, small = W < 700;
+    const slots = [[-.31, -.2, -11], [.31, -.19, 9], [-.31, .22, 7], [.31, .23, -8]];
+    for (let k = 0; k < items.length; k++) {
+      const it = items[k], last = k === items.length - 1;
+      flash('rgba(255,255,255,.9)'); setTimeout(function () { flash(last ? 'rgba(255,211,107,.9)' : 'rgba(255,255,255,.6)'); }, 110);
+      const p = document.createElement('div');
+      p.className = 'pol in' + (last ? ' gp' : '');
+      p.style.setProperty('--rot', ((Math.random() - .5) * 8).toFixed(1) + 'deg');
+      p.innerHTML = '<div class="ph" style="background-image:url(&quot;' + it[2] + '&quot;)"></div><div class="cap"><small>' + esc(it[0]) + '</small><b>' + esc(it[1]) + '</b></div>';
+      box.appendChild(p); shake();
+      burst(W / 2, H * .46, last ? FXC.goat : ['#ffffff', '#ffe9b0', '#f2c25b'], last ? 90 : 30, last ? 13 : 8);
+      await sleepH(last ? 1400 : 1050);
+      if (!last) {
+        const sl = slots[k % slots.length];
+        p.style.setProperty('--tx', (sl[0] * W * (small ? .9 : 1)).toFixed(0) + 'px'); p.style.setProperty('--ty', (sl[1] * H).toFixed(0) + 'px');
+        p.style.setProperty('--rot', sl[2] + 'deg'); p.style.setProperty('--sc', small ? '.48' : '.56');
+        await sleepH(280);
+      } else p.classList.add('pulse');
+    }
+  }
   // Rafale de flashs façon paparazzi : les visuels du même jeu s'empilent de plus en plus vite
   async function strobe(c) {
     const pool = CATALOG.filter(function (x) { return x.game === c.game && x.img && x.id !== c.id && x.rarity !== 'goat'; })
@@ -785,7 +819,7 @@
     requestAnimationFrame(buildStrip);
     setTimeout(function () { opPack.focus({ preventScroll: true }); }, 50);
   }
-  function openerHide() { photoOff(); $('#opStrobe').className = 'op-strobe'; $('#opStrobe').innerHTML = ''; OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; OP.rain = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
+  function openerHide() { photoOff(); $('#opDossier').className = 'op-dossier'; $('#opDossier').innerHTML = ''; $('#opStrobe').className = 'op-strobe'; $('#opStrobe').innerHTML = ''; OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; OP.rain = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
   async function startOpen() {
     if (!USER) { openAuth('signup'); return; }
     if (!S || S.boosters < 1) { toast('Tu n\'as plus de booster. Récupère le gratuit, tourne la roue ou achètes-en un.', true); location.hash = '#boosters'; return; }
@@ -965,18 +999,13 @@
       for (let i = 0; i < 3; i++) { await sleepH(460); flash('rgba(255,217,138,.28)'); }
       el.classList.remove('beat');
       opReveal.classList.add('hush');
-      await strobe(c);
-      const ph = GOAT_PHOTOS[c.name] || [];
-      await clue(c.game, 'Jeu', 1000, true, ph[0]);
-      if (c.year) await clue(c.year, 'Époque', 950, true, ph[1]);
-      if (c.type) await clue(c.type, 'Catégorie', 900, true, ph[2]);
-      if (GOAT_HOOK[c.name]) await clue(GOAT_HOOK[c.name], 'Palmarès', 1150, true, ph[3]);
-      await clue('Greatest of all time', 'Rareté', 1300, true, ph[4]);
-      photoOff();
-      opReveal.classList.remove('hush'); await sleepH(380);
+      await dossier(c);
       el.classList.add('lift', 'tense', 'charging');
       implode(FXC.goat, 140, 950);
-      await sleepH(1150);
+      await sleepH(1000);
+      $('#opDossier').classList.add('boom');
+      opReveal.classList.remove('hush');
+      setTimeout(function () { const d = $('#opDossier'); d.className = 'op-dossier'; d.innerHTML = ''; }, 900);
       el.classList.remove('tense', 'charging', 'teased');
     } else if (lvl >= 3) {
       // Walkout : écran noir, indices un par un, puis la carte se charge d'énergie

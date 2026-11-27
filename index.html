@@ -7,7 +7,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Oxanium:wght@500;700;800&family=Oswald:wght@700&family=Barlow+Condensed:wght@800&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Oxanium:wght@500;700;800&family=Permanent+Marker&family=Oswald:wght@700&family=Barlow+Condensed:wght@800&family=JetBrains+Mono:wght@500&display=swap">
 <style>
   /* Interface : menu en haut, bandeau « booster du moment », boutons en relief */
   :root {
@@ -776,6 +776,22 @@
     border: 6px solid #f4f1ea; border-bottom-width: 22px; box-shadow: 0 20px 40px -10px rgba(0,0,0,.9); filter: contrast(1.1) saturate(1.15); animation: snap .22s cubic-bezier(.2,1.4,.4,1) both; }
   @keyframes snap { from { scale: 1.9; opacity: 0; filter: brightness(3) blur(6px); } 60% { opacity: 1; filter: brightness(1.6); } }
   .op-strobe.out i { transition: transform .32s cubic-bezier(.5,0,.8,.4), opacity .32s; transform: translateY(80vh) rotate(25deg); opacity: 0; }
+  /* Dossier GOAT : chaque info arrive sur sa photo, façon polaroïd */
+  .op-dossier { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+  .pol { position: absolute; left: 50%; top: 46%; width: min(38vmin, 330px); translate: -50% -50%; background: #f4f1ea; padding: 10px 10px 0; border-radius: 3px;
+    transform: translate(var(--tx, 0px), var(--ty, 0px)) rotate(var(--rot, 0deg)) scale(var(--sc, 1)); transition: transform .6s cubic-bezier(.3,1.15,.4,1), opacity .4s; box-shadow: 0 30px 60px -15px rgba(0,0,0,.95); }
+  .pol .ph { aspect-ratio: 1 / 1.05; background: center 25% / cover no-repeat; filter: contrast(1.08) saturate(1.1); }
+  .pol .cap { padding: 10px 6px 14px; text-align: center; }
+  .pol .cap small { display: block; font: 500 11px/1 var(--f-mono); letter-spacing: .3em; text-transform: uppercase; color: #7a6f86; }
+  .pol .cap b { display: block; margin-top: 7px; font: 400 clamp(19px, 3.3vmin, 32px)/1.05 'Permanent Marker', var(--f-display); color: #1a1030; }
+  .pol.in { animation: polin .5s cubic-bezier(.2,1.3,.35,1) both; }
+  @keyframes polin { from { opacity: 0; scale: 2.3; filter: brightness(3) blur(10px); } 55% { opacity: 1; filter: brightness(1.5); } to { scale: 1; } }
+  .pol.gp { width: min(46vmin, 400px); box-shadow: 0 0 60px 6px rgba(255,211,107,.55), 0 30px 60px -15px rgba(0,0,0,.95); }
+  .pol.gp .cap b { background: linear-gradient(90deg, #ff4f9a, #d49a1f, #2bb6f0, #8b5cf6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .pol.pulse { animation: polpulse .5s ease-in-out infinite; }
+  @keyframes polpulse { 50% { scale: 1.04; } }
+  .op-dossier.boom .pol { transform: translate(calc(var(--tx, 0px) * 2.6), calc(var(--ty, 0px) * 2.6 - 40px)) rotate(calc(var(--rot, 0deg) * 2.5)) scale(.35); opacity: 0; transition: transform .7s cubic-bezier(.4,0,.7,.3), opacity .7s; }
+  .op-dossier.boom .pol.gp { transform: scale(1.6); opacity: 0; transition: transform .45s ease-out, opacity .45s; }
   /* ---------- Cinématique GOAT ---------- */
   .op-snd { position: absolute; top: 14px; left: 14px; z-index: 11; background: rgba(0,0,0,.35); font-size: 16px; }
   .cine { position: absolute; inset: 0; z-index: 10; overflow: hidden; background: #000; display: none; cursor: pointer; }
@@ -1147,6 +1163,7 @@
   <div class="op-wave" id="opWave2"></div>
   <div class="op-photo" id="opPhoto"><i></i></div>
   <div class="op-strobe" id="opStrobe"></div>
+  <div class="op-dossier" id="opDossier"></div>
   <div class="op-clue" id="opClue"></div>
   <div class="op-chips" id="opChips"></div>
   <div class="op-stage" id="opStage">
@@ -1195,6 +1212,6 @@
 <script src="data/origines.js?v=de4fd81f"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=69ff0c01"></script>
+<script src="js/app.js?v=9b34c847"></script>
 </body>
 </html>
