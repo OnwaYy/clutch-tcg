@@ -658,7 +658,9 @@
   }
   // Palmarès mis en avant pendant le walkout des GOAT
   // Photos de carrière affichées derrière les indices du walkout (dans l'ordre : jeu, époque, catégorie, palmarès, GOAT)
-  const GOAT_PHOTOS = {};
+  const GOAT_PHOTOS = {
+    Faker: [1, 2, 3, 4, 5].map(function (i) { return 'assets/goat/faker-' + i + '.webp?v=1'; })
+  };
   function photoOn(src) {
     const el = $('#opPhoto'), img = el.querySelector('i');
     img.style.backgroundImage = 'url("' + src + '")'; el.classList.add('on');
