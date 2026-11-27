@@ -268,6 +268,12 @@
       questCount: quests.filter(function (q) { return q.recuperee; }).length + ' / ' + (quests.length || 5)
     };
     $$('[data-bind]').forEach(function (el) { const k = el.dataset.bind; if (k in vals && el.textContent !== String(vals[k])) el.textContent = vals[k]; });
+    $$('[data-clock]').forEach(function (el) {
+      const ms = el.dataset.clock === 'free' ? free : wheel, k = !S ? '-' : ms <= 0 ? 'ok' : countdown(ms);
+      if (el._k === k) return; el._k = k;
+      el.innerHTML = !S ? '<b>--</b>:<b>--</b>:<b>--</b>' : ms <= 0 ? '<span class="ready">' + (el.dataset.clock === 'free' ? 'Disponible' : 'Prête') + '</span>'
+        : k.split(':').map(function (x) { return '<b>' + x + '</b>'; }).join(':');
+    });
     $$('[data-bind-width="freePct"]').forEach(function (el) { const w = (!S ? 0 : free <= 0 ? 100 : Math.max(0, 100 - free / 36e3)).toFixed(1) + '%'; if (el.style.width !== w) el.style.width = w; });
     $$('[data-action="claim-free"]').forEach(function (b) { const h = !(S && free <= 0); if (b.hidden !== h) b.hidden = h; });
     $$('[data-wheel-btn]').forEach(function (b) { const d = !(S && wheel <= 0); if (b.disabled !== d) b.disabled = d; });
@@ -298,6 +304,9 @@
     $('#odds').innerHTML = RAR.map(function (r) {
       return '<div class="odd" style="--r:' + r.color + '"><span class="odd-name">' + r.name + '</span><span class="odd-pct">' + r.odds + '</span><span class="odd-note">' + r.note + '</span></div>';
     }).join('');
+    if (!$('#fanL').firstChild) [['#fanL', 176], ['#fanR', 177]].forEach(function (f) {
+      const c = BY_ID[f[1]]; if (c) $(f[0]).innerHTML = '<div class="cc mini ' + finish(c) + '" style="' + cardStyle(c) + '" aria-hidden="true">' + cardInner(c) + corners(c) + '</div>';
+    });
     const w = (ownedCount() / CATALOG.length * 100).toFixed(1) + '%';
     $('#homeProg').style.width = w; $('#collProg').style.width = w;
   }
@@ -378,7 +387,6 @@
     const needLogin = view === 'profil' && !USER; if (needLogin) view = 'accueil';
     $$('[data-view]').forEach(function (el) { el.hidden = el.dataset.view !== view; });
     $$('[data-link]').forEach(function (a) { if (a.dataset.link === view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-    $('#topTitle').textContent = TITLES[view];
     $$('#wheelModal.open, #authModal.open').forEach(closeModal); closeCard();
     if (view === 'profil' && S) $('#pseudoInput').value = S.pseudo || '';
     if (view === 'classement') loadBoard();
