@@ -661,7 +661,8 @@
   const GOAT_PHOTOS = {
     Faker: [1, 2, 3, 4, 5].map(function (i) { return 'assets/goat/faker-' + i + '.webp?v=1'; }),
     ZywOo: [1, 2, 3, 4, 5].map(function (i) { return 'assets/goat/zywoo-' + i + '.webp?v=1'; }),
-    Kaydop: [1, 2, 3, 4, 5].map(function (i) { return 'assets/goat/kaydop-' + i + '.webp?v=1'; })
+    Kaydop: [1, 2, 3, 4, 5].map(function (i) { return 'assets/goat/kaydop-' + i + '.webp?v=1'; }),
+    Shotzzy: [1, 2, 3, 4, 5].map(function (i) { return 'assets/goat/shotzzy-' + i + '.webp?v=1'; })
   };
   function photoOn(src) {
     const el = $('#opPhoto'), img = el.querySelector('i');
