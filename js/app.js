@@ -237,18 +237,26 @@
       (g[0] ? '<span class="g3-hook">' + esc(g[0]) + '</span>' : '') + '</span>';
   }
   // ---------- Secrètes : encre invisible, révélée par la lumière ----------
-  const UV_MSG = ['tu m\'as trouvé ;)', 'chut…', 'bien vu.', 'rare parmi les rares', 'regarde mieux', 'garde-la bien', 'pas pour tout le monde', 'tu n\'étais pas censé voir ça'];
+  // Ce que révèle la lumière sur chaque secrète : un détail lié à la carte
+  const UV_TXT = {
+    151: 'DreamHack · Jönköping 2011', 152: 'Gamescom · Cologne 2011', 153: 'Düsseldorf · août 2023', 154: 'Shanghai 2024 · MVP à 17 ans',
+    155: 'SlayerS_`BoxeR`', 156: '« God » · KT Rolster', 157: 'pour la Horde', 158: '87 maps · 0 défaite',
+    159: 'Londres · Katowice · Berlin', 160: 'TI8 Vancouver · TI9 Shanghai', 161: 'BlizzCon 2018 · Finlande', 162: 'Arthur Ashe · 3 000 000 $',
+    163: 'Gale Force · Dignitas · Vitality', 164: 'Paris · Austin · Budapest', 165: 'Cluj 2015 → Budapest 2025', 166: 'PGL Stockholm 2021',
+    167: 'Accor Arena · Paris 2023', 168: 'les Worlds depuis 2011', 169: 'les noms gravés pour toujours', 170: 'le graal de Counter-Strike',
+    171: '30 séries d\'affilée', 172: '2013 · 15 · 16 · 23 · 24 · 25', 173: 'sortis des play-ins', 174: '« Ceb Face »', 175: '« The French Monster »'
+  };
   function uvLayer(c) {
     let seed = c.id * 7919 % 2147483647 || 1; const r = function () { seed = seed * 16807 % 2147483647; return seed / 2147483647; };
     let stars = '';
     for (let i = 0; i < 12; i++) { const x = 15 + r() * 310, y = 15 + r() * 320, k = 5 + r() * 9; stars += '<path d="M' + x.toFixed(0) + ' ' + (y - k).toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + (x + k).toFixed(0) + ' ' + y.toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + x.toFixed(0) + ' ' + (y + k).toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + (x - k).toFixed(0) + ' ' + y.toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + x.toFixed(0) + ' ' + (y - k).toFixed(0) + 'Z"/>'; }
-    const a = 300 + r() * 40, b = 360 + r() * 30;
+    const a = 285 + r() * 20, b = 320 + r() * 20;
     return '<span class="cc-uv" aria-hidden="true"><span class="uv-tint" style="background-image:url(' + c.img + ')"></span><svg viewBox="0 0 340 475" preserveAspectRatio="xMidYMid slice">' +
       '<text x="170" y="250" text-anchor="middle" class="uv-num">' + c.num + '</text><g class="uv-stars">' + stars + '</g>' +
-      '<text x="170" y="58" text-anchor="middle" class="uv-head">CARTE SECRÈTE · Nº ' + c.num + '</text>' +
-      '<text x="44" y="' + a.toFixed(0) + '" class="uv-msg" transform="rotate(-7 44 ' + a.toFixed(0) + ')">' + esc(UV_MSG[c.id % UV_MSG.length]) + '</text>' +
+      '<text x="170" y="' + a.toFixed(0) + '" text-anchor="middle" class="uv-msg" transform="rotate(-6 170 ' + a.toFixed(0) + ')">' + esc(UV_TXT[c.id] || c.game) + '</text>' +
       '<path class="uv-line" d="M56 ' + b.toFixed(0) + ' C 110 ' + (b - 40).toFixed(0) + ', 150 ' + (b + 20).toFixed(0) + ', 200 ' + (b - 20).toFixed(0) + ' S 280 ' + (b - 30).toFixed(0) + ', 300 ' + b.toFixed(0) + '"/></svg></span><span class="cc-lamp"></span>';
   }
+  const footFit = function (t) { t = String(t); return t.length > 30 ? ' f-xs' : t.length > 22 ? ' f-s' : ''; };
   function cardInner(c) {
     if (c.rarity === 'goat') return goatInner(c);
     const s = setById(c.set);
@@ -265,7 +273,7 @@
       (goat ? '<span class="cc-num"><b>GOAT</b><small>HORS SÉRIE</small></span>' : '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>') +
       '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-ed">PREMIÈRE ÉDITION</span>' + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
       '<div class="cc-band' + (fr ? ' fr' : '') + (story ? ' has-story' : '') + '">' + (c.rarity === 'legend' ? '<span class="cc-crest"><b>★</b> LÉGENDAIRE <b>★</b></span>' : c.rarity === 'secret' ? '<span class="cc-crest"><b>★</b> SECRÈTE <b>★</b></span>' : goat ? '<span class="cc-crest"><b>★★★</b> GREATEST OF ALL TIME <b>★★★</b></span>' : '') + (story ? '<h3>' + esc(title) + '</h3><p class="cc-story">' + esc(story) + '</p>' : '<h3>' + esc(title) + '</h3><p>' + esc(subLine) + '</p>') + '</div>' +
-      '<div class="cc-foot"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + numText(c) + '<i></i></span></div></div>';
+      '<div class="cc-foot' + footFit(story ? subLine : c.type + ' · ' + c.game) + '"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + numText(c) + '<i></i></span></div></div>';
   }
   // Finition selon la rareté
   const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend l-glass', goat: 'g3d', secret: 'l-legend s-secret s-uv' };

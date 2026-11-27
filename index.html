@@ -545,6 +545,8 @@
   .cc-band h3 small { font: 600 calc(var(--u) * 2.8) 'Barlow', sans-serif; font-style: normal; letter-spacing: .12em; text-transform: uppercase; opacity: .7; margin-left: calc(var(--u) * 1); white-space: nowrap; }
   .cc-foot { display: flex; justify-content: space-between; align-items: center; gap: calc(var(--u) * 2); padding: 0 calc(var(--u) * 1); font: 600 calc(var(--u) * 3) 'Barlow', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--foot); }
   .cc-foot > span:first-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cc-foot.f-s > span:first-child { font-size: calc(var(--u) * 2.6); letter-spacing: .06em; }
+  .cc-foot.f-xs > span:first-child { font-size: calc(var(--u) * 2.3); letter-spacing: .02em; }
   .cc-set { display: flex; align-items: center; gap: calc(var(--u) * 1.4); color: var(--foot-strong); white-space: nowrap; }
   .cc-set i { width: calc(var(--u) * 2.2); height: calc(var(--u) * 2.2); border-radius: 50%; background: var(--rr); }
 
@@ -627,8 +629,7 @@
   .cc-uv svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 0 calc(var(--u) * .7) rgba(170,130,255,.9)); }
   .uv-num { font: 900 250px 'Archivo', sans-serif; font-stretch: 62%; fill: none; stroke: #7dfcff; stroke-width: 2.5; }
   .uv-stars { fill: #e7ff5a; }
-  .uv-head { font: 500 13px 'JetBrains Mono', monospace; letter-spacing: 5px; fill: #ff7ae6; }
-  .uv-msg { font: 500 12px 'JetBrains Mono', monospace; letter-spacing: 1.5px; fill: #7dfcff; }
+  .uv-msg { font: 500 17px 'JetBrains Mono', monospace; letter-spacing: 1px; fill: #7dfcff; paint-order: stroke; stroke: rgba(10,0,30,.6); stroke-width: 3px; }
   .uv-line { fill: none; stroke: #ff7ae6; stroke-width: 3; stroke-linecap: round; }
   .cc-lamp { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: var(--o, 0); mix-blend-mode: screen; background: radial-gradient(circle calc(var(--u) * 26) at var(--mx, 50%) var(--my, 50%), rgba(150,90,255,.28), transparent 70%); }
   .cc.mini .cc-uv, .cc.mini .cc-lamp { display: none; }
@@ -970,7 +971,7 @@
   .rv.big-r.face .rv-front { box-shadow: 0 0 70px 6px color-mix(in srgb, var(--glow) 55%, transparent); }
   .rv-new { position: absolute; z-index: 12; top: -14px; left: 50%; transform: translateX(-50%) scale(0); font-family: var(--f-display); font-weight: 900; font-stretch: 112%; font-size: 14px; letter-spacing: .1em; padding: 4px 12px; border-radius: 8px; background: var(--ok); color: #062615; box-shadow: 0 6px 16px -4px rgba(95,211,154,.7); transition: transform .4s cubic-bezier(.3,1.6,.5,1) .35s; }
   .rv.face .rv-new { transform: translateX(-50%) scale(1); }
-  .op-banner { transition: opacity .35s, transform .35s; position: absolute; z-index: 8; left: 50%; top: 0; translate: -50% 0; font-family: var(--f-display); font-weight: 900; font-stretch: 125%; font-size: clamp(34px, 7vw, 64px); text-transform: uppercase; line-height: 1; white-space: nowrap; pointer-events: none;
+  .op-banner { text-align: center; transition: opacity .35s, transform .35s; position: absolute; z-index: 8; left: 50%; top: 0; translate: -50% 0; font-family: var(--f-display); font-weight: 900; font-stretch: 125%; font-size: clamp(34px, 7vw, 64px); text-transform: uppercase; line-height: 1; white-space: nowrap; pointer-events: none;
     color: var(--rc); text-shadow: 0 0 30px var(--rc), 0 4px 0 rgba(0,0,0,.5); opacity: 0; transform: scale(2.2); }
   .op-banner.show { animation: banner .8s cubic-bezier(.16,1.3,.3,1) forwards; }
   .op-banner small { display: block; margin-top: 8px; font-size: .5em; letter-spacing: .12em; color: #fff; -webkit-text-fill-color: #fff; text-shadow: 0 0 24px rgba(255,217,138,.9); }
@@ -1517,6 +1518,6 @@
 <script src="data/origines.js?v=43e1d476"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=3f7496ff"></script>
+<script src="js/app.js?v=76585c67"></script>
 </body>
 </html>
