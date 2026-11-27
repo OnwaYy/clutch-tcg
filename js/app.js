@@ -540,69 +540,247 @@
   // =====================================================================
   // Ouverture de booster
   // =====================================================================
-  const OP = { busy: false, res: null };
-  function openerShow() {
-    const op = $('#opener'); op.hidden = false; document.body.style.overflow = 'hidden';
-    $('#opPack').hidden = false; $('#opPack').className = 'op-pack'; $('#opPack').innerHTML = packHTML(SETS[0]);
-    $('#opCards').innerHTML = ''; $('#opSum').hidden = true; $('#opActions').hidden = true; $('#opHint').hidden = false;
-    $('#opHint').textContent = 'Touche le booster pour l\'ouvrir';
-    $$('#opActions [data-op]').forEach(function (b) { b.hidden = b.dataset.op !== 'reveal'; });
-    OP.res = null;
+  const RC = { common: '#e4e0ee', uncommon: '#4fd1c5', epic: '#b46bff', legend: '#f2c25b', secret: '#ff7ad9', goat: '#ffffff' };
+  const FXC = { common: ['#ffffff', '#d9d4e8'], uncommon: ['#4fd1c5', '#c9fff8', '#ffffff'], epic: ['#b46bff', '#e2c4ff', '#ffffff'], legend: ['#f2c25b', '#fff1c4', '#ffffff', '#ffb02e'], secret: ['#ff7ad9', '#ffd1f1', '#ffffff', '#b996ff'], goat: ['#ff7eb6', '#ffd36b', '#ffffff', '#6fd0ff', '#b996ff', '#f2c25b'] };
+  const OP = { phase: 'off', res: null, req: null, err: null, list: [], idx: 0, busy: false, tearing: false, tp: 0, emit: null };
+  const opener = $('#opener'), opPack = $('#opPack'), opReveal = $('#opReveal');
+  const setRc = function (col) { opener.style.setProperty('--rc', col); };
+  const shake = function () { const st = $('#opStage'); st.classList.remove('shake'); void st.offsetWidth; st.classList.add('shake'); };
+  function flash(color) { const f = $('#opFlash'); f.style.setProperty('--fc', color); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); }
+  function opButtons(show) { $$('#opActions [data-op]').forEach(function (b) { b.hidden = show.indexOf(b.dataset.op) < 0 || (b.dataset.op === 'next' && !(S && S.boosters > 0)); }); }
+
+  // ---------- Particules ----------
+  const FX = { ctx: null, ps: [], raf: 0, w: 0, h: 0 };
+  function fxInit() {
+    const c = $('#opFx'), d = Math.min(2, window.devicePixelRatio || 1);
+    FX.w = window.innerWidth; FX.h = window.innerHeight; c.width = FX.w * d; c.height = FX.h * d;
+    FX.ctx = c.getContext('2d'); FX.ctx.setTransform(d, 0, 0, d, 0, 0);
   }
-  function openerHide() { $('#opener').hidden = true; document.body.style.overflow = ''; renderAll(); }
+  function spawn(x, y, colors, vx, vy, size, decay, g) {
+    FX.ps.push({ x: x, y: y, vx: vx, vy: vy, life: 1, decay: decay, size: size, c: colors[Math.floor(Math.random() * colors.length)], rot: Math.random() * 6, vr: (Math.random() - .5) * .3, sq: Math.random() < .55, g: g });
+  }
+  function burst(x, y, colors, n, power) {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, v = power * (.35 + Math.random() * .9);
+      spawn(x, y, colors, Math.cos(a) * v, Math.sin(a) * v - power * .25, 2 + Math.random() * 4.5, .008 + Math.random() * .016, .13);
+    }
+    fxRun();
+  }
+  function fxRun() { if (!FX.raf) FX.raf = requestAnimationFrame(fxLoop); }
+  function fxLoop() {
+    FX.raf = 0; const ctx = FX.ctx; if (!ctx) return;
+    ctx.clearRect(0, 0, FX.w, FX.h);
+    if (OP.emit) {
+      const r = opReveal.getBoundingClientRect();
+      for (let i = 0; i < 2; i++) {
+        const side = Math.random(), x = side < .5 ? r.left + Math.random() * r.width : (side < .75 ? r.left : r.right), y = side < .5 ? r.bottom - Math.random() * r.height * .2 : r.top + Math.random() * r.height;
+        spawn(x, y, OP.emit, (Math.random() - .5) * 1.2, -1 - Math.random() * 2.2, 1.5 + Math.random() * 3, .01 + Math.random() * .012, -.01);
+      }
+    }
+    FX.ps = FX.ps.filter(function (p) {
+      p.vy += p.g; p.vx *= .985; p.vy *= .985; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= p.decay;
+      if (p.life <= 0) return false;
+      ctx.globalAlpha = Math.min(1, p.life * 1.6); ctx.fillStyle = p.c;
+      if (p.sq) { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2); ctx.restore(); }
+      else { ctx.beginPath(); ctx.arc(p.x, p.y, p.size / 2, 0, 6.283); ctx.fill(); }
+      return true;
+    });
+    ctx.globalAlpha = 1;
+    if (FX.ps.length || OP.emit) fxRun();
+  }
+  function centerOf(el, fy) { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height * (fy == null ? .5 : fy)]; }
+
+  // ---------- Ouverture ----------
+  function openerShow() {
+    opener.hidden = false; document.body.style.overflow = 'hidden'; fxInit(); FX.ps = [];
+    Object.assign(OP, { phase: 'pack', res: null, req: null, err: null, list: [], idx: 0, busy: false, tearing: false, tp: 0, emit: null });
+    opener.classList.remove('dark', 'rays'); setRc('#ffffff');
+    opPack.hidden = false; opPack.className = 'op-pack'; opPack.style.setProperty('--tp', 0);
+    opPack.innerHTML = packHTML(SETS[0]).replace(/<\/div>$/, '<i class="pk-slit"></i><i class="pk-guide"></i></div>');
+    opReveal.hidden = true; opReveal.innerHTML = ''; $('#opSumWrap').hidden = true; $('#opCount').hidden = true;
+    $('#opBanner').className = 'op-banner'; $('#opX').hidden = false;
+    $('#opHint').textContent = 'Glisse le long du haut du booster pour le déchirer';
+    opButtons([]);
+    setTimeout(function () { opPack.focus({ preventScroll: true }); }, 50);
+  }
+  function openerHide() { OP.phase = 'off'; OP.emit = null; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
   async function startOpen() {
     if (!USER) { openAuth('signup'); return; }
     if (!S || S.boosters < 1) { toast('Tu n\'as plus de booster. Récupère le gratuit, tourne la roue ou achètes-en un.', true); location.hash = '#boosters'; return; }
     openerShow();
   }
-  async function tearPack() {
-    if (OP.busy || OP.res) return; OP.busy = true;
-    const pk = $('#opPack'); pk.classList.add('charge'); $('#opHint').textContent = 'Ouverture…';
-    try {
-      const [res] = await Promise.all([rpc('ouvrir_booster'), sleep(900)]);
-      OP.res = res;
-      pk.classList.remove('charge'); pk.classList.add('tear'); await sleep(380);
-      flash('#fff'); pk.classList.add('gone'); await sleep(380); pk.hidden = true;
-      dealCards(res);
-      refresh();
-    } catch (e) { pk.classList.remove('charge'); $('#opHint').textContent = e.message; toast(e.message, true); }
-    finally { OP.busy = false; }
+  function bestRarity(res) { let b = 'common'; res.cartes.forEach(function (id) { const r = BY_ID[id].rarity; if (RORDER[r] > RORDER[b]) b = r; }); return b; }
+  // Le tirage part dès qu'on touche le booster : la lueur de la déchirure prend la couleur de la meilleure carte
+  function ensureReq() {
+    if (OP.req) return OP.req;
+    OP.req = rpc('ouvrir_booster').then(function (res) { OP.res = res; setRc(RC[bestRarity(res)]); refresh(); return res; }, function (e) { OP.err = e; throw e; });
+    OP.req.catch(function () {});
+    return OP.req;
   }
-  function flash(color) { const f = $('#opFlash'); f.style.setProperty('--fc', color); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); }
-  function dealCards(res) {
-    // La plus rare en dernier, pour le suspense
-    const list = res.cartes.map(function (id, i) { return { c: BY_ID[id], i: i, neu: res.nouvelles.indexOf(id) >= 0 }; });
+  function setTp(v) { OP.tp = v; opPack.style.setProperty('--tp', v.toFixed(3)); }
+  function animTp(to, ms) {
+    return new Promise(function (done) {
+      const from = OP.tp, t0 = performance.now();
+      (function step(t) { const k = Math.min(1, (t - t0) / ms); setTp(from + (to - from) * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); else done(); })(t0);
+    });
+  }
+  async function tearPack() {
+    if (OP.phase !== 'pack' || OP.tearing) return; OP.tearing = true;
+    ensureReq();
+    if (OP.tp < 1) await animTp(1, 320);
+    opPack.classList.add('charge'); $('#opHint').textContent = '';
+    let res;
+    try { [res] = await Promise.all([OP.req, sleep(250)]); }
+    catch (e) { opPack.classList.remove('charge'); setTp(0); OP.tearing = false; OP.req = null; $('#opHint').textContent = e.message; toast(e.message, true); return; }
+    const best = bestRarity(res);
+    opPack.classList.remove('charge'); opPack.classList.add('torn');
+    const p = centerOf(opPack.querySelector('.pack'), .07);
+    burst(p[0], p[1], FXC[best], RORDER[best] >= 3 ? 70 : 34, RORDER[best] >= 3 ? 9 : 6);
+    flash(RORDER[best] >= 2 ? RC[best] : 'rgba(255,255,255,.6)');
+    await sleep(520);
+    opPack.classList.add('gone');
+    buildReveal(res);
+    await sleep(500); opPack.hidden = true;
+  }
+  // Glisser le doigt / la souris le long du booster pour le déchirer, sinon un simple clic l'ouvre
+  let tearDrag = null;
+  opPack.addEventListener('pointerdown', function (e) {
+    if (OP.phase !== 'pack' || OP.tearing) return;
+    opPack.setPointerCapture(e.pointerId);
+    tearDrag = { x0: e.clientX, moved: false, w: opPack.querySelector('.pack').getBoundingClientRect().width };
+    ensureReq();
+  });
+  opPack.addEventListener('pointermove', function (e) {
+    const pack = opPack.querySelector('.pack'); if (!pack || OP.phase !== 'pack') return;
+    const r = pack.getBoundingClientRect();
+    opPack.style.setProperty('--px', (((e.clientY - r.top) / r.height - .5) * -14).toFixed(1) + 'deg');
+    opPack.style.setProperty('--py', (((e.clientX - r.left) / r.width - .5) * 18).toFixed(1) + 'deg');
+    if (!tearDrag || OP.tearing) return;
+    const dx = Math.abs(e.clientX - tearDrag.x0);
+    if (dx > 6) { tearDrag.moved = true; opPack.classList.add('drag'); }
+    if (!tearDrag.moved) return;
+    const v = Math.min(1, dx / (tearDrag.w * .8));
+    if (v > OP.tp) {
+      setTp(v);
+      if (Math.random() < .5) { spawn(r.left + r.width * v, r.top + r.height * .066, ['#ffffff', getComputedStyle(opener).getPropertyValue('--rc').trim() || '#fff'], (Math.random() - .3) * 3, -Math.random() * 3, 2 + Math.random() * 2, .03, .15); fxRun(); }
+    }
+    if (OP.tp >= 1) { tearDrag = null; opPack.classList.remove('drag'); tearPack(); }
+  });
+  function tearEnd() {
+    if (!tearDrag) return;
+    const d = tearDrag; tearDrag = null; opPack.classList.remove('drag');
+    if (!d.moved || OP.tp > .55) tearPack(); else animTp(0, 250);
+  }
+  opPack.addEventListener('pointerup', tearEnd);
+  opPack.addEventListener('pointercancel', tearEnd);
+  opPack.addEventListener('pointerleave', function () { opPack.style.setProperty('--px', '0deg'); opPack.style.setProperty('--py', '0deg'); });
+  opPack.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tearPack(); } });
+
+  // ---------- Révélation une par une, la plus rare en dernier ----------
+  function buildReveal(res) {
+    const list = res.cartes.map(function (id) { return { c: BY_ID[id], neu: res.nouvelles.indexOf(id) >= 0 }; });
     const seen = {}; list.forEach(function (x) { if (x.neu) { if (seen[x.c.id]) x.neu = false; seen[x.c.id] = 1; } });
     list.sort(function (a, b) { return RORDER[a.c.rarity] - RORDER[b.c.rarity]; });
-    $('#opHint').textContent = 'Touche les cartes pour les retourner';
-    $('#opCards').innerHTML = list.map(function (x, k) {
+    OP.list = list; OP.idx = 0; OP.phase = 'reveal';
+    opReveal.innerHTML = list.map(function (x, k) {
       const c = x.c;
-      return '<button class="flip" type="button" data-flip data-r="' + c.rarity + '" data-id="' + c.id + '" style="--i:' + k + '" aria-label="Retourner la carte ' + (k + 1) + '">' +
-        '<div class="flip-inner"><div class="face cback"><img class="cback-logo" src="assets/marque/embleme.webp?v=1" alt=""></div>' +
-        '<div class="face front"><div class="cc reveal ' + finish(c) + '" style="' + cardStyle(c) + '">' + cardInner(c).replace(' loading="lazy"', '') + corners(c) + '</div>' + (x.neu ? '<span class="newtag">NOUVELLE</span>' : '') + '</div></div></button>';
+      return '<div class="rv rise" data-r="' + c.rarity + '" style="--k:' + k + ';--d:' + k + '"><div class="rv-in">' +
+        '<div class="rv-f cback"><img class="cback-logo" src="assets/marque/embleme.webp?v=1" alt=""></div>' +
+        '<div class="rv-f rv-front"><div class="cc big ' + finish(c) + '" style="' + cardStyle(c) + '">' + cardInner(c).replace(/ loading="lazy"/g, '') + corners(c) + '<span class="cc-holo"></span><span class="cc-glare"></span></div></div>' +
+        '</div>' + (x.neu ? '<span class="rv-new">NOUVELLE</span>' : '') + '</div>';
     }).join('');
-    requestAnimationFrame(function () { $$('#opCards .flip').forEach(function (f) { f.classList.add('in'); }); });
-    $('#opActions').hidden = false;
+    $$('.rv', opReveal).forEach(function (el, k) {
+      if (RORDER[list[k].c.rarity] >= 3) { const pn = el.querySelector('.cc-panel'); if (pn) pn.insertAdjacentHTML('beforeend', '<span class="cc-glint"></span>'); }
+    });
+    opReveal.hidden = false; markCur();
+    $('#opCount').innerHTML = list.map(function () { return '<i></i>'; }).join(''); $('#opCount').hidden = false;
+    $('#opHint').textContent = 'Touche la carte pour la retourner';
+    opButtons(['skip']);
   }
-  function flipCard(f) {
-    if (f.classList.contains('on')) { openCard(BY_ID[f.dataset.id].num); return; }
-    f.classList.add('on');
-    const r = f.dataset.r;
-    if (RORDER[r] >= 3) { flash(r === 'legend' ? '#f2c25b' : r === 'secret' ? '#ff7ad9' : '#ffffff'); const st = $('.op-stage'); st.classList.remove('shake'); void st.offsetWidth; st.classList.add('shake'); }
-    else if (r === 'epic') flash('rgba(180,107,255,.7)');
-    if ($$('#opCards .flip:not(.on)').length === 0) finishOpen();
+  function markCur() {
+    $$('.rv', opReveal).forEach(function (el, k) { el.style.setProperty('--d', Math.max(0, k - OP.idx)); el.classList.toggle('cur', k === OP.idx); });
   }
-  async function revealAll() {
-    const rest = $$('#opCards .flip:not(.on)');
-    for (const f of rest) { flipCard(f); await sleep(RORDER[f.dataset.r] >= 3 ? 700 : 220); }
+  const NAMES = { epic: 'Épique', legend: 'Légendaire', secret: 'Secrète', goat: 'GOAT' };
+  async function revealCur() {
+    const el = $$('.rv', opReveal)[OP.idx]; if (!el || OP.busy) return;
+    OP.busy = true;
+    const r = el.dataset.r, lvl = RORDER[r], col = RC[r];
+    setRc(col); $('#opRays').classList.toggle('goat', r === 'goat');
+    // Montée de tension selon la rareté
+    if (r === 'goat') { opener.classList.add('dark'); el.classList.add('beat'); await sleep(1400); el.classList.remove('beat'); }
+    if (lvl >= 3) { opener.classList.add('rays'); el.classList.add('tense'); await sleep(r === 'goat' ? 500 : 800); el.classList.remove('tense'); el.classList.add('slow'); }
+    else if (lvl === 2) { el.classList.add('tense'); await sleep(380); el.classList.remove('tense'); }
+    el.classList.add('face', 'pop');
+    await sleep(lvl >= 3 ? 330 : 170);
+    const p = centerOf(opReveal);
+    if (lvl >= 3) {
+      flash(col); shake(); burst(p[0], p[1], FXC[r], r === 'goat' ? 180 : 110, r === 'goat' ? 16 : 13);
+      OP.emit = FXC[r]; el.classList.add('big-r');
+      const b = $('#opBanner'); b.textContent = NAMES[r]; b.className = 'op-banner' + (r === 'goat' ? ' goat' : ''); void b.offsetWidth; b.classList.add('show');
+      if (r === 'goat') opener.classList.remove('dark');
+    } else if (lvl === 2) {
+      flash('rgba(180,107,255,.75)'); burst(p[0], p[1], FXC.epic, 60, 10); el.classList.add('big-r');
+      const b = $('#opBanner'); b.textContent = NAMES.epic; b.className = 'op-banner'; void b.offsetWidth; b.classList.add('show');
+    } else burst(p[0], p[1], FXC[r], 18, 6);
+    const dot = $$('#opCount i')[OP.idx]; if (dot) { dot.style.setProperty('--c', col); dot.classList.add('done'); }
+    $('#opHint').textContent = OP.idx === OP.list.length - 1 ? 'Touche pour voir ton booster' : 'Touche ou glisse pour la carte suivante';
+    await sleep(lvl >= 3 ? 700 : 260);
+    OP.busy = false;
   }
-  function finishOpen() {
-    const res = OP.res; if (!res) return;
+  async function sendAway(dir) {
+    const els = $$('.rv', opReveal), el = els[OP.idx]; if (!el || OP.busy) return;
+    OP.busy = true; OP.emit = null;
+    $('#opBanner').classList.remove('show'); opener.classList.remove('rays', 'dark');
+    const d = dir || (OP.idx % 2 ? 1 : -1);
+    el.style.setProperty('--ax', (d * 120) + 'vw'); el.style.setProperty('--ar', (d * 24) + 'deg');
+    el.classList.add('away'); OP.idx++; markCur();
+    await sleep(260); OP.busy = false;
+    if (OP.idx >= OP.list.length) showSummary();
+  }
+  function advance(dir) {
+    if (OP.phase !== 'reveal' || OP.busy) return;
+    const el = $$('.rv', opReveal)[OP.idx]; if (!el) return;
+    if (el.classList.contains('face')) sendAway(dir); else revealCur();
+  }
+  let rvDrag = null;
+  opReveal.addEventListener('pointerdown', function (e) { rvDrag = { x: e.clientX, y: e.clientY }; });
+  opReveal.addEventListener('pointerup', function (e) {
+    if (!rvDrag) return; const dx = e.clientX - rvDrag.x, dy = e.clientY - rvDrag.y; rvDrag = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) advance(dx > 0 ? 1 : -1); else if (Math.abs(dx) < 12 && Math.abs(dy) < 12) advance();
+  });
+  // Inclinaison de la carte révélée qui suit la souris / le doigt
+  opReveal.addEventListener('pointermove', function (e) {
+    const el = $$('.rv', opReveal)[OP.idx]; if (!el || !el.classList.contains('face') || OP.busy) return;
+    const card = el.querySelector('.cc.big'), r = opReveal.getBoundingClientRect();
+    const px = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), py = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+    card.style.setProperty('--rx', ((0.5 - py) * 20).toFixed(2) + 'deg'); card.style.setProperty('--ry', ((px - 0.5) * 24).toFixed(2) + 'deg');
+    card.style.setProperty('--mx', (px * 100).toFixed(1) + '%'); card.style.setProperty('--my', (py * 100).toFixed(1) + '%'); card.style.setProperty('--o', 1);
+  });
+  opReveal.addEventListener('pointerleave', function () {
+    $$('.cc.big', opReveal).forEach(function (c) { c.style.setProperty('--rx', '0deg'); c.style.setProperty('--ry', '0deg'); c.style.setProperty('--o', 0); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (opener.hidden || OP.phase !== 'reveal') return;
+    if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); advance(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); advance(-1); }
+  });
+
+  // ---------- Récapitulatif ----------
+  function showSummary() {
+    const res = OP.res; if (!res || OP.phase === 'sum') return;
+    OP.phase = 'sum'; OP.emit = null; OP.busy = false;
+    opener.classList.remove('rays', 'dark'); $('#opBanner').classList.remove('show');
+    opReveal.hidden = true; $('#opCount').hidden = true;
+    $('#opCards').innerHTML = OP.list.map(function (x, k) {
+      const c = x.c;
+      return '<button class="op-card" type="button" data-card="' + c.num + '" data-r="' + c.rarity + '" style="--i:' + k + '" aria-label="Voir ' + esc(c.name) + '">' +
+        '<div class="cc ' + finish(c) + '" style="' + cardStyle(c) + '">' + cardInner(c) + corners(c) + '</div>' + (x.neu ? '<span class="newtag">NOUVELLE</span>' : '') + '</button>';
+    }).join('');
     const nb = res.nouvelles.length;
-    $('#opHint').textContent = 'Touche une carte pour la voir en grand';
     $('#opSum').innerHTML = '<span>Score du booster <b>' + fmt(res.score) + '</b></span><span class="gain"><i class="coin"></i><b>+' + fmt(res.score) + '</b> pièces</span><span>' + (nb ? '<b>' + nb + '</b> nouvelle' + (nb > 1 ? 's' : '') + ' carte' + (nb > 1 ? 's' : '') : 'Aucune nouvelle carte') + '</span>';
-    $('#opSum').hidden = false;
-    $$('#opActions [data-op]').forEach(function (b) { b.hidden = b.dataset.op === 'reveal' || (b.dataset.op === 'next' && !(S && S.boosters > 0)); });
+    $('#opSumWrap').hidden = false;
+    $('#opHint').textContent = 'Touche une carte pour la voir en grand';
+    opButtons(['next', 'close']);
     bump('#coinChip');
   }
 
@@ -658,9 +836,7 @@
     if (t.dataset.oauth) { oauth(t.dataset.oauth); return; }
     if (t.dataset.closeModal !== undefined) { closeModal(t.closest('.modal')); return; }
     if (t.id === 'wheelSpin') { spinWheel(); return; }
-    if (t.id === 'opPack') { tearPack(); return; }
-    if (t.dataset.flip !== undefined) { flipCard(t); return; }
-    if (t.dataset.op === 'reveal') { revealAll(); return; }
+    if (t.dataset.op === 'skip') { showSummary(); return; }
     if (t.dataset.op === 'next') { openerShow(); return; }
     if (t.dataset.op === 'close') { openerHide(); return; }
     if (t.dataset.setLink) { F.set = t.dataset.setLink; F.rarity = t.dataset.rarLink || 'all'; renderCollection(); }
