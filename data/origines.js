@@ -173,7 +173,8 @@ window.ORIGINES = {
     "Serral — Premier champion non coréen": {"img": "assets/cartes/serral-premier-champion-non-coreen.jpg", "color": "#e8c24a", "photo": true},
     "Bugha — Champion de la Fortnite World Cup": {"img": "assets/cartes/bugha-champion-de-la-fortnite-world-cup.jpg", "color": "#d9a93a", "photo": true},
     "Vitality — Champions du Major de Paris": {"img": "assets/cartes/vitality-champions-du-major-de-paris.jpg", "color": "#f5d100", "photo": true},
-    "La Coupe de l'Invocateur": {"img": "assets/cartes/la-coupe-de-l-invocateur.jpg", "color": "#4fb8d8", "photo": true}
+    "La Coupe de l'Invocateur": {"img": "assets/cartes/la-coupe-de-l-invocateur.jpg", "color": "#4fb8d8", "photo": true},
+    "L'Aegis des Champions": {"img": "assets/cartes/l-aegis-des-champions.jpg", "color": "#2a4fa8", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
