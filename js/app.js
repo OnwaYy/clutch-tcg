@@ -668,6 +668,8 @@
   // Le dossier GOAT : chaque info arrive sur une photo (polaroïd), puis va s'épingler autour de la carte
   async function dossier(c) {
     const box = $('#opDossier'); box.innerHTML = ''; box.className = 'op-dossier';
+    opener.classList.add('cinema'); auInit(); SFX.crowd(8.5);
+    const cam = box.animate([{ transform: 'scale(1) translate(0,0)' }, { transform: 'scale(1.08) translate(-1%, 1%)' }], { duration: 9000, easing: 'ease-in-out', fill: 'forwards' });
     const own = GOAT_PHOTOS[c.name] || [];
     const pool = CATALOG.filter(function (x) { return x.game === c.game && x.img && x.id !== c.id && x.rarity !== 'goat'; })
       .sort(function (a, b) { return RORDER[b.rarity] - RORDER[a.rarity] || Math.random() - .5; });
@@ -688,7 +690,9 @@
       p.className = 'pol in' + (last ? ' gp' : '');
       p.style.setProperty('--rot', ((Math.random() - .5) * 8).toFixed(1) + 'deg');
       p.innerHTML = '<div class="ph" style="background-image:url(&quot;' + it[2] + '&quot;)"></div><div class="cap"><small>' + esc(it[0]) + '</small><b>' + esc(it[1]) + '</b></div>';
-      box.appendChild(p); shake();
+      box.querySelectorAll('.pol').forEach(function (q) { q.classList.add('pinned'); });
+      box.appendChild(p); shake(); SFX.shutter();
+      box.animate([{ scale: 1.035 }, { scale: 1 }], { duration: 450, easing: 'cubic-bezier(.2,.8,.3,1)', composite: 'add' });
       burst(W / 2, H * .46, last ? FXC.goat : ['#ffffff', '#ffe9b0', '#f2c25b'], last ? 90 : 30, last ? 13 : 8);
       await sleepH(last ? 1400 : 1050);
       if (!last) {
@@ -696,8 +700,15 @@
         p.style.setProperty('--tx', (sl[0] * W * (small ? .9 : 1)).toFixed(0) + 'px'); p.style.setProperty('--ty', (sl[1] * H).toFixed(0) + 'px');
         p.style.setProperty('--rot', sl[2] + 'deg'); p.style.setProperty('--sc', small ? '.48' : '.56');
         await sleepH(280);
-      } else p.classList.add('pulse');
+      } else {
+        p.classList.add('pulse');
+        // Le tampon GOAT frappé sur le dossier
+        p.insertAdjacentHTML('beforeend', '<span class="pstamp">GOAT</span>'); const st = p.querySelector('.pstamp'); void st.offsetWidth; st.classList.add('hit');
+        setTimeout(function () { SFX.stamp(); shake(); flash('rgba(214,28,58,.35)'); }, 300);
+        await sleepH(700);
+      }
     }
+    cam.cancel();
   }
   // Rafale de flashs façon paparazzi : les visuels du même jeu s'empilent de plus en plus vite
   async function strobe(c) {
@@ -759,6 +770,19 @@
       const o = c.createOscillator(), g = auGain(0); o.type = 'sine'; o.frequency.setValueAtTime(90, t); o.frequency.exponentialRampToValueAtTime(28, t + 1.6); g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(.001, t + 1.8); o.connect(g); o.start(t); o.stop(t + 1.9);
       const n = auNoise(1.6), hp = c.createBiquadFilter(), ng = auGain(0); hp.type = 'highpass'; hp.frequency.value = 5000; ng.gain.setValueAtTime(.35, t); ng.gain.exponentialRampToValueAtTime(.001, t + 1.5); n.connect(hp).connect(ng); n.start(t);
       [0, 4, 7, 12].forEach(function (st, k) { const tt = t + .08 + k * .07, so = c.createOscillator(), sg = auGain(0); so.type = 'triangle'; so.frequency.value = 523.25 * Math.pow(2, st / 12); sg.gain.setValueAtTime(.14, tt); sg.gain.exponentialRampToValueAtTime(.001, tt + 1.2); so.connect(sg); so.start(tt); so.stop(tt + 1.3); }); },
+    // Déclic d'appareil photo + sifflement du flash
+    shutter: function () { const c = auInit(); if (!c) return; const t = c.currentTime;
+      [0, .055].forEach(function (d, k) { const n = auNoise(.04), hp = c.createBiquadFilter(), g = auGain(0); hp.type = 'highpass'; hp.frequency.value = k ? 2500 : 1500; g.gain.setValueAtTime(k ? .5 : .7, t + d); g.gain.exponentialRampToValueAtTime(.001, t + d + .04); n.connect(hp).connect(g); n.start(t + d); });
+      const o = c.createOscillator(), g = auGain(0); o.type = 'sine'; o.frequency.setValueAtTime(2200, t + .06); o.frequency.exponentialRampToValueAtTime(7000, t + .4); g.gain.setValueAtTime(.0001, t + .06); g.gain.exponentialRampToValueAtTime(.05, t + .2); g.gain.exponentialRampToValueAtTime(.0001, t + .42); o.connect(g); o.start(t + .06); o.stop(t + .45); },
+    // Foule qui monte
+    crowd: function (dur) { const c = auInit(); if (!c) return; const t = c.currentTime, g = auGain(0);
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.06, t + 1); g.gain.exponentialRampToValueAtTime(.5, t + dur);
+      [[500, .8], [1300, 1.2], [250, .6]].forEach(function (b) { const n = auNoise(dur + .2), bp = c.createBiquadFilter(), bg = c.createGain(); bp.type = 'bandpass'; bp.frequency.value = b[0]; bp.Q.value = b[1]; bg.gain.value = .6;
+        const l = c.createOscillator(), lg = c.createGain(); l.frequency.value = 2 + Math.random() * 3; lg.gain.value = .25; l.connect(lg).connect(bg.gain); l.start(t); l.stop(t + dur + .2);
+        n.connect(bp).connect(bg).connect(g); n.start(t); n.stop(t + dur + .2); }); },
+    // Coup de tampon
+    stamp: function () { const c = auInit(); if (!c) return; const t = c.currentTime, o = c.createOscillator(), g = auGain(0); o.type = 'sine'; o.frequency.setValueAtTime(160, t); o.frequency.exponentialRampToValueAtTime(45, t + .2); g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(.001, t + .3); o.connect(g); o.start(t); o.stop(t + .32);
+      const n = auNoise(.08), lp = c.createBiquadFilter(), ng = auGain(0); lp.type = 'lowpass'; lp.frequency.value = 1800; ng.gain.setValueAtTime(.8, t); ng.gain.exponentialRampToValueAtTime(.001, t + .08); n.connect(lp).connect(ng); n.start(t); },
     stop: function () { if (!AU.ctx) return; const t = AU.ctx.currentTime; AU.live.forEach(function (g) { try { g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + .15); } catch (e) {} }); AU.live = []; }
   };
   function sndBtn() { const b = $('#opSnd'); if (b) { b.textContent = AU.on ? '🔊' : '🔇'; b.setAttribute('aria-label', AU.on ? 'Couper le son' : 'Activer le son'); } }
@@ -819,7 +843,7 @@
     requestAnimationFrame(buildStrip);
     setTimeout(function () { opPack.focus({ preventScroll: true }); }, 50);
   }
-  function openerHide() { photoOff(); $('#opDossier').className = 'op-dossier'; $('#opDossier').innerHTML = ''; $('#opStrobe').className = 'op-strobe'; $('#opStrobe').innerHTML = ''; OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; OP.rain = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
+  function openerHide() { SFX.stop(); opener.classList.remove('cinema'); photoOff(); $('#opDossier').className = 'op-dossier'; $('#opDossier').innerHTML = ''; $('#opStrobe').className = 'op-strobe'; $('#opStrobe').innerHTML = ''; OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; OP.rain = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
   async function startOpen() {
     if (!USER) { openAuth('signup'); return; }
     if (!S || S.boosters < 1) { toast('Tu n\'as plus de booster. Récupère le gratuit, tourne la roue ou achètes-en un.', true); location.hash = '#boosters'; return; }
@@ -996,13 +1020,16 @@
       // GOAT : battements dans le noir, indices sur des photos de sa carrière, puis la carte se charge
       opener.classList.add('dark'); $('#opHint').textContent = ''; $('#opChips').innerHTML = '';
       el.classList.add('beat');
-      for (let i = 0; i < 3; i++) { await sleepH(460); flash('rgba(255,217,138,.28)'); }
+      for (let i = 0; i < 3; i++) { await sleepH(460); flash('rgba(255,217,138,.28)'); SFX.heart(); }
       el.classList.remove('beat');
       opReveal.classList.add('hush');
       await dossier(c);
-      el.classList.add('lift', 'tense', 'charging');
-      implode(FXC.goat, 140, 950);
-      await sleepH(1000);
+      // Ralenti : la carte se charge, le son monte, puis tout explose
+      el.classList.add('lift', 'tense', 'charging'); SFX.riser(1.4);
+      implode(FXC.goat, 140, 1250);
+      await sleepH(1350);
+      SFX.stop(); SFX.boom();
+      opener.classList.remove('cinema');
       $('#opDossier').classList.add('boom');
       opReveal.classList.remove('hush');
       setTimeout(function () { const d = $('#opDossier'); d.className = 'op-dossier'; d.innerHTML = ''; }, 900);
@@ -1054,7 +1081,7 @@
     OP.busy = false; OP.seq = false;
   }
   $('#opSnd').addEventListener('click', function (e) { e.stopPropagation(); AU.on = !AU.on; try { localStorage.setItem('clutch-son', AU.on ? '1' : '0'); } catch (er) {} if (!AU.on) SFX.stop(); sndBtn(); });
-  sndBtn(); $('#opSnd').hidden = true;
+  sndBtn();
   // Un toucher pendant la séquence fait défiler les indices plus vite
   opener.addEventListener('pointerdown', function () { if (OP.seq) OP.hurry = true; });
   // La carte part dans la direction du lancer, avec la vitesse du geste

@@ -792,6 +792,27 @@
   @keyframes polpulse { 50% { scale: 1.04; } }
   .op-dossier.boom .pol { transform: translate(calc(var(--tx, 0px) * 2.6), calc(var(--ty, 0px) * 2.6 - 40px)) rotate(calc(var(--rot, 0deg) * 2.5)) scale(.35); opacity: 0; transition: transform .7s cubic-bezier(.4,0,.7,.3), opacity .7s; }
   .op-dossier.boom .pol.gp { transform: scale(1.6); opacity: 0; transition: transform .45s ease-out, opacity .45s; }
+  /* Mise en scène cinéma du dossier GOAT */
+  .op-bar { position: absolute; left: 0; right: 0; height: 10vh; background: #000; z-index: 9; pointer-events: none; transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+  .op-bar.top { top: 0; transform: translateY(-100%); } .op-bar.bot { bottom: 0; transform: translateY(100%); }
+  .opener.cinema .op-bar { transform: none; }
+  .op-grain { position: absolute; inset: -50%; z-index: 9; pointer-events: none; opacity: 0; transition: opacity .6s; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E"); animation: grain .5s steps(4) infinite; }
+  .opener.cinema .op-grain { opacity: .22; }
+  @keyframes grain { 25% { transform: translate(-3%, 2%); } 50% { transform: translate(2%, -3%); } 75% { transform: translate(-1%, -2%); } }
+  .pol { filter: none; transition: transform .6s cubic-bezier(.3,1.15,.4,1), opacity .4s, filter .6s; }
+  .pol.pinned { filter: blur(2.5px) brightness(.5) saturate(.7); }
+  .pol .ph { position: relative; overflow: hidden; }
+  .pol .ph::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.6) 50%, transparent 65%); transform: translateX(-130%); }
+  .pol.in .ph::after { animation: sweep 1s .3s ease-out forwards; }
+  @keyframes sweep { to { transform: translateX(130%); } }
+  .pol .cap b { clip-path: inset(-10% 100% -10% 0); animation: write .7s .35s cubic-bezier(.4,0,.3,1) forwards; }
+  @keyframes write { to { clip-path: inset(-10% -2% -10% 0); } }
+  .pol .pstamp { position: absolute; left: 50%; top: 40%; z-index: 3; translate: -50% -50%; rotate: -14deg; pointer-events: none; padding: 4px 18px; border: 6px solid rgba(214,28,58,.95); border-radius: 10px; background: rgba(255,255,255,.08);
+    font: 900 clamp(38px, 7.5vmin, 80px)/1 var(--f-display); font-stretch: 125%; letter-spacing: .06em; color: rgba(214,28,58,.95); opacity: 0; text-shadow: 0 0 1px rgba(214,28,58,.9);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.7' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 1.6'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .pol .pstamp.hit { animation: stamp .32s cubic-bezier(.5,0,.8,.4) forwards; }
+  @keyframes stamp { from { opacity: 0; scale: 3; } to { opacity: 1; scale: 1; } }
   /* ---------- Cinématique GOAT ---------- */
   .op-snd { position: absolute; top: 14px; left: 14px; z-index: 11; background: rgba(0,0,0,.35); font-size: 16px; }
   .cine { position: absolute; inset: 0; z-index: 10; overflow: hidden; background: #000; display: none; cursor: pointer; }
@@ -1164,6 +1185,8 @@
   <div class="op-photo" id="opPhoto"><i></i></div>
   <div class="op-strobe" id="opStrobe"></div>
   <div class="op-dossier" id="opDossier"></div>
+  <div class="op-grain"></div>
+  <div class="op-bar top"></div><div class="op-bar bot"></div>
   <div class="op-clue" id="opClue"></div>
   <div class="op-chips" id="opChips"></div>
   <div class="op-stage" id="opStage">
@@ -1212,6 +1235,6 @@
 <script src="data/origines.js?v=de4fd81f"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=9b34c847"></script>
+<script src="js/app.js?v=7051a436"></script>
 </body>
 </html>
