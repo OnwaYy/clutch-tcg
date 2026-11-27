@@ -7,9 +7,10 @@ sont gérés par Supabase.
 
 - `schema.sql` : tables, règles de sécurité (RLS) et fonctions du jeu.
 - `marche.sql` : le marché entre joueurs (annonces, ventes, cours, taxe de 5 %).
+- `profil.sql` : le profil public (photo choisie parmi ses cartes, vitrine de 5 cartes, bannière, titres à débloquer) et le classement.
 - `catalogue.sql` : les 180 cartes (régénérer si `data/origines.js` change).
 
-Ordre d'installation : `schema.sql`, puis `catalogue.sql`, puis `marche.sql` (SQL Editor de Supabase).
+Ordre d'installation : `schema.sql`, puis `catalogue.sql`, puis `marche.sql`, puis `profil.sql` (SQL Editor de Supabase).
 
 ## Sécurité
 

@@ -97,7 +97,7 @@
         const d = me(); save(d); const now = Date.now();
         return { pseudo: d.pseudo, pieces: d.pieces, boosters: d.boosters, ouverts: d.ouverts, achetes: d.achetes, depense: d.depense, cree_le: d.cree, maintenant: new Date(now).toISOString(),
           prochain_gratuit: new Date(d.lastFree ? d.lastFree + 3600e3 : now - 1000).toISOString(), prochaine_roue: new Date(d.lastWheel ? d.lastWheel + 86400e3 : now - 1000).toISOString(),
-          prix: { un: 200, cinq: 900 }, collection: d.col,
+          prix: { un: 200, cinq: 900 }, collection: d.col, avatar: d.avatar || null, vitrine: d.vitrine || [], banniere: d.ban || 'g-nuit', titre: d.titre || 'recrue', titres: titresDe(d.col, d.ouverts, 0),
           quetes: QS.map(function (q) { const st = d.q[q[0]] || { p: 0, ok: false }; return { id: q[0], nom: q[1], objectif: q[2], pieces: q[3], boosters: q[4], progres: Math.min(st.p, q[2]), recuperee: st.ok }; }),
           recompenses: RW.map(function (r) { return { id: r[0], nom: r[1], rarete: r[2], pieces: r[3], boosters: r[4], total: total(r[2]), possede: owned(d, r[2]), recuperee: !!d.rw[r[0]] }; }) };
       },
@@ -119,7 +119,7 @@
       },
       recuperer_quete: function (a) { const d = me(), q = QS.find(function (x) { return x[0] === a.q; }), st = d.q[a.q]; if (!q || !st || st.ok || st.p < q[2]) throw new Error('Quête pas encore terminée ou déjà récupérée.'); st.ok = true; d.pieces += q[3]; d.boosters += q[4]; save(d); return { pieces: q[3], boosters: q[4] }; },
       recuperer_recompense: function (a) { const d = me(), r = RW.find(function (x) { return x[0] === a.r; }); if (!r) throw new Error('Récompense inconnue.'); const m = total(r[2]) - owned(d, r[2]); if (m > 0) throw new Error('Il te manque encore ' + m + ' carte(s).'); if (d.rw[a.r]) throw new Error('Récompense déjà récupérée.'); d.rw[a.r] = 1; d.pieces += r[3]; d.boosters += r[4]; save(d); return { pieces: r[3], boosters: r[4] }; },
-      classement: function () { const d = load(); if (!d) return []; let sc = 0, lg = 0, n = 0; Object.keys(d.col).forEach(function (id) { const c = BY_ID[id]; if (!c) return; n++; sc += RAR.find(function (r) { return r.id === c.rarity; }).pts; if (RORDER[c.rarity] >= 3) lg++; }); return [{ pseudo: d.pseudo, score: sc, legendaires: lg, cartes: n }]; },
+      classement: function () { const d = load(); if (!d) return []; let sc = 0, lg = 0, n = 0; Object.keys(d.col).forEach(function (id) { const c = BY_ID[id]; if (!c) return; n++; sc += RAR.find(function (r) { return r.id === c.rarity; }).pts; if (RORDER[c.rarity] >= 3) lg++; }); return [{ pseudo: d.pseudo, score: sc, legendaires: lg, cartes: n, avatar: d.col[d.avatar] ? d.avatar : null, titre: d.titre || 'recrue' }]; },
       pseudo_libre: function (a) { return NAME_OK.test(a.p); },
       suis_testeur: function () { return !!load(); },
       test_boosters: function (a) { const d = me(); d.boosters += a.n; save(d); return d.boosters; },
@@ -140,6 +140,19 @@
       acheter_annonce: function (a) { const d = me(), m = mkDemo(), x = m.ann.find(function (y) { return y.id === a.p_id; }); if (!x) throw new Error('Cette carte vient d\'être vendue ou retirée.'); if (x.moi) throw new Error('C\'est ta propre annonce.'); if (d.pieces < x.prix) throw new Error('Pas assez de pièces.');
         d.pieces -= x.prix; d.col[x.carte] = (d.col[x.carte] || 0) + 1; save(d); m.ann = m.ann.filter(function (y) { return y !== x; }); m.ventes.push({ carte: x.carte, prix: x.prix, t: Date.now() / 1000 }); mkSave(m); return { carte: x.carte, prix: x.prix }; },
       test_truquer: function (a) { const d = me(); d.forced = a.r || null; save(d); return a.r; },
+      modifier_profil: function (a) {
+        const d = me();
+        if (a.p_avatar != null) { if (a.p_avatar === 0) d.avatar = null; else if (d.col[a.p_avatar]) d.avatar = a.p_avatar; else throw new Error('Tu ne possèdes pas cette carte.'); }
+        if (a.p_vitrine) { if (a.p_vitrine.length > 5) throw new Error('La vitrine contient 5 cartes maximum.'); if (a.p_vitrine.some(function (x) { return !d.col[x]; })) throw new Error('Tu ne possèdes pas une des cartes de la vitrine.'); d.vitrine = a.p_vitrine.slice(); }
+        if (a.p_banniere) d.ban = a.p_banniere;
+        if (a.p_titre) { if (titresDe(d.col, d.ouverts, 0).indexOf(a.p_titre) < 0) throw new Error('Titre pas encore débloqué.'); d.titre = a.p_titre; }
+        save(d); return { avatar: d.avatar || null, vitrine: d.vitrine || [], banniere: d.ban || 'g-nuit', titre: d.titre || 'recrue', titres: titresDe(d.col, d.ouverts, 0) };
+      },
+      profil_public: function (a) {
+        const d = load(); if (!d || !d.pseudo || d.pseudo.toLowerCase() !== String(a.p_pseudo || '').toLowerCase()) return null;
+        const pr = {}; let sc = 0, n = 0; Object.keys(d.col).forEach(function (id) { const c = BY_ID[id]; if (!c) return; n++; pr[c.rarity] = (pr[c.rarity] || 0) + 1; sc += RAR.find(function (r) { return r.id === c.rarity; }).pts; });
+        return { pseudo: d.pseudo, cree_le: d.cree, ouverts: d.ouverts, avatar: d.col[d.avatar] ? d.avatar : null, vitrine: (d.vitrine || []).filter(function (x) { return d.col[x]; }), banniere: d.ban || 'g-nuit', titre: d.titre || 'recrue', titres: titresDe(d.col, d.ouverts, 0), score: sc, cartes: n, par_rarete: pr, ventes: 0, rang: 1, joueurs: 1 };
+      },
       test_toutes_cartes: function () { const d = me(); let n = 0; CATALOG.forEach(function (c) { if (!d.col[c.id]) { d.col[c.id] = 1; n++; } }); save(d); return n; }
     };
     return api;
@@ -400,27 +413,240 @@
     const mine = S && S.pseudo;
     $('#boardBody').innerHTML = boardRows.map(function (r, i) {
       const me = mine && r.pseudo === mine;
-      return '<tr' + (me ? ' class="me"' : '') + '><td class="rank' + (i < 3 ? ' top' : '') + '">' + (i + 1) + '</td>' +
-        '<td><div class="who"><span class="avatar">' + esc(initials(r.pseudo)) + '</span><span>' + esc(r.pseudo) + (me ? ' <span class="muted">(toi)</span>' : '') + '</span></div></td>' +
+      return '<tr data-player="' + esc(r.pseudo) + '"' + (me ? ' class="me"' : '') + '><td class="rank' + (i < 3 ? ' top' : '') + '">' + (i + 1) + '</td>' +
+        '<td><div class="who">' + avatarHTML(r.avatar, r.pseudo) + '<span>' + esc(r.pseudo) + (me ? ' <span class="muted">(toi)</span>' : '') + '</span>' + (r.titre && r.titre !== 'recrue' && TITRE[r.titre] ? titleChip(r.titre, 'sm') : '') + '</div></td>' +
         '<td class="r num">' + fmt(r[key]) + '</td></tr>';
     }).join('');
   }
 
-  function renderAll() { renderAuthState(); renderBinds(); renderQuests(); renderHome(); renderBoosters(); renderCollection(); renderBoard(); }
+  // =====================================================================
+  // Profil : photo (une carte possédée), vitrine, bannière, titre
+  // =====================================================================
+  const TITRES = [
+    ['recrue', 'Recrue', 'Dès l\'inscription'],
+    ['collectionneur', 'Collectionneur', '50 cartes différentes'],
+    ['archiviste', 'Archiviste', '150 cartes différentes'],
+    ['legendes', 'Chasseur de légendes', '5 légendaires'],
+    ['secrets', 'Gardien des secrets', '10 secrètes'],
+    ['goat', 'Chasseur de GOAT', '1 carte GOAT'],
+    ['marchand', 'Marchand', '10 ventes au marché'],
+    ['ouvreur', 'Ouvreur fou', '100 boosters ouverts'],
+    ['maitre', 'Maître d\'Origines', 'La série Origines complète']
+  ];
+  const TITRE = {}; TITRES.forEach(function (t) { TITRE[t[0]] = t; });
+  const BANS = [['g-nuit', 'Nuit'], ['g-braise', 'Braise'], ['g-ocean', 'Océan'], ['g-neon', 'Néon'], ['g-or', 'Or']];
+  // Mêmes règles que le serveur (_titres), pour la démo et l'affichage immédiat
+  function titresDe(col, ouverts, ventes) {
+    let n = 0, leg = 0, sec = 0, goat = 0, ori = 0, oriTot = 0;
+    CATALOG.forEach(function (c) { if (c.rarity !== 'goat') oriTot++; if (!col || !col[c.id]) return; n++; if (c.rarity === 'legend') leg++; if (c.rarity === 'secret') sec++; if (c.rarity === 'goat') goat++; else ori++; });
+    return TITRES.map(function (t) { return t[0]; }).filter(function (k) {
+      return k === 'recrue' || (k === 'collectionneur' && n >= 50) || (k === 'archiviste' && n >= 150) || (k === 'legendes' && leg >= 5) || (k === 'secrets' && sec >= 10) ||
+        (k === 'goat' && goat >= 1) || (k === 'marchand' && ventes >= 10) || (k === 'ouvreur' && ouverts >= 100) || (k === 'maitre' && ori >= oriTot);
+    });
+  }
+  const titleChip = function (k, sm) { const t = TITRE[k] || TITRE.recrue; return '<span class="ttl t-' + t[0] + (sm ? ' sm' : '') + '">' + esc(t[1]) + '</span>'; };
+  const BIG = { legend: 1, secret: 1, goat: 1 };
+  // Avatar : le visuel d'une carte, recadré (photo, joueur ou logo sur le fond de la carte)
+  function avatarParts(id, pseudo) {
+    const c = id && BY_ID[id];
+    if (!c || !c.img) return { cls: '', style: '', html: esc(initials(pseudo)) };
+    const rgb = hexRgb(c.color || RHEX[c.rarity]), W = [255, 255, 255], K = [0, 0, 0];
+    const logo = !c.photo && !c.player;
+    const bg = c.photo ? '#111' : c.dark ? 'linear-gradient(160deg,' + mixc(rgb, K, .3) + ',' + mixc(rgb, K, .68) + ')' : 'linear-gradient(160deg,' + mixc(rgb, W, .85) + ',' + mixc(rgb, W, .45) + ')';
+    return { cls: ' has-card r-' + c.rarity, style: '--avbg:' + bg + (BIG[c.rarity] ? ';--avr:' + RHEX[c.rarity] : ''),
+      html: '<img' + (c.rarity === 'goat' ? ' class="av-goat"' : logo ? ' class="av-logo"' : c.player ? ' class="av-player"' : '') + ' src="' + c.img + '" alt="" loading="lazy">' };
+  }
+  function avatarHTML(id, pseudo, cls) { const a = avatarParts(id, pseudo); return '<span class="avatar' + (cls ? ' ' + cls : '') + a.cls + '" style="' + a.style + '">' + a.html + '</span>'; }
+  function myAvatar() { return S && S.avatar && owns(S.avatar) ? S.avatar : null; }
+  function renderMe() {
+    const id = myAvatar(), key = id + '|' + (S && S.pseudo);
+    $$('[data-avatar-me]').forEach(function (el) {
+      if (el._k === key) return; el._k = key;
+      const a = avatarParts(id, S && S.pseudo);
+      el.className = 'avatar' + a.cls; el.style.cssText = a.style; el.innerHTML = a.html;
+    });
+    if (!$('[data-view="profil"]').hidden) { if (S && S.pseudo && !PF.mine && !PF.busy) loadMine(); else renderMine(); }
+  }
+  function bannerParts(b) {
+    const m = /^c-(\d+)$/.exec(b || ''), c = m && BY_ID[m[1]];
+    if (c && c.img) return { cls: 'b-g-nuit', img: '<img' + (c.rarity === 'goat' ? ' class="goat"' : '') + ' src="' + c.img + '" alt="">', style: '--bgrad:' + (c.color || RHEX[c.rarity]) };
+    return { cls: 'b-' + (BANS.some(function (x) { return x[0] === b; }) ? b : 'g-nuit'), img: '', style: '' };
+  }
+  const RLABEL = { common: 'Communes', uncommon: 'Peu communes', epic: 'Épiques', legend: 'Légendaires', secret: 'Secrètes', goat: 'GOAT' };
+  function profileHTML(P, mine) {
+    const b = bannerParts(P.banniere), vit = P.vitrine || [], has = P.titres || ['recrue'];
+    const isMe = S && S.pseudo && P.pseudo.toLowerCase() === S.pseudo.toLowerCase();
+    const tot = {}; CATALOG.forEach(function (c) { tot[c.rarity] = (tot[c.rarity] || 0) + 1; });
+    const pr = P.par_rarete || {};
+    const share = '<button class="btn btn-dark btn-sm" type="button" data-pf-share="' + esc(P.pseudo) + '">Partager</button>';
+    let slots = '';
+    for (let i = 0; i < 5; i++) {
+      const c = BY_ID[vit[i]];
+      slots += c ? ownedSlot(c, 1) : mine ? '<button class="pf-slot" type="button" data-pf-open="vitrine">+<br>Exposer une carte</button>' : '<div class="pf-slot">Vide</div>';
+    }
+    return '<section class="pf">' +
+      '<div class="pf-banner ' + b.cls + '" style="' + b.style + '">' + b.img + '<span class="pf-grid"></span></div>' +
+      '<div class="pf-head">' + avatarHTML(P.avatar, P.pseudo) +
+        '<div class="pf-id">' + titleChip(P.titre) + '<h1>' + esc(P.pseudo) + '</h1>' +
+          '<div class="pf-meta"><span>Inscrit le <b>' + new Date(P.cree_le).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</b></span>' +
+          (P.rang ? '<span><b>#' + fmt(P.rang) + '</b> sur ' + fmt(P.joueurs) + ' joueur' + (P.joueurs > 1 ? 's' : '') + '</span>' : '') + '</div></div>' +
+        '<div class="pf-actions">' + (mine ? '<button class="btn btn-gold btn-sm" type="button" data-pf-open="avatar">Personnaliser</button>' : isMe ? '<a class="btn btn-gold btn-sm" href="#profil">Modifier</a>' : '') + share + '</div>' +
+      '</div>' +
+      '<div class="pf-stats">' +
+        '<div class="gold"><b>' + (P.rang ? '#' + fmt(P.rang) : '—') + '</b><span>Classement</span></div>' +
+        '<div><b>' + fmt(P.score || 0) + '</b><span>Score de collection</span></div>' +
+        '<div><b>' + fmt(P.cartes || 0) + '<small>/' + CATALOG.length + '</small></b><span>Cartes différentes</span></div>' +
+        '<div><b>' + fmt(P.ouverts || 0) + '</b><span>Boosters ouverts</span></div>' +
+        '<div><b>' + (P.ventes == null ? '—' : fmt(P.ventes)) + '</b><span>Ventes au marché</span></div>' +
+      '</div></section>' +
+      '<section class="panel" style="margin-bottom:22px"><div class="panel-head"><h2>Vitrine</h2>' + (mine ? '<button class="btn btn-ghost btn-sm" type="button" data-pf-open="vitrine">Modifier la vitrine</button>' : '<span class="eyebrow">Ses plus belles cartes</span>') + '</div>' +
+        '<div class="pf-shelf">' + slots + '</div></section>' +
+      '<div class="pf-cols">' +
+        '<section class="panel"><div class="panel-head"><h2>Collection</h2><span class="eyebrow">' + fmt(P.cartes || 0) + ' / ' + CATALOG.length + '</span></div><div class="pf-rars">' +
+          RAR.filter(function (r) { return tot[r.id]; }).map(function (r) { const n = pr[r.id] || 0; return '<div class="pf-rar" style="--rc:' + (RHEX[r.id] || r.color) + '"><span>' + (RLABEL[r.id] || r.name) + '</span><div class="track"><i style="width:' + (n / tot[r.id] * 100).toFixed(1) + '%"></i></div><span class="num">' + n + '/' + tot[r.id] + '</span></div>'; }).join('') +
+        '</div></section>' +
+        '<section class="panel"><div class="panel-head"><h2>Titres</h2><span class="eyebrow">' + has.length + ' / ' + TITRES.length + '</span></div><div class="pf-titles">' +
+          TITRES.map(function (t) { const ok = has.indexOf(t[0]) >= 0; return '<div class="pf-tl' + (ok ? '' : ' locked') + '">' + titleChip(t[0], 1) + '<small>' + (ok ? 'Débloqué' : esc(t[2])) + '</small></div>'; }).join('') +
+        '</div></section>' +
+      '</div>';
+  }
+  // Mon profil : l'état local (immédiat) complété par le rang et les ventes venus du serveur
+  const PF = { mine: null, pub: null, busy: false };
+  function myProfile() {
+    const pr = {}; Object.keys(S.collection || {}).forEach(function (id) { const c = BY_ID[id]; if (c) pr[c.rarity] = (pr[c.rarity] || 0) + 1; });
+    const x = PF.mine || {};
+    return { pseudo: S.pseudo || 'Joueur', cree_le: S.cree_le, ouverts: S.ouverts, avatar: myAvatar(), vitrine: (S.vitrine || []).filter(owns),
+      banniere: S.banniere, titre: S.titre, titres: S.titres, score: collScore(), cartes: ownedCount(), par_rarete: pr, ventes: x.ventes, rang: x.rang, joueurs: x.joueurs };
+  }
+  function renderMine() { if (S) $('#pfMine').innerHTML = profileHTML(myProfile(), true); }
+  async function loadMine() {
+    renderMine();
+    if (!S || !S.pseudo || PF.busy) return;
+    PF.busy = true;
+    try { PF.mine = await rpc('profil_public', { p_pseudo: S.pseudo }); } catch (e) {}
+    PF.busy = false;
+    renderMine();
+  }
+  async function loadPublic(pseudo) {
+    const el = $('#pfPublic');
+    el.innerHTML = '<div class="pf-404 muted">Chargement du profil…</div>';
+    let P = null;
+    try { P = await rpc('profil_public', { p_pseudo: pseudo }); } catch (e) { toast(e.message, true); }
+    if (location.hash.slice(1).split('/')[0] !== 'joueur') return;
+    if (!P) { el.innerHTML = '<div class="pf-404"><h1>Joueur introuvable</h1><p class="muted">Aucun joueur ne s\'appelle « ' + esc(pseudo) + ' ».</p><a class="btn btn-light" href="#classement">Voir le classement</a></div>'; return; }
+    PF.pub = P; el.innerHTML = profileHTML(P, false);
+  }
+
+  // ---------- Fenêtre « Personnaliser » ----------
+  const PFE = { tab: 'avatar', avatar: null, vitrine: [], banniere: 'g-nuit', titre: 'recrue', q: '', rar: 'all' };
+  function openPf(tab) {
+    if (!S) return;
+    Object.assign(PFE, { tab: tab || 'avatar', avatar: myAvatar(), vitrine: (S.vitrine || []).filter(owns), banniere: S.banniere || 'g-nuit', titre: S.titre || 'recrue', q: '', rar: 'all' });
+    $('#pfSearch').value = '';
+    openModal('#pfModal'); renderPf();
+  }
+  function closePf() { closeModal($('#pfModal')); }
+  const rankSort = function (a, b) { return (RORDER[b.rarity] - RORDER[a.rarity]) || (a.id - b.id); };
+  function pfCards(needImg) {
+    const q = PFE.q.trim().toLowerCase();
+    return CATALOG.filter(function (c) { return owns(c.id) && (!needImg || c.img) && (PFE.rar === 'all' || c.rarity === PFE.rar) && (!q || (c.name + ' ' + c.game).toLowerCase().indexOf(q) >= 0); }).sort(rankSort);
+  }
+  function renderPf() {
+    const t = PFE.tab;
+    $$('#pfTabs button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.pfTab === t); });
+    // Aperçu
+    const b = bannerParts(PFE.banniere);
+    const pv = $('#pfPreview'); pv.className = 'pf-preview ' + b.cls; pv.style.cssText = b.style;
+    pv.innerHTML = b.img + avatarHTML(PFE.avatar, S.pseudo) + '<div class="pv-id">' + titleChip(PFE.titre, 1) + '<b>' + esc(S.pseudo || 'Joueur') + '</b></div>' +
+      '<div class="pv-shelf">' + [0, 1, 2, 3, 4].map(function (i) { const c = BY_ID[PFE.vitrine[i]]; return c ? '<i class="on" style="--rc:' + RHEX[c.rarity] + ';' + (c.img ? 'background-image:url(\'' + c.img + '\')' : '') + '"></i>' : '<i></i>'; }).join('') + '</div>';
+    const cardsTab = t === 'avatar' || t === 'vitrine';
+    $('#pfTools').hidden = !cardsTab;
+    $('#pfRar').innerHTML = [['all', 'Toutes']].concat(RAR.slice().reverse().map(function (r) { return [r.id, RLABEL[r.id] || r.name]; })).filter(function (r) { return r[0] === 'all' || CATALOG.some(function (c) { return c.rarity === r[0]; }); })
+      .map(function (r) { return '<button type="button" data-pf-rar="' + r[0] + '" aria-pressed="' + (PFE.rar === r[0]) + '">' + r[1] + '</button>'; }).join('');
+    const pick = $('#pfPick'); let h = '';
+    if (t === 'avatar') {
+      pick.className = 'pf-pick';
+      $('#pfHelp').textContent = 'Ta photo de profil : le visuel d\'une de tes cartes. Les grosses cartes ont un contour spécial.';
+      h = '<button class="pk-av" type="button" data-pk-av="0" aria-pressed="' + !PFE.avatar + '">' + avatarHTML(null, S.pseudo) + '<span>Initiales</span></button>' +
+        pfCards(true).map(function (c) { return '<button class="pk-av" type="button" data-pk-av="' + c.id + '" aria-pressed="' + (PFE.avatar === c.id) + '" title="' + esc(c.name) + '">' + avatarHTML(c.id, '') + '<span>' + esc(c.name.split(' — ')[0]) + '</span></button>'; }).join('');
+    } else if (t === 'vitrine') {
+      pick.className = 'pf-pick cards';
+      $('#pfHelp').textContent = 'Choisis jusqu\'à 5 cartes, dans l\'ordre où tu veux les montrer (' + PFE.vitrine.length + '/5). Clique à nouveau pour en retirer une.';
+      h = pfCards(false).map(function (c) { const k = PFE.vitrine.indexOf(c.id); return '<button class="pk-card" type="button" data-pk-vit="' + c.id + '" aria-pressed="' + (k >= 0) + '">' + (k >= 0 ? '<b class="pk-n">' + (k + 1) + '</b>' : '') + '<div class="cc mini ' + finish(c) + '" style="' + cardStyle(c) + '">' + cardInner(c) + corners(c) + '</div></button>'; }).join('');
+    } else if (t === 'banniere') {
+      pick.className = 'pf-pick wide';
+      $('#pfHelp').textContent = 'Les 5 couleurs sont offertes. Chaque légendaire, secrète ou GOAT que tu possèdes débloque sa bannière.';
+      const cards = CATALOG.filter(function (c) { return BIG[c.rarity] && c.img && owns(c.id); }).sort(rankSort);
+      h = BANS.map(function (x) { return '<button class="pk-ban b-' + x[0] + '" type="button" data-pk-ban="' + x[0] + '" aria-pressed="' + (PFE.banniere === x[0]) + '"><span>' + x[1] + '</span></button>'; }).join('') +
+        cards.map(function (c) { const k = 'c-' + c.id; return '<button class="pk-ban" type="button" data-pk-ban="' + k + '" aria-pressed="' + (PFE.banniere === k) + '" style="--bgrad:' + (c.color || RHEX[c.rarity]) + '"><img' + (c.rarity === 'goat' ? ' class="goat"' : '') + ' src="' + c.img + '" alt="" loading="lazy"><span>' + esc(c.name.split(' — ')[0]) + '</span></button>'; }).join('');
+    } else {
+      pick.className = 'pf-pick list';
+      const has = S.titres || ['recrue'];
+      $('#pfHelp').textContent = 'Ton titre s\'affiche sous ton pseudo et dans le classement. Débloques-en d\'autres en jouant.';
+      h = TITRES.map(function (x) { const ok = has.indexOf(x[0]) >= 0; return '<button class="pk-tl" type="button" data-pk-tl="' + x[0] + '" aria-pressed="' + (PFE.titre === x[0]) + '"' + (ok ? '' : ' disabled') + '>' + titleChip(x[0]) + '<small>' + (ok ? 'Débloqué' : '🔒 ' + esc(x[2])) + '</small></button>'; }).join('');
+    }
+    pick.innerHTML = h || '<p class="pf-empty">Aucune carte ici. Ouvre des boosters pour en obtenir !</p>';
+  }
+  async function savePf() {
+    const btn = $('#pfSave'), a = {};
+    if (PFE.avatar !== myAvatar()) a.p_avatar = PFE.avatar || 0;
+    if (PFE.vitrine.join() !== (S.vitrine || []).filter(owns).join()) a.p_vitrine = PFE.vitrine;
+    if (PFE.banniere !== S.banniere) a.p_banniere = PFE.banniere;
+    if (PFE.titre !== S.titre) a.p_titre = PFE.titre;
+    if (!Object.keys(a).length) { closePf(); return; }
+    busy(btn, true, 'Enregistrement…');
+    try {
+      const r = await rpc('modifier_profil', a);
+      Object.assign(S, { avatar: r.avatar, vitrine: r.vitrine || [], banniere: r.banniere, titre: r.titre, titres: r.titres });
+      closePf(); renderAll(); toast('Profil mis à jour.');
+    } catch (e) { toast(e.message, true); }
+    busy(btn, false);
+  }
+  $('#pfModal').addEventListener('click', function (e) {
+    const t = e.target.closest('button, .modal-bg'); if (!t) return;
+    if (t.dataset.pfClose !== undefined) { closePf(); return; }
+    if (t.dataset.pfTab) { PFE.tab = t.dataset.pfTab; renderPf(); $('#pfPick').scrollTop = 0; return; }
+    if (t.dataset.pfRar) { PFE.rar = t.dataset.pfRar; renderPf(); return; }
+    if (t.dataset.pkAv !== undefined) { PFE.avatar = +t.dataset.pkAv || null; renderPf(); return; }
+    if (t.dataset.pkVit) {
+      const id = +t.dataset.pkVit, k = PFE.vitrine.indexOf(id);
+      if (k >= 0) PFE.vitrine.splice(k, 1); else if (PFE.vitrine.length >= 5) { toast('La vitrine contient 5 cartes maximum. Retires-en une d\'abord.', true); return; } else PFE.vitrine.push(id);
+      const st = $('#pfPick').scrollTop; renderPf(); $('#pfPick').scrollTop = st; return;
+    }
+    if (t.dataset.pkBan) { PFE.banniere = t.dataset.pkBan; const st = $('#pfPick').scrollTop; renderPf(); $('#pfPick').scrollTop = st; return; }
+    if (t.dataset.pkTl) { PFE.titre = t.dataset.pkTl; renderPf(); return; }
+  });
+  $('#pfSave').addEventListener('click', savePf);
+  $('#pfSearch').addEventListener('input', function () { PFE.q = this.value; const st = 0; renderPf(); $('#pfPick').scrollTop = st; });
+  document.addEventListener('click', function (e) {
+    const o = e.target.closest('[data-pf-open]'); if (o) { openPf(o.dataset.pfOpen); return; }
+    const sh = e.target.closest('[data-pf-share]');
+    if (sh) {
+      const url = location.origin + location.pathname + '#joueur/' + encodeURIComponent(sh.dataset.pfShare);
+      (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { toast('Lien du profil copié.'); }, function () { prompt('Lien du profil :', url); });
+      return;
+    }
+    const row = e.target.closest('tr[data-player]'); if (row) { location.hash = '#joueur/' + encodeURIComponent(row.dataset.player); }
+  });
+
+  function renderAll() { renderAuthState(); renderBinds(); renderQuests(); renderHome(); renderBoosters(); renderCollection(); renderBoard(); renderMe(); }
 
   // =====================================================================
   // Navigation
   // =====================================================================
-  const VIEWS = ['accueil', 'boosters', 'collection', 'marche', 'classement', 'profil'];
-  const TITLES = { accueil: 'Accueil', boosters: 'Boosters', collection: 'Collection', marche: 'Marché', classement: 'Classement', profil: 'Profil' };
+  const VIEWS = ['accueil', 'boosters', 'collection', 'marche', 'classement', 'profil', 'joueur'];
+  const TITLES = { accueil: 'Accueil', boosters: 'Boosters', collection: 'Collection', marche: 'Marché', classement: 'Classement', profil: 'Profil', joueur: 'Joueur' };
   function route() {
     let v = location.hash.slice(1); if (v === 'echanges') v = 'marche';
-    let view = VIEWS.indexOf(v) >= 0 ? v : 'accueil';
+    let who = ''; if (v.indexOf('joueur/') === 0) { try { who = decodeURIComponent(v.slice(7)); } catch (e) { who = v.slice(7); } v = 'joueur'; }
+    let view = VIEWS.indexOf(v) >= 0 && (v !== 'joueur' || who) ? v : 'accueil';
     const needLogin = view === 'profil' && !USER; if (needLogin) view = 'accueil';
     $$('[data-view]').forEach(function (el) { el.hidden = el.dataset.view !== view; });
     $$('[data-link]').forEach(function (a) { if (a.dataset.link === view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-    $$('#wheelModal.open, #authModal.open').forEach(closeModal); closeCard();
-    if (view === 'profil' && S) $('#pseudoInput').value = S.pseudo || '';
+    $$('#wheelModal.open, #authModal.open, #pfModal.open').forEach(closeModal); closeCard();
+    if ($('#mkModal').classList.contains('open')) closeMk();
+    if (view === 'profil' && S) { $('#pseudoInput').value = S.pseudo || ''; loadMine(); }
+    if (view === 'joueur') loadPublic(who);
     if (view === 'classement') loadBoard();
     if (view === 'marche') loadMarket();
     if (needLogin) openAuth('login');
@@ -448,7 +674,7 @@
   // =====================================================================
   async function setUser(u) {
     USER = u ? { email: u.email } : null;
-    $('#testPanel').hidden = true;
+    $('#testPanel').hidden = true; PF.mine = null;
     if (!USER) { S = null; renderAll(); return; }
     closeModal($('#authModal'));
     await refresh();
@@ -1309,6 +1535,7 @@
     if (e.key !== 'Escape') return;
     if ($('#cardModal').classList.contains('open')) { closeCard(); return; }
     if ($('#mkModal').classList.contains('open')) { closeMk(); return; }
+    if ($('#pfModal').classList.contains('open')) { closePf(); return; }
     const m = $('#authModal.open, #wheelModal.open'); if (m) closeModal(m);
   });
 
@@ -1419,7 +1646,7 @@
       '<div class="mk-stats"><div><b>' + (f.plus_bas ? fmt(f.plus_bas) : '—') + '</b><span>Plus bas</span></div><div><b>' + (f.plus_haut ? fmt(f.plus_haut) : '—') + '</b><span>Plus haut</span></div><div><b>' + fmt(f.volume || 0) + '</b><span>Ventes</span></div></div>' +
       '<div><div class="panel-head" style="margin-bottom:8px"><h2 style="font-size:17px">En vente (' + f.annonces.length + ')</h2></div><div class="mk-list">' +
       (f.annonces.length ? f.annonces.map(function (a) {
-        return '<div class="mk-offer"><span class="num"><i class="coin"></i>' + fmt(a.prix) + '</span><span class="who">' + (a.moi ? 'Ton annonce' : 'par ' + esc(a.vendeur)) + '</span>' +
+        return '<div class="mk-offer"><span class="num"><i class="coin"></i>' + fmt(a.prix) + '</span><span class="who">' + (a.moi ? 'Ton annonce' : 'par <a class="seller" href="#joueur/' + encodeURIComponent(a.vendeur) + '">' + esc(a.vendeur) + '</a>') + '</span>' +
           (a.moi ? '<button class="btn btn-dark btn-sm" type="button" data-mk-del="' + a.id + '">Retirer</button>' : USER ? '<button class="btn btn-gold btn-sm" type="button" data-mk-buy="' + a.id + '" data-prix="' + a.prix + '"' + (S && S.pieces < a.prix ? ' disabled title="Pas assez de pièces"' : '') + '>Acheter</button>' : '') + '</div>';
       }).join('') : '<p class="muted" style="margin:0">Personne ne vend cette carte pour l\'instant.</p>') + '</div></div>' +
       (!USER ? '<p class="mk-hint"><button class="linkish" type="button" data-action="login">Connecte-toi</button> pour acheter ou vendre.</p>' :

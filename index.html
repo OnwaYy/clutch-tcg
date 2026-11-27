@@ -613,6 +613,125 @@
   .stat b { font-family: var(--f-mono); font-size: 26px; font-weight: 500; font-variant-numeric: tabular-nums; }
   .stat span { color: var(--muted); font-size: 13px; }
 
+  /* ---------- Avatars (une carte possédée) ---------- */
+  .avatar.has-card { position: relative; overflow: hidden; padding: 0; background: var(--avbg, var(--panel-2)); border-color: var(--avr, var(--line-2)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+  .avatar.has-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
+  .avatar.has-card img.av-logo { inset: 14%; width: 72%; height: 72%; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+  .avatar.has-card img.av-goat { object-position: 50% 62%; transform: scale(1.9); transform-origin: 50% 72%; }
+  .avatar.has-card img.av-player { object-position: 50% 0; transform: scale(1.25); transform-origin: 50% 0; }
+  .avatar.r-legend, .avatar.r-secret, .avatar.r-goat { border-width: 2px; }
+  .avatar.r-goat { box-shadow: 0 0 0 1px rgba(226,1,45,.4), 0 0 14px -2px rgba(226,1,45,.6); }
+  .avatar.r-secret { box-shadow: 0 0 12px -3px rgba(255,122,217,.7); }
+  .avatar.r-legend { box-shadow: 0 0 12px -3px rgba(242,194,91,.7); }
+
+  /* ---------- Profil public ---------- */
+  .pf { position: relative; border: 1px solid var(--line); border-radius: 22px; overflow: hidden; background: var(--panel); margin-bottom: 22px; }
+  .pf-banner { position: relative; height: clamp(150px, 22vw, 240px); overflow: hidden; background: var(--bgrad); }
+  .pf-banner img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 35%; filter: saturate(1.15) brightness(.8); }
+  .pf-banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,10,14,0) 35%, rgba(20,18,25,.85) 88%, var(--panel)), radial-gradient(120% 90% at 85% 0%, rgba(255,255,255,.12), transparent 60%); }
+  .pf-banner .pf-grid { position: absolute; inset: 0; opacity: .14; background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px); background-size: 34px 34px; mask-image: linear-gradient(180deg, #000, transparent 85%); -webkit-mask-image: linear-gradient(180deg, #000, transparent 85%); }
+  .b-g-nuit { --bgrad: radial-gradient(90% 140% at 15% 0%, #3b2a7a, transparent 60%), radial-gradient(80% 120% at 90% 10%, #18335f, transparent 60%), #0e0c16; }
+  .b-g-braise { --bgrad: radial-gradient(90% 140% at 20% 0%, #c2361f, transparent 60%), radial-gradient(80% 120% at 85% 20%, #f2a03b, transparent 55%), #1a0b08; }
+  .b-g-ocean { --bgrad: radial-gradient(90% 140% at 15% 0%, #0f7c8c, transparent 60%), radial-gradient(80% 120% at 90% 10%, #1f4fd1, transparent 60%), #071219; }
+  .b-g-neon { --bgrad: radial-gradient(90% 140% at 15% 0%, #d42a9c, transparent 58%), radial-gradient(80% 120% at 90% 10%, #2bd4e8, transparent 55%), #12071a; }
+  .b-g-or { --bgrad: radial-gradient(90% 140% at 20% 0%, #f2c25b, transparent 55%), radial-gradient(80% 120% at 90% 20%, #8a5a14, transparent 60%), #140f05; }
+  .pf-head { position: relative; display: flex; align-items: flex-end; gap: 22px; padding: 0 28px; margin-top: -64px; flex-wrap: wrap; }
+  .pf-head .avatar { width: 132px; height: 132px; border-radius: 22px; font-size: 46px; border-width: 3px; box-shadow: 0 18px 40px -12px rgba(0,0,0,.9); background-color: var(--panel-2); }
+  .pf-head .avatar.has-card { border-width: 3px; }
+  .pf-id { flex: 1; min-width: 220px; padding-bottom: 6px; display: grid; gap: 6px; }
+  .pf-id h1 { font-size: clamp(32px, 4.6vw, 52px); font-weight: 900; font-stretch: 112%; line-height: .95; letter-spacing: -.01em; word-break: break-word; }
+  .pf-meta { color: var(--muted); font-size: 14px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .pf-meta b { color: var(--fg); font-weight: 600; }
+  .pf-actions { display: flex; gap: 8px; padding-bottom: 10px; flex-wrap: wrap; }
+  .ttl { justify-self: start; display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-display); font-weight: 800; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; padding: 5px 10px 5px 8px; border-radius: 7px; color: var(--tc, #cfcbd8); background: linear-gradient(color-mix(in srgb, var(--tc, #cfcbd8) 16%, transparent), color-mix(in srgb, var(--tc, #cfcbd8) 16%, transparent)), rgba(14,12,20,.85); border: 1px solid color-mix(in srgb, var(--tc, #cfcbd8) 40%, transparent); }
+  .ttl::before { content: ""; width: 7px; height: 7px; transform: rotate(45deg); background: currentColor; }
+  .ttl.sm { font-size: 10px; padding: 3px 7px 3px 6px; letter-spacing: .1em; }
+  .t-recrue { --tc: #b7b2c2; } .t-collectionneur { --tc: #4fd1c5; } .t-archiviste { --tc: #4fa8ff; } .t-marchand { --tc: #5fd39a; } .t-ouvreur { --tc: #ff9a4a; }
+  .t-legendes { --tc: #f2c25b; } .t-secrets { --tc: #ff7ad9; } .t-goat { --tc: #ff4a64; } .t-maitre { --tc: #f7e3a8; }
+  .t-maitre { background: linear-gradient(90deg, rgba(242,194,91,.25), rgba(255,122,217,.18), rgba(79,168,255,.2)), rgba(14,12,20,.85); }
+  .pf-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--line); border-top: 1px solid var(--line); margin-top: 24px; }
+  .pf-stats div { background: var(--panel); padding: 16px 20px; display: grid; gap: 2px; }
+  .pf-stats b { font-family: var(--f-mono); font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .pf-stats b small { font-size: 14px; color: var(--muted); }
+  .pf-stats span { color: var(--muted); font-size: 13px; }
+  .pf-stats .gold b { color: var(--gold); }
+  .pf-shelf { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 22px; border-radius: 14px; background: radial-gradient(80% 120% at 50% 120%, rgba(242,194,91,.1), transparent 70%), linear-gradient(180deg, #100e15, #17151d); border: 1px solid var(--line); }
+  .pf-shelf .cc.mini { width: 100%; }
+  .pf-slot { aspect-ratio: 63/88; border: 1px dashed var(--line-2); border-radius: 12px; display: grid; place-items: center; color: var(--dim); font-size: 13px; text-align: center; padding: 10px; background: rgba(255,255,255,.015); }
+  button.pf-slot:hover { border-color: var(--gold); color: var(--gold); }
+  .pf-cols { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; margin-bottom: 22px; align-items: start; }
+  .pf-banner img.goat { object-position: 50% 58%; }
+  .pf-preview > img { max-width: none; }
+  .pf-preview > img.goat, .pk-ban img.goat { object-position: 50% 55%; }
+  .pf-rars { display: grid; gap: 12px; }
+  .pf-rar { display: grid; grid-template-columns: 110px 1fr 70px; gap: 12px; align-items: center; font-size: 14px; }
+  .pf-rar .track { height: 8px; }
+  .pf-rar .track i { background: var(--rc); }
+  .pf-rar .num { text-align: right; font-family: var(--f-mono); color: var(--muted); font-size: 13px; }
+  .pf-rar > span:first-child { color: var(--rc); font-weight: 700; }
+  .pf-titles { display: grid; gap: 8px; }
+  .pf-tl { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); }
+  .pf-tl small { color: var(--muted); font-size: 12px; text-align: right; }
+  .pf-tl.locked { opacity: .45; }
+  .pf-tl.locked .ttl { filter: grayscale(1); }
+  .pf-404 { text-align: center; padding: 80px 16px; display: grid; gap: 12px; justify-items: center; }
+  .board tbody tr[data-player] { cursor: pointer; }
+  .board tbody tr[data-player]:hover td { background: rgba(255,255,255,.03); }
+  .who .ttl { margin-left: 4px; }
+  a.seller { color: inherit; text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
+  a.seller:hover { color: var(--gold); }
+
+  /* Fenêtre « Personnaliser » */
+  .pf-box { position: relative; width: min(980px, 100%); max-height: calc(100vh - 32px); display: grid; grid-template-rows: auto auto auto auto 1fr auto; gap: 14px; padding: 24px 26px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 20px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.95); overflow: hidden; }
+  .pf-box-head { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding-right: 40px; }
+  .pf-box-head h2 { font-size: 24px; font-weight: 800; }
+  .pf-preview { display: flex; align-items: center; gap: 16px; padding: 12px; border-radius: 14px; overflow: hidden; position: relative; min-height: 96px; background: var(--bgrad, var(--panel-2)); border: 1px solid var(--line); }
+  .pf-preview > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: brightness(.6); }
+  .pf-preview > * { position: relative; }
+  .pf-preview .avatar { width: 72px; height: 72px; border-radius: 14px; font-size: 26px; }
+  .pf-preview .pv-id { display: grid; gap: 4px; }
+  .pf-preview .pv-id b { font-size: 24px; font-weight: 900; font-stretch: 112%; }
+  .pf-preview .pv-shelf { margin-left: auto; display: flex; gap: 6px; }
+  .pf-preview .pv-shelf i { width: 34px; aspect-ratio: 63/88; border-radius: 4px; border: 1px dashed rgba(255,255,255,.25); background: rgba(0,0,0,.25) center 25% / cover no-repeat; }
+  .pf-preview .pv-shelf i.on { border: 1px solid var(--rc, #fff); }
+  .pf-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .pf-tools .input { max-width: 260px; }
+  .pf-help { margin: 0; font-size: 13px; }
+  .pf-pick { overflow: auto; min-height: 200px; display: grid; gap: 10px; align-content: start; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); padding: 2px 4px 2px 2px; }
+  .pf-pick.cards { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .pf-pick.wide { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .pf-pick.list { grid-template-columns: 1fr 1fr; }
+  .pk-av { position: relative; background: none; border: 0; padding: 0; display: grid; gap: 6px; justify-items: center; color: var(--muted); font-size: 11px; text-align: center; }
+  .pk-av .avatar { width: 76px; height: 76px; border-radius: 14px; font-size: 22px; }
+  .pk-av span { line-height: 1.2; max-width: 88px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pk-av[aria-pressed="true"] .avatar, .pk-card[aria-pressed="true"] .cc { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .pk-av:hover .avatar { transform: translateY(-2px); }
+  .pk-card { position: relative; background: none; border: 0; padding: 0; }
+  .pk-card .cc.mini { width: 100%; pointer-events: none; }
+  .pk-card b.pk-n { position: absolute; top: -6px; right: -6px; z-index: 3; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: #1a1200; font-family: var(--f-mono); font-size: 13px; box-shadow: 0 4px 10px rgba(0,0,0,.5); }
+  .pk-ban { position: relative; height: 96px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--bgrad); padding: 0; text-align: left; }
+  .pk-ban img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: brightness(.75); }
+  .pk-ban span { position: absolute; left: 10px; bottom: 8px; font-family: var(--f-display); font-weight: 800; font-size: 13px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.8); }
+  .pk-ban[aria-pressed="true"] { outline: 3px solid var(--gold); outline-offset: 2px; }
+  .pk-tl { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); text-align: left; color: var(--fg); }
+  .pk-tl small { color: var(--muted); font-size: 12px; }
+  .pk-tl[aria-pressed="true"] { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+  .pk-tl:disabled { opacity: .4; cursor: not-allowed; }
+  .pf-box-foot { display: flex; justify-content: flex-end; gap: 10px; padding-top: 4px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .pf-empty { grid-column: 1 / -1; color: var(--muted); padding: 30px 0; text-align: center; }
+  @media (max-width: 860px) {
+    .pf-head { margin-top: -50px; padding: 0 16px; gap: 14px; }
+    .pf-head .avatar { width: 96px; height: 96px; font-size: 34px; border-radius: 18px; }
+    .pf-stats { grid-template-columns: repeat(2, 1fr); }
+    .pf-stats div:first-child { grid-column: 1 / -1; }
+    .pf-shelf { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px; }
+    .pf-cols { grid-template-columns: 1fr; }
+    .pf-rar { grid-template-columns: 90px 1fr 60px; }
+    .pf-box { padding: 20px 14px; }
+    .pf-pick.list { grid-template-columns: 1fr; }
+    .pf-preview .pv-shelf { display: none; }
+  }
+
   .toast { border-radius: 12px; position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom,0px)); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--panel-2); border: 1px solid var(--line-2); border-left: 3px solid var(--gold); color: var(--fg); padding: 12px 18px; transition: .25s; z-index: 70; max-width: calc(100% - 32px); text-align: center; }
   .toast.err { border-left-color: var(--bad); }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
@@ -958,7 +1077,7 @@
     <div class="wallet">
       <span class="chip" id="coinChip" title="Pièces" data-auth hidden><i class="coin"></i><span data-bind="coins">0</span></span>
       <a class="chip" id="packChip" href="#accueil" title="Boosters à ouvrir" data-auth hidden><i class="pk"></i><span data-bind="packTotal">0</span></a>
-      <a class="avatar" href="#profil" data-link="profil" title="Mon profil" data-bind="initials" data-auth hidden>?</a>
+      <a class="avatar" href="#profil" data-link="profil" title="Mon profil" data-avatar-me data-auth hidden>?</a>
       <button class="btn btn-light btn-sm" type="button" data-action="login" data-guest>Se connecter</button>
     </div>
   </div>
@@ -1106,25 +1225,8 @@
 
   <!-- ================= PROFIL ================= -->
   <div data-view="profil" class="wrap page" hidden>
-    <div class="page-head">
-      <div class="id-card">
-        <span class="avatar" data-bind="initials">?</span>
-        <div>
-          <div class="eyebrow">Collectionneur · inscrit le <span data-bind="joined"></span></div>
-          <h1 data-bind="pseudo">Joueur</h1>
-        </div>
-      </div>
-    </div>
+    <div id="pfMine"></div>
     <div class="profile-grid">
-      <div class="panel">
-        <div class="panel-head"><h2>Statistiques</h2></div>
-        <div class="stats">
-          <div class="stat"><b data-bind="owned">0</b><span>Cartes différentes</span></div>
-          <div class="stat"><b data-bind="score">0</b><span>Score de collection</span></div>
-          <div class="stat"><b data-bind="opened">0</b><span>Boosters ouverts</span></div>
-          <div class="stat"><b data-bind="bought">0</b><span>Boosters achetés</span></div>
-        </div>
-      </div>
       <div class="panel">
         <div class="panel-head"><h2>Paramètres</h2></div>
         <form id="pseudoForm" class="field" novalidate>
@@ -1157,6 +1259,10 @@
       </div>
     </div>
   </div>
+  <!-- ================= PROFIL PUBLIC ================= -->
+  <div data-view="joueur" class="wrap page" hidden>
+    <div id="pfPublic"></div>
+  </div>
 </main>
 <footer><div class="wrap"><span>Clutch TCG · Série Origines</span><span data-guest>Crée un compte pour sauvegarder ta collection</span><span data-auth hidden>Progression enregistrée sur ton compte</span></div></footer>
 
@@ -1169,6 +1275,33 @@
 </div>
 
 <!-- Fiche marché d'une carte -->
+<div class="modal" id="pfModal" aria-hidden="true">
+  <div class="modal-bg" data-pf-close></div>
+  <div class="pf-box" role="dialog" aria-label="Personnaliser mon profil">
+    <button class="x" type="button" data-pf-close aria-label="Fermer">×</button>
+    <div class="pf-box-head">
+      <h2>Personnaliser</h2>
+      <div class="seg" id="pfTabs">
+        <button type="button" data-pf-tab="avatar" aria-pressed="true">Photo</button>
+        <button type="button" data-pf-tab="vitrine" aria-pressed="false">Vitrine</button>
+        <button type="button" data-pf-tab="banniere" aria-pressed="false">Bannière</button>
+        <button type="button" data-pf-tab="titre" aria-pressed="false">Titre</button>
+      </div>
+    </div>
+    <div class="pf-preview" id="pfPreview"></div>
+    <div class="pf-tools" id="pfTools">
+      <input class="input" id="pfSearch" type="search" placeholder="Chercher une carte…" autocomplete="off" spellcheck="false">
+      <div class="seg" id="pfRar"></div>
+    </div>
+    <p class="pf-help muted" id="pfHelp"></p>
+    <div class="pf-pick" id="pfPick"></div>
+    <div class="pf-box-foot">
+      <button class="btn btn-ghost btn-sm" type="button" data-pf-close>Annuler</button>
+      <button class="btn btn-gold" type="button" id="pfSave">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="mkModal" aria-hidden="true">
   <div class="modal-bg" data-mk-close></div>
   <div class="mk-box" role="dialog" aria-label="Fiche de la carte">
@@ -1299,6 +1432,6 @@
 <script src="data/origines.js?v=de4fd81f"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=d92ef295"></script>
+<script src="js/app.js?v=2a1a3276"></script>
 </body>
 </html>

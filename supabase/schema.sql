@@ -268,7 +268,7 @@ begin
                   'possede', (select count(*) from public.collection co join public.cartes c on c.id = co.carte where co.joueur = u and c.serie = r.serie and c.rarete <> 'goat' and (r.rarete is null or c.rarete = r.rarete)),
                   'recuperee', exists (select 1 from public.recompenses_joueur rj where rj.joueur = u and rj.recompense = r.id)) order by r.ordre)
                from public.recompenses r)
-  );
+  ) || coalesce(public._mon_profil(u), '{}'::jsonb);   -- avatar, vitrine, bannière, titre (profil.sql)
 end $$;
 
 -- Acheter des boosters (1 ou 5)
@@ -379,26 +379,11 @@ begin
 end $$;
 
 -- Classement public : pseudo et chiffres seulement
-create or replace function public.classement(tri text default 'score') returns table (pseudo text, score bigint, legendaires bigint, cartes bigint)
-language sql stable security definer set search_path = '' as $$
-  with s as (
-    select p.pseudo,
-           coalesce(sum((public.reglage('points') ->> c.rarete)::int), 0) as score,
-           count(*) filter (where c.rarete in ('legend','secret','goat')) as legendaires,
-           count(c.id) as cartes
-    from public.profils p
-    left join public.collection co on co.joueur = p.id
-    left join public.cartes c on c.id = co.carte
-    where p.pseudo is not null
-    group by p.id, p.pseudo
-  )
-  select * from s order by case tri when 'legendaires' then legendaires when 'cartes' then cartes else score end desc, pseudo
-  limit 100
-$$;
+-- (le classement est défini dans profil.sql)
 
 -- Droits : seules ces fonctions sont appelables, et seulement connecté (sauf pseudo_libre et classement)
 revoke execute on all functions in schema public from public, anon, authenticated;
-grant execute on function public.pseudo_libre(text), public.classement(text) to anon, authenticated;
+grant execute on function public.pseudo_libre(text) to anon, authenticated;
 grant execute on function public.choisir_pseudo(text), public.mon_etat(), public.acheter_boosters(int), public.recuperer_gratuit(),
   public.tourner_roue(), public.ouvrir_booster(), public.recuperer_quete(text), public.recuperer_recompense(text) to authenticated;
 
