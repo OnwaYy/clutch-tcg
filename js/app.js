@@ -711,12 +711,33 @@
     const p = centerOf(opPack.querySelector('.pack'), .07);
     burst(p[0], p[1], FXC[best], RORDER[best] >= 3 ? 80 : 36, RORDER[best] >= 3 ? 9 : 6);
     flash(RORDER[best] >= 2 ? RC[best] : 'rgba(255,255,255,.55)');
-    // La bande s'envole pendant que le sachet descend et que les cartes en sortent
+    // La bande s'envole, les cartes montent par l'ouverture, puis le sachet se dissout dans la lumière
     tween(700, easeOut, function (k) { renderTear(1, k); });
-    await sleep(260);
-    opPack.classList.add('gone');
+    OP.busy = true;
     buildReveal(res);
-    await sleep(900); opPack.hidden = true;
+    await sleep(180);
+    const up = opReveal.animate([
+      { transform: 'translateY(16%) scale(.8)', opacity: 0 },
+      { transform: 'translateY(12%) scale(.8)', opacity: 1, offset: .12 },
+      { transform: 'translateY(-46%) scale(.84)', opacity: 1 }
+    ], { duration: 900, easing: 'cubic-bezier(.22,.9,.3,1)', fill: 'forwards' });
+    await sleep(700);
+    const packEl = opPack.querySelector('.pack');
+    packEl.style.animation = 'none';
+    const fade = opPack.animate([
+      { opacity: 1, transform: 'scale(1)', filter: 'blur(0px) brightness(1)' },
+      { opacity: .9, transform: 'scale(1.04)', filter: 'blur(2px) brightness(1.8)', offset: .35 },
+      { opacity: 0, transform: 'scale(1.1)', filter: 'blur(10px) brightness(2.2)' }
+    ], { duration: 520, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+    flash('rgba(255,255,255,.35)');
+    await sleep(140);
+    const settle = opReveal.animate([
+      { transform: 'translateY(-46%) scale(.84)' },
+      { transform: 'translateY(0) scale(1)' }
+    ], { duration: 750, easing: 'cubic-bezier(.3,1.25,.45,1)', fill: 'forwards' });
+    up.cancel();
+    await new Promise(function (r) { settle.onfinish = r; });
+    settle.cancel(); fade.cancel(); opPack.hidden = true; OP.busy = false;
   }
   // Glisser le doigt / la souris le long du booster pour le déchirer, sinon un simple clic l'ouvre
   let tearDrag = null;
@@ -760,14 +781,13 @@
     OP.list = list; OP.idx = 0; OP.phase = 'reveal';
     opReveal.innerHTML = list.map(function (x, k) {
       const c = x.c;
-      return '<div class="rv rise" data-r="' + c.rarity + '" style="--k:' + k + ';--d:' + k + '"><div class="rv-in">' +
+      return '<div class="rv" data-r="' + c.rarity + '" style="--k:' + k + ';--d:' + k + '"><div class="rv-in">' +
         '<div class="rv-f cback"><img class="cback-logo" src="assets/marque/embleme.webp?v=1" alt=""></div>' +
         '<div class="rv-f rv-front"><div class="cc big ' + finish(c) + '" style="' + cardStyle(c) + '">' + cardInner(c).replace(/ loading="lazy"/g, '') + corners(c) + '<span class="cc-holo"></span><span class="cc-glare"></span></div></div>' +
         '</div>' + (x.neu ? '<span class="rv-new">NOUVELLE</span>' : '') + '</div>';
     }).join('');
     $$('.rv', opReveal).forEach(function (el, k) {
       if (RORDER[list[k].c.rarity] >= 3) { const pn = el.querySelector('.cc-panel'); if (pn) pn.insertAdjacentHTML('beforeend', '<span class="cc-glint"></span>'); }
-      el.addEventListener('animationend', function (e) { if (e.animationName === 'rise') el.classList.remove('rise'); });
     });
     opReveal.hidden = false; markCur();
     $('#opCount').innerHTML = list.map(function () { return '<i></i>'; }).join(''); $('#opCount').hidden = false;
