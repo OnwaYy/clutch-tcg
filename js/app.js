@@ -572,10 +572,25 @@
     }
     fxRun();
   }
+  // Particules aspirées vers la carte (charge avant l'explosion)
+  function implode(colors, n, ms) {
+    const r = opReveal.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = Math.max(FX.w, FX.h) * .55, frames = ms / 16.7;
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * 6.283, d = R * (.6 + Math.random() * .5), x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d, f = frames * (.6 + Math.random() * .4);
+      FX.ps.push({ x: x, y: y, vx: (cx - x) / f, vy: (cy - y) / f, life: 1, decay: 1 / f, size: 1.5 + Math.random() * 3, c: colors[Math.floor(Math.random() * colors.length)], rot: 0, vr: 0, sq: false, g: 0, nd: true });
+    }
+    fxRun();
+  }
   function fxRun() { if (!FX.raf) FX.raf = requestAnimationFrame(fxLoop); }
   function fxLoop() {
     FX.raf = 0; const ctx = FX.ctx; if (!ctx) return;
     ctx.clearRect(0, 0, FX.w, FX.h);
+    if (OP.crackle && !opReveal.hidden) {
+      const r = opReveal.getBoundingClientRect(), t = Math.random() * 4, cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const x = t < 1 ? r.left + r.width * t : t < 2 ? r.right : t < 3 ? r.left + r.width * (t - 2) : r.left, y = t < 1 ? r.top : t < 2 ? r.top + r.height * (t - 1) : t < 3 ? r.bottom : r.top + r.height * (t - 3);
+      const dx = x - cx, dy = y - cy, n = Math.hypot(dx, dy) || 1;
+      if (Math.random() < .7) spawn(x, y, OP.crackle, dx / n * (1 + Math.random() * 2.5), dy / n * (1 + Math.random() * 2.5), 1.4 + Math.random() * 2, .045 + Math.random() * .04, 0);
+    }
     if (OP.emit) {
       const r = opReveal.getBoundingClientRect();
       for (let i = 0; i < 2; i++) {
@@ -584,7 +599,7 @@
       }
     }
     FX.ps = FX.ps.filter(function (p) {
-      p.vy += p.g; p.vx *= .985; p.vy *= .985; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= p.decay;
+      p.vy += p.g; if (!p.nd) { p.vx *= .985; p.vy *= .985; } p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= p.decay;
       if (p.life <= 0) return false;
       ctx.globalAlpha = Math.min(1, p.life * 1.6); ctx.fillStyle = p.c;
       if (p.sq) { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2); ctx.restore(); }
@@ -592,7 +607,7 @@
       return true;
     });
     ctx.globalAlpha = 1;
-    if (FX.ps.length || OP.emit) fxRun();
+    if (FX.ps.length || OP.emit || OP.crackle) fxRun();
   }
   function centerOf(el, fy) { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height * (fy == null ? .5 : fy)]; }
 
@@ -615,11 +630,28 @@
     card.style.setProperty('--mx', (50 + c.x * 100).toFixed(1) + '%'); card.style.setProperty('--my', (50 + c.y * 100).toFixed(1) + '%'); card.style.setProperty('--o', c.o.toFixed(3));
   });
 
+  function swayLoop() {
+    if (!OP.sway || OP.phase !== 'reveal') return;
+    const t = performance.now();
+    if (t - (OP.lastMove || 0) > 1400) { cardTilt.tgt = { x: Math.sin(t / 1100) * .24, y: Math.cos(t / 1500) * .17, o: .85 }; smKick(); }
+    requestAnimationFrame(swayLoop);
+  }
+  // Attente qu'un toucher peut écourter (pour passer les indices)
+  function sleepH(ms) { return new Promise(function (done) { const t0 = performance.now(); (function chk() { if (OP.hurry || performance.now() - t0 >= ms) done(); else requestAnimationFrame(chk); })(); }); }
+  async function clue(text, sub, ms) {
+    if (!text) return;
+    const el = $('#opClue'); el.innerHTML = (sub ? '<small>' + esc(sub) + '</small>' : '') + esc(text);
+    el.className = 'op-clue'; void el.offsetWidth; el.classList.add('in');
+    await sleepH(ms); el.classList.remove('in'); el.classList.add('outc'); await sleepH(260); el.className = 'op-clue';
+  }
+  function wave(id, delay) { setTimeout(function () { const w = $(id); w.classList.remove('go'); void w.offsetWidth; w.classList.add('go'); }, delay || 0); }
+
   // ---------- Ouverture ----------
   function openerShow() {
     opener.hidden = false; document.body.style.overflow = 'hidden'; fxInit(); FX.ps = [];
     Object.assign(OP, { phase: 'pack', res: null, req: null, err: null, list: [], idx: 0, busy: false, tearing: false, tp: 0, emit: null });
     opener.classList.remove('dark', 'rays'); setRc('#ffffff');
+    opReveal.classList.remove('hush');
     opPack.getAnimations().concat(opReveal.getAnimations()).forEach(function (an) { an.cancel(); });
     opPack.hidden = false; opPack.className = 'op-pack'; opPack.style.setProperty('--tp', 0);
     opPack.innerHTML = packHTML(SETS[0]).replace(/<\/div>$/, '<div class="pk-strip"></div><i class="pk-slit"></i><i class="pk-guide"></i></div>');
@@ -631,7 +663,7 @@
     requestAnimationFrame(buildStrip);
     setTimeout(function () { opPack.focus({ preventScroll: true }); }, 50);
   }
-  function openerHide() { OP.phase = 'off'; OP.emit = null; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
+  function openerHide() { OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
   async function startOpen() {
     if (!USER) { openAuth('signup'); return; }
     if (!S || S.boosters < 1) { toast('Tu n\'as plus de booster. Récupère le gratuit, tourne la roue ou achètes-en un.', true); location.hash = '#boosters'; return; }
@@ -765,7 +797,7 @@
     OP.list = list; OP.idx = 0; OP.phase = 'reveal';
     opReveal.innerHTML = list.map(function (x, k) {
       const c = x.c;
-      return '<div class="rv" data-r="' + c.rarity + '" style="--k:' + k + ';--d:' + k + '"><div class="rv-in">' +
+      return '<div class="rv" data-r="' + c.rarity + '" style="--k:' + k + ';--d:' + k + '"><div class="rv-aura"></div><div class="rv-in">' +
         '<div class="rv-f cback"><img class="cback-logo" src="assets/marque/embleme.webp?v=1" alt=""></div>' +
         '<div class="rv-f rv-front"><div class="cc big ' + finish(c) + '" style="' + cardStyle(c) + '">' + cardInner(c).replace(/ loading="lazy"/g, '') + corners(c) + '<span class="cc-holo"></span><span class="cc-glare"></span></div></div>' +
         '</div>' + (x.neu ? '<span class="rv-new">NOUVELLE</span>' : '') + '</div>';
@@ -779,47 +811,70 @@
     opButtons(['skip']);
   }
   function markCur() {
-    $$('.rv', opReveal).forEach(function (el, k) { el.style.setProperty('--d', Math.max(0, k - OP.idx)); el.classList.toggle('cur', k === OP.idx); });
+    let cur = null;
+    $$('.rv', opReveal).forEach(function (el, k) {
+      el.style.setProperty('--d', Math.max(0, k - OP.idx)); el.classList.toggle('cur', k === OP.idx);
+      const tease = k === OP.idx && RORDER[el.dataset.r] >= 2 && !el.classList.contains('face');
+      el.classList.toggle('teased', tease); if (tease) cur = el;
+    });
+    OP.crackle = cur ? FXC[cur.dataset.r] : null; if (OP.crackle) fxRun();
     cardTilt.cur = { x: 0, y: 0, o: 0 }; cardTilt.tgt = { x: 0, y: 0, o: 0 };
   }
   const NAMES = { epic: 'Épique', legend: 'Légendaire', secret: 'Secrète', goat: 'GOAT' };
   function showBanner(r) { const b = $('#opBanner'); b.textContent = NAMES[r]; b.className = 'op-banner' + (r === 'goat' ? ' goat' : ''); void b.offsetWidth; b.classList.add('show'); }
   async function revealCur() {
     const el = $$('.rv', opReveal)[OP.idx]; if (!el || OP.busy) return;
-    OP.busy = true;
-    const r = el.dataset.r, lvl = RORDER[r], col = RC[r], inner = el.querySelector('.rv-in');
+    OP.busy = true; OP.hurry = false; OP.seq = true;
+    const r = el.dataset.r, lvl = RORDER[r], col = RC[r], inner = el.querySelector('.rv-in'), c = OP.list[OP.idx].c;
     setRc(col); $('#opRays').classList.toggle('goat', r === 'goat');
-    // Montée de tension selon la rareté
-    if (r === 'goat') { opener.classList.add('dark'); el.classList.add('beat'); await sleep(1400); el.classList.remove('beat'); }
-    if (lvl >= 3) { opener.classList.add('rays'); el.classList.add('tense'); await sleep(r === 'goat' ? 600 : 900); el.classList.remove('tense'); }
-    else if (lvl === 2) { el.classList.add('tense'); await sleep(450); el.classList.remove('tense'); }
-    // Retournement avec élan : la carte se soulève, pivote et retombe en douceur
-    const dur = lvl >= 3 ? 1100 : lvl === 2 ? 800 : 640;
+    OP.crackle = null;
+    if (lvl >= 3) {
+      // Walkout : écran noir, indices un par un, puis la carte se charge d'énergie
+      opener.classList.add('dark');
+      if (r !== 'legend') {
+        opReveal.classList.add('hush'); $('#opHint').textContent = ''; await sleepH(450);
+        await clue(c.game, 'Jeu', 950);
+        if (r === 'goat') { if (c.year) await clue(c.year, 'Époque', 900); await clue('Greatest of all time', 'Rareté', 1150); }
+        opReveal.classList.remove('hush'); await sleepH(380);
+      }
+      el.classList.add('lift', 'tense', 'charging');
+      implode(FXC[r], r === 'goat' ? 140 : 90, 950);
+      await sleepH(r === 'goat' ? 1150 : 980);
+      el.classList.remove('tense', 'charging', 'teased');
+    } else if (lvl === 2) {
+      el.classList.add('tense', 'charging'); implode(FXC.epic, 45, 520); await sleepH(540); el.classList.remove('tense', 'charging', 'teased');
+    }
+    // Retournement avec élan
+    const dur = lvl >= 3 ? 900 : lvl === 2 ? 720 : 620;
     el.classList.add('face');
     inner.animate([
       { transform: 'rotateY(0deg) translateZ(0) scale(1)' },
-      { transform: 'rotateY(100deg) translateZ(60px) scale(1.1)', offset: .45 },
-      { transform: 'rotateY(196deg) translateZ(20px) scale(1.04)', offset: .75 },
+      { transform: 'rotateY(100deg) translateZ(70px) scale(1.12)', offset: .42 },
+      { transform: 'rotateY(198deg) translateZ(20px) scale(1.05)', offset: .72 },
       { transform: 'rotateY(180deg) translateZ(0) scale(1)' }
     ], { duration: dur, easing: 'cubic-bezier(.3,.6,.25,1)' });
-    await sleep(dur * .45);
+    await sleep(dur * .4);
     const p = centerOf(opReveal);
     if (lvl >= 3) {
-      flash(col); shake(); burst(p[0], p[1], FXC[r], r === 'goat' ? 180 : 110, r === 'goat' ? 16 : 13);
-      OP.emit = FXC[r]; el.classList.add('big-r'); showBanner(r);
-      if (r === 'goat') opener.classList.remove('dark');
+      opener.classList.remove('dark'); flash('#ffffff'); setTimeout(function () { flash(col); }, 140);
+      wave('#opWave'); wave('#opWave2', 160); shake();
+      burst(p[0], p[1], FXC[r], r === 'goat' ? 220 : 140, r === 'goat' ? 18 : 15);
+      opener.classList.add('rays'); OP.emit = FXC[r]; el.classList.add('big-r'); el.classList.remove('lift'); showBanner(r);
     } else if (lvl === 2) {
-      flash('rgba(180,107,255,.7)'); burst(p[0], p[1], FXC.epic, 60, 10); el.classList.add('big-r'); showBanner('epic');
+      flash('rgba(180,107,255,.75)'); wave('#opWave'); burst(p[0], p[1], FXC.epic, 70, 11); el.classList.add('big-r'); showBanner('epic');
     } else burst(p[0], p[1], FXC[r], 18, 6);
+    if (lvl >= 2) { OP.sway = true; OP.lastMove = 0; requestAnimationFrame(swayLoop); }
     const dot = $$('#opCount i')[OP.idx]; if (dot) { dot.style.setProperty('--c', col); dot.classList.add('done'); }
     $('#opHint').textContent = OP.idx === OP.list.length - 1 ? 'Touche pour voir ton booster' : 'Glisse la carte ou touche pour la suivante';
-    await sleep(dur * .55);
-    OP.busy = false;
+    await sleep(dur * .6);
+    OP.busy = false; OP.seq = false;
   }
+  // Un toucher pendant la séquence fait défiler les indices plus vite
+  opener.addEventListener('pointerdown', function () { if (OP.seq) OP.hurry = true; });
   // La carte part dans la direction du lancer, avec la vitesse du geste
   async function throwCard(dir, from, vel) {
     const el = $$('.rv', opReveal)[OP.idx]; if (!el || OP.busy) return;
-    OP.busy = true; OP.emit = null; hideBanner(); opener.classList.remove('rays', 'dark');
+    OP.busy = true; OP.emit = null; OP.sway = false; OP.crackle = null; hideBanner(); opener.classList.remove('rays', 'dark');
     const d = dir || (OP.idx % 2 ? 1 : -1), f = from || { x: 0, y: 0, r: 0 };
     const tx = d * (window.innerWidth * .6 + 300), ty = f.y - 80 - Math.abs(vel || 0) * 40;
     el.classList.add('dragging');
@@ -843,6 +898,7 @@
   opReveal.addEventListener('pointermove', function (e) {
     const el = $$('.rv', opReveal)[OP.idx];
     if (el && el.classList.contains('face') && !OP.busy) {
+      OP.lastMove = performance.now();
       const r = opReveal.getBoundingClientRect();
       cardTilt.tgt = { x: clamp((e.clientX - r.left) / r.width - .5, -.5, .5), y: clamp((e.clientY - r.top) / r.height - .5, -.5, .5), o: 1 }; smKick();
     }
@@ -878,7 +934,7 @@
   // ---------- Récapitulatif ----------
   function showSummary() {
     const res = OP.res; if (!res || OP.phase === 'sum') return;
-    OP.phase = 'sum'; OP.emit = null; OP.busy = false;
+    OP.phase = 'sum'; OP.emit = null; OP.busy = false; OP.crackle = null; OP.sway = false;
     opener.classList.remove('rays', 'dark'); hideBanner();
     opReveal.hidden = true; $('#opCount').hidden = true;
     $('#opCards').innerHTML = OP.list.map(function (x, k) {
