@@ -665,6 +665,29 @@
     img.classList.remove('kb'); void img.offsetWidth; img.classList.add('kb');
   }
   function photoOff() { $('#opPhoto').classList.remove('on'); }
+  // Rafale de flashs façon paparazzi : les visuels du même jeu s'empilent de plus en plus vite
+  async function strobe(c) {
+    const pool = CATALOG.filter(function (x) { return x.game === c.game && x.img && x.id !== c.id && x.rarity !== 'goat'; })
+      .sort(function (a, b) { return RORDER[b.rarity] - RORDER[a.rarity] || Math.random() - .5; }).map(function (x) { return x.img; });
+    const imgs = (GOAT_PHOTOS[c.name] || []).concat(pool).slice(0, 14);
+    if (!imgs.length) return;
+    while (imgs.length < 10) imgs.push(imgs[imgs.length % Math.max(1, imgs.length)]);
+    const box = $('#opStrobe'); box.innerHTML = ''; box.className = 'op-strobe on';
+    imgs.forEach(function (src) { const im = new Image(); im.src = src; });
+    for (let i = 0; i < imgs.length && !OP.hurry; i++) {
+      const fig = document.createElement('i');
+      fig.style.backgroundImage = 'url("' + imgs[i] + '")';
+      fig.style.left = (12 + Math.random() * 76) + '%'; fig.style.top = (14 + Math.random() * 66) + '%';
+      fig.style.setProperty('--r', ((Math.random() - .5) * 36).toFixed(1) + 'deg');
+      box.appendChild(fig);
+      flash(i % 3 === 2 ? 'rgba(255,217,138,.9)' : 'rgba(255,255,255,.85)');
+      if (i % 4 === 3) shake();
+      await sleepH(Math.max(55, 190 - i * 14));
+    }
+    await sleepH(380);
+    box.classList.add('out'); await sleepH(320);
+    box.className = 'op-strobe'; box.innerHTML = '';
+  }
   const GOAT_FACE = { Faker: [74, 55], ZywOo: [52, 43], Kaydop: [64, 46], Shotzzy: [84, 54], N0tail: [50, 54] };
   const GOAT_HOOK = { Faker: '6× champion du monde', ZywOo: '3× champion du Major', Kaydop: '3× champion du monde', Shotzzy: '3× champion du monde', N0tail: '2× champion de The International' };
   function wave(id, delay) { setTimeout(function () { const w = $(id); w.classList.remove('go'); void w.offsetWidth; w.classList.add('go'); }, delay || 0); }
@@ -762,7 +785,7 @@
     requestAnimationFrame(buildStrip);
     setTimeout(function () { opPack.focus({ preventScroll: true }); }, 50);
   }
-  function openerHide() { photoOff(); OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; OP.rain = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
+  function openerHide() { photoOff(); $('#opStrobe').className = 'op-strobe'; $('#opStrobe').innerHTML = ''; OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; OP.rain = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
   async function startOpen() {
     if (!USER) { openAuth('signup'); return; }
     if (!S || S.boosters < 1) { toast('Tu n\'as plus de booster. Récupère le gratuit, tourne la roue ou achètes-en un.', true); location.hash = '#boosters'; return; }
@@ -941,7 +964,8 @@
       el.classList.add('beat');
       for (let i = 0; i < 3; i++) { await sleepH(460); flash('rgba(255,217,138,.28)'); }
       el.classList.remove('beat');
-      opReveal.classList.add('hush'); await sleepH(420);
+      opReveal.classList.add('hush');
+      await strobe(c);
       const ph = GOAT_PHOTOS[c.name] || [];
       await clue(c.game, 'Jeu', 1000, true, ph[0]);
       if (c.year) await clue(c.year, 'Époque', 950, true, ph[1]);

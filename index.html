@@ -770,6 +770,12 @@
   .op-photo i.kb { animation: phkb 1.4s ease-out forwards; }
   @keyframes phkb { from { transform: scale(1.18); filter: grayscale(.35) contrast(1.15) brightness(.9) blur(4px); } to { transform: scale(1.04); } }
   .op-photo::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,.15), rgba(0,0,0,.75) 80%), linear-gradient(135deg, rgba(255,211,107,.18), rgba(185,150,255,.18)); }
+  .op-strobe { position: absolute; inset: 0; z-index: 6; pointer-events: none; display: none; }
+  .op-strobe.on { display: block; }
+  .op-strobe i { position: absolute; width: min(30vmin, 260px); aspect-ratio: 63 / 88; translate: -50% -50%; rotate: var(--r); background: center / cover no-repeat;
+    border: 6px solid #f4f1ea; border-bottom-width: 22px; box-shadow: 0 20px 40px -10px rgba(0,0,0,.9); filter: contrast(1.1) saturate(1.15); animation: snap .22s cubic-bezier(.2,1.4,.4,1) both; }
+  @keyframes snap { from { scale: 1.9; opacity: 0; filter: brightness(3) blur(6px); } 60% { opacity: 1; filter: brightness(1.6); } }
+  .op-strobe.out i { transition: transform .32s cubic-bezier(.5,0,.8,.4), opacity .32s; transform: translateY(80vh) rotate(25deg); opacity: 0; }
   /* ---------- Cinématique GOAT ---------- */
   .op-snd { position: absolute; top: 14px; left: 14px; z-index: 11; background: rgba(0,0,0,.35); font-size: 16px; }
   .cine { position: absolute; inset: 0; z-index: 10; overflow: hidden; background: #000; display: none; cursor: pointer; }
@@ -1140,6 +1146,7 @@
   <div class="op-wave" id="opWave"></div>
   <div class="op-wave" id="opWave2"></div>
   <div class="op-photo" id="opPhoto"><i></i></div>
+  <div class="op-strobe" id="opStrobe"></div>
   <div class="op-clue" id="opClue"></div>
   <div class="op-chips" id="opChips"></div>
   <div class="op-stage" id="opStage">
@@ -1188,6 +1195,6 @@
 <script src="data/origines.js?v=de4fd81f"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=c82b56d8"></script>
+<script src="js/app.js?v=69ff0c01"></script>
 </body>
 </html>
