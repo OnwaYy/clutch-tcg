@@ -165,7 +165,9 @@ window.ORIGINES = {
     "Na'Vi — Le premier The International": {"img": "assets/cartes/na-vi-le-premier-the-international.jpg", "color": "#f5d100", "photo": true},
     "BoxeR — L'Empereur des Terrans": {"img": "assets/cartes/boxer-l-empereur-des-terrans.jpg", "color": "#2a6fd8", "photo": true},
     "Flash — Le Dieu": {"img": "assets/cartes/flash-le-dieu.jpg", "color": "#e2012d", "photo": true},
-    "Grubby — La légende de Warcraft III": {"img": "assets/cartes/grubby-la-legende-de-warcraft-iii.jpg", "color": "#7a8aa8", "photo": true}
+    "Grubby — La légende de Warcraft III": {"img": "assets/cartes/grubby-la-legende-de-warcraft-iii.jpg", "color": "#7a8aa8", "photo": true},
+    "Serral — Premier champion non coréen": {"img": "assets/cartes/serral-premier-champion-non-coreen.jpg", "color": "#e8c24a", "photo": true},
+    "Bugha — Champion de la Fortnite World Cup": {"img": "assets/cartes/bugha-champion-de-la-fortnite-world-cup.jpg", "color": "#d9a93a", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
