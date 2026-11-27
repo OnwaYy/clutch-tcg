@@ -721,23 +721,26 @@
       { transform: 'translateY(12%) scale(.8)', opacity: 1, offset: .12 },
       { transform: 'translateY(-46%) scale(.84)', opacity: 1 }
     ], { duration: 900, easing: 'cubic-bezier(.22,.9,.3,1)', fill: 'forwards' });
-    await sleep(700);
+    await up.finished;
+    await sleep(220);
+    // 2. le sachet disparaît pendant que les cartes restent immobiles au-dessus
     const packEl = opPack.querySelector('.pack');
     packEl.style.animation = 'none';
     const fade = opPack.animate([
       { opacity: 1, transform: 'scale(1)', filter: 'blur(0px) brightness(1)' },
-      { opacity: .9, transform: 'scale(1.04)', filter: 'blur(2px) brightness(1.8)', offset: .35 },
-      { opacity: 0, transform: 'scale(1.1)', filter: 'blur(10px) brightness(2.2)' }
-    ], { duration: 520, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
-    flash('rgba(255,255,255,.35)');
-    await sleep(140);
+      { opacity: 0, transform: 'scale(.94)', filter: 'blur(6px) brightness(1.5)' }
+    ], { duration: 480, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+    await fade.finished;
+    opPack.hidden = true;
+    await sleep(120);
+    // 3. puis les cartes descendent se placer au centre
     const settle = opReveal.animate([
       { transform: 'translateY(-46%) scale(.84)' },
       { transform: 'translateY(0) scale(1)' }
-    ], { duration: 750, easing: 'cubic-bezier(.3,1.25,.45,1)', fill: 'forwards' });
+    ], { duration: 700, easing: 'cubic-bezier(.3,1.2,.45,1)', fill: 'forwards' });
     up.cancel();
-    await new Promise(function (r) { settle.onfinish = r; });
-    settle.cancel(); fade.cancel(); opPack.hidden = true; OP.busy = false;
+    await settle.finished;
+    settle.cancel(); fade.cancel(); OP.busy = false;
   }
   // Glisser le doigt / la souris le long du booster pour le déchirer, sinon un simple clic l'ouvre
   let tearDrag = null;
