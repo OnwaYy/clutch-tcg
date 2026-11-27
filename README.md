@@ -15,7 +15,7 @@ Jeu de cartes à collectionner sur le thème de l'e-sport, sur navigateur : joue
 - **Origines** (symbole ORI, tampon Édition 1) : les 175 joueurs, clubs, jeux et moments qui ont fait l'e-sport, de 1972 à aujourd'hui, tous jeux et tous pays. 150 cartes + 25 secrètes, numérotées jusqu'à 175/150.
   - Numérotées (001 à 150) : 50 communes, 41 peu communes, 47 épiques, 12 légendaires.
   - Secrètes (151 à 175) : 25 cartes secrètes, hors numérotation.
-  - GOAT : le plus grand de chaque jeu (Faker, ZywOo, Kaydop), sans numéro (marqués « GOAT »), en dehors des 175.
+  - GOAT : le plus grand de chaque jeu (Faker, ZywOo, Kaydop, Shotzzy), sans numéro (marqués « GOAT »), en dehors des 175.
 - **Séries d'événement** : sortent uniquement pendant les events.
 
 Les visuels sont dans `assets/cartes/` (nommés d'après la carte). Ceux des cartes retirées d'Origines sont gardés dans `assets/cartes/retirees/`.

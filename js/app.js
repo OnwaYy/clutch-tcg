@@ -654,7 +654,7 @@
     await sleepH(300); el.className = 'op-clue';
   }
   // Palmarès mis en avant pendant le walkout des GOAT
-  const GOAT_HOOK = { Faker: '6× champion du monde', ZywOo: '3× champion du Major', Kaydop: '3× champion du monde' };
+  const GOAT_HOOK = { Faker: '6× champion du monde', ZywOo: '3× champion du Major', Kaydop: '3× champion du monde', Shotzzy: '3× champion du monde' };
   function wave(id, delay) { setTimeout(function () { const w = $(id); w.classList.remove('go'); void w.offsetWidth; w.classList.add('go'); }, delay || 0); }
 
   // ---------- Ouverture ----------
