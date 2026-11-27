@@ -762,6 +762,44 @@
   @media (max-width: 760px) { .op-cards { --cw: min(120px, 28vw); gap: 10px; } }
   @media (prefers-reduced-motion: reduce) { .op-rays { animation: none; } .rv.tense .rv-in, .rv.beat { animation: none; } }
 
+
+  /* ---------- Cinématique GOAT ---------- */
+  .op-snd { position: absolute; top: 14px; left: 14px; z-index: 11; background: rgba(0,0,0,.35); font-size: 16px; }
+  .cine { position: absolute; inset: 0; z-index: 10; overflow: hidden; background: #000; display: none; cursor: pointer; }
+  .cine.on { display: block; animation: cinein .3s ease-out; }
+  .cine.out { animation: cineout .35s ease-in forwards; }
+  @keyframes cinein { from { opacity: 0; } }
+  @keyframes cineout { to { opacity: 0; } }
+  .cine-bg { position: absolute; inset: -6%; background-size: cover; background-repeat: no-repeat; filter: grayscale(1) contrast(1.45) brightness(.7); opacity: 0; will-change: transform; }
+  .cine-bg.show { opacity: 1; animation: kb .9s linear forwards; }
+  @keyframes kb { from { transform: scale(var(--s0, 1.05)) translate(var(--x0, 0), var(--y0, 0)); } to { transform: scale(var(--s1, 1.2)) translate(var(--x1, 0), var(--y1, 0)); } }
+  .cine-tint { position: absolute; inset: 0; mix-blend-mode: color; background: linear-gradient(135deg, #ffd36b, #ff7eb6 45%, #6fd0ff); opacity: .55; }
+  .cine-vig { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.85) 85%); }
+  .cine-scan { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px); mix-blend-mode: overlay; pointer-events: none; }
+  .cine-bar { position: absolute; left: 0; right: 0; height: 12vh; background: #000; z-index: 3; transition: transform .6s cubic-bezier(.2,.8,.2,1); }
+  .cine-bar.top { top: 0; transform: translateY(-100%); } .cine-bar.bot { bottom: 0; transform: translateY(100%); }
+  .cine.bars .cine-bar { transform: none; }
+  .cine-txt { position: absolute; left: 50%; top: 50%; translate: -50% -50%; z-index: 2; width: 94vw; text-align: center; color: #fff; font-family: var(--f-display); font-weight: 900; font-stretch: 125%; text-transform: uppercase; line-height: .95; font-size: clamp(40px, 10vw, 140px); }
+  .cine-txt.long { font-size: clamp(32px, 7vw, 96px); }
+  .cine-txt small { display: block; margin-bottom: 18px; font-family: var(--f-mono); font-weight: 500; font-stretch: 100%; font-size: clamp(12px, 1.7vw, 18px); letter-spacing: .4em; color: #ffd36b; }
+  .cine-txt.line { font-size: clamp(18px, 3vw, 34px); font-family: var(--f-mono); font-weight: 500; font-stretch: 100%; letter-spacing: .35em; color: rgba(255,255,255,.85); animation: linein 1.4s ease-out forwards; }
+  @keyframes linein { from { opacity: 0; letter-spacing: .8em; filter: blur(6px); } 40% { opacity: 1; filter: blur(0); } to { opacity: 1; letter-spacing: .35em; } }
+  .cine-txt.slam span { display: inline-block; position: relative; animation: slam .5s cubic-bezier(.2,1.3,.3,1) both; text-shadow: 0 0 40px rgba(255,211,107,.7); }
+  .cine-txt.slam span::before, .cine-txt.slam span::after { content: attr(data-t); position: absolute; inset: 0; mix-blend-mode: screen; animation: glitch .5s steps(2) 3; }
+  .cine-txt.slam span::before { color: #ff2a6d; transform: translate(-6px, 2px); clip-path: inset(10% 0 55% 0); }
+  .cine-txt.slam span::after { color: #00e5ff; transform: translate(6px, -2px); clip-path: inset(55% 0 8% 0); }
+  @keyframes slam { from { transform: scale(2.8); filter: blur(12px); opacity: 0; } 55% { transform: scale(.95); filter: blur(0); opacity: 1; } to { transform: scale(1); } }
+  @keyframes glitch { 0% { clip-path: inset(10% 0 60% 0); } 50% { clip-path: inset(60% 0 5% 0); } 100% { clip-path: inset(30% 0 40% 0); } }
+  .cine-txt.name { font-size: clamp(56px, 15vw, 210px); letter-spacing: .04em; }
+  .cine-txt.name b { display: inline-block; background: linear-gradient(180deg, #fff, #ffd36b 50%, #ff7eb6); -webkit-background-clip: text; background-clip: text; color: transparent; animation: letter .35s cubic-bezier(.2,1.5,.3,1) both; filter: drop-shadow(0 0 24px rgba(255,211,107,.8)); }
+  @keyframes letter { from { transform: translateY(40%) scale(1.6); opacity: 0; filter: blur(8px); } }
+  .cine-flash { position: absolute; inset: 0; z-index: 4; background: #fff; opacity: 0; pointer-events: none; }
+  .cine-flash.go { animation: cflash .45s ease-out; }
+  .cine-flash.white { transition: opacity .5s ease-in; opacity: .92; }
+  @keyframes cflash { from { opacity: .85; } to { opacity: 0; } }
+  .cine-skip { position: absolute; z-index: 5; right: 18px; bottom: calc(12vh + 10px); font-family: var(--f-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.35); }
+  .cine.shake { animation: cshake .35s; }
+  @keyframes cshake { 25% { translate: -10px 5px; } 50% { translate: 8px -6px; } 75% { translate: -6px 3px; } }
   /* ---------- Roue ---------- */
   .wheel-box { position: relative; display: grid; gap: 18px; justify-items: center; }
   .wheel-wrap { position: relative; width: min(360px, 86vw); aspect-ratio: 1; }
@@ -1116,6 +1154,14 @@
   <canvas class="op-fx" id="opFx"></canvas>
   <div class="op-flash" id="opFlash"></div>
   <button class="x op-x" type="button" data-op="close" id="opX" aria-label="Fermer">×</button>
+  <button class="x op-snd" type="button" id="opSnd" aria-label="Couper le son">🔊</button>
+  <div class="cine" id="opCine" aria-hidden="true">
+    <div class="cine-bg" id="cineBg"></div><div class="cine-tint"></div><div class="cine-vig"></div><div class="cine-scan"></div>
+    <div class="cine-txt" id="cineTxt"></div>
+    <div class="cine-bar top"></div><div class="cine-bar bot"></div>
+    <div class="cine-flash" id="cineFlash"></div>
+    <div class="cine-skip">Touche pour passer</div>
+  </div>
 </div>
 
 <!-- Roue du jour -->
@@ -1134,6 +1180,6 @@
 <script src="data/origines.js?v=de4fd81f"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=0132846a"></script>
+<script src="js/app.js?v=8ef8809d"></script>
 </body>
 </html>

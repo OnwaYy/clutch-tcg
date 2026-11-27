@@ -656,8 +656,85 @@
     await sleepH(300); el.className = 'op-clue';
   }
   // Palmarès mis en avant pendant le walkout des GOAT
+  const GOAT_FACE = { Faker: [74, 55], ZywOo: [52, 43], Kaydop: [64, 46], Shotzzy: [84, 54], N0tail: [50, 54] };
   const GOAT_HOOK = { Faker: '6× champion du monde', ZywOo: '3× champion du Major', Kaydop: '3× champion du monde', Shotzzy: '3× champion du monde', N0tail: '2× champion de The International' };
   function wave(id, delay) { setTimeout(function () { const w = $(id); w.classList.remove('go'); void w.offsetWidth; w.classList.add('go'); }, delay || 0); }
+
+
+  // ---------- Son : effets générés par le navigateur (aucun fichier, aucun droit) ----------
+  const AU = { ctx: null, out: null, on: true, live: [] };
+  try { AU.on = localStorage.getItem('clutch-son') !== '0'; } catch (e) {}
+  function auInit() {
+    if (!AU.on) return null;
+    if (!AU.ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; AU.ctx = new C(); AU.out = AU.ctx.createDynamicsCompressor(); AU.out.connect(AU.ctx.destination); }
+    if (AU.ctx.state === 'suspended') AU.ctx.resume();
+    return AU.ctx;
+  }
+  function auNoise(dur) { const c = AU.ctx, b = c.createBuffer(1, Math.max(1, Math.floor(c.sampleRate * dur)), c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const n = c.createBufferSource(); n.buffer = b; return n; }
+  function auGain(v) { const g = AU.ctx.createGain(); g.gain.value = v; g.connect(AU.out); AU.live.push(g); return g; }
+  const SFX = {
+    // Montée de tension : souffle filtré + dent de scie qui grimpent
+    riser: function (dur) { const c = auInit(); if (!c) return; const t = c.currentTime, g = auGain(0);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(.5, t + dur * .95); g.gain.linearRampToValueAtTime(0, t + dur);
+      const n = auNoise(dur), bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 6; bp.frequency.setValueAtTime(200, t); bp.frequency.exponentialRampToValueAtTime(5000, t + dur); n.connect(bp).connect(g); n.start(t); n.stop(t + dur);
+      const o = c.createOscillator(), og = c.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(55, t); o.frequency.exponentialRampToValueAtTime(440, t + dur); og.gain.value = .12; const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1400; o.connect(lp).connect(og).connect(g); o.start(t); o.stop(t + dur); },
+    // Battement de cœur : deux coups graves
+    heart: function () { const c = auInit(); if (!c) return; [0, .17].forEach(function (d, k) { const t = c.currentTime + d, o = c.createOscillator(), g = auGain(0); o.type = 'sine'; o.frequency.setValueAtTime(70, t); o.frequency.exponentialRampToValueAtTime(38, t + .18); g.gain.setValueAtTime(k ? .7 : .9, t); g.gain.exponentialRampToValueAtTime(.001, t + .28); o.connect(g); o.start(t); o.stop(t + .3); }); },
+    // Impact : claquement + coup de basse
+    impact: function (big) { const c = auInit(); if (!c) return; const t = c.currentTime;
+      const n = auNoise(.25), hp = c.createBiquadFilter(), g = auGain(0); hp.type = 'highpass'; hp.frequency.value = 900; g.gain.setValueAtTime(big ? .9 : .6, t); g.gain.exponentialRampToValueAtTime(.001, t + .22); n.connect(hp).connect(g); n.start(t);
+      const o = c.createOscillator(), og = auGain(0); o.type = 'sine'; o.frequency.setValueAtTime(big ? 140 : 120, t); o.frequency.exponentialRampToValueAtTime(40, t + (big ? .9 : .4)); og.gain.setValueAtTime(big ? 1 : .8, t); og.gain.exponentialRampToValueAtTime(.001, t + (big ? 1 : .45)); o.connect(og); o.start(t); o.stop(t + 1.1); },
+    // Souffle qui passe
+    whoosh: function () { const c = auInit(); if (!c) return; const t = c.currentTime, n = auNoise(.7), bp = c.createBiquadFilter(), g = auGain(0); bp.type = 'bandpass'; bp.Q.value = 2; bp.frequency.setValueAtTime(3000, t); bp.frequency.exponentialRampToValueAtTime(250, t + .6); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.6, t + .25); g.gain.exponentialRampToValueAtTime(.001, t + .7); n.connect(bp).connect(g); n.start(t); },
+    // Lettre qui s'écrit
+    tick: function (i) { const c = auInit(); if (!c) return; const t = c.currentTime, o = c.createOscillator(), g = auGain(0); o.type = 'square'; o.frequency.value = 660 + i * 70; g.gain.setValueAtTime(.12, t); g.gain.exponentialRampToValueAtTime(.001, t + .08); o.connect(g); o.start(t); o.stop(t + .09); },
+    // Le gros BOOM : chute de basse + éclat + carillon
+    boom: function () { const c = auInit(); if (!c) return; const t = c.currentTime; SFX.impact(true);
+      const o = c.createOscillator(), g = auGain(0); o.type = 'sine'; o.frequency.setValueAtTime(90, t); o.frequency.exponentialRampToValueAtTime(28, t + 1.6); g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(.001, t + 1.8); o.connect(g); o.start(t); o.stop(t + 1.9);
+      const n = auNoise(1.6), hp = c.createBiquadFilter(), ng = auGain(0); hp.type = 'highpass'; hp.frequency.value = 5000; ng.gain.setValueAtTime(.35, t); ng.gain.exponentialRampToValueAtTime(.001, t + 1.5); n.connect(hp).connect(ng); n.start(t);
+      [0, 4, 7, 12].forEach(function (st, k) { const tt = t + .08 + k * .07, so = c.createOscillator(), sg = auGain(0); so.type = 'triangle'; so.frequency.value = 523.25 * Math.pow(2, st / 12); sg.gain.setValueAtTime(.14, tt); sg.gain.exponentialRampToValueAtTime(.001, tt + 1.2); so.connect(sg); so.start(tt); so.stop(tt + 1.3); }); },
+    stop: function () { if (!AU.ctx) return; const t = AU.ctx.currentTime; AU.live.forEach(function (g) { try { g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + .15); } catch (e) {} }); AU.live = []; }
+  };
+  function sndBtn() { const b = $('#opSnd'); if (b) { b.textContent = AU.on ? '🔊' : '🔇'; b.setAttribute('aria-label', AU.on ? 'Couper le son' : 'Activer le son'); } }
+
+  // ---------- Cinématique de révélation d'une GOAT ----------
+  async function goatCine(c) {
+    const cv = $('#opCine'), bg = $('#cineBg'), tx = $('#cineTxt'), fl = $('#cineFlash');
+    // Point du visage sur chaque carte : les gros plans zooment dessus
+    const f = GOAT_FACE[c.name] || [50, 45];
+    const cut = function (s0, s1, dy, txt, sub) {
+      bg.style.backgroundImage = 'url("' + c.img + '")'; bg.style.backgroundSize = 'cover';
+      bg.style.backgroundPosition = f[0] + '% ' + (f[1] + dy) + '%'; bg.style.transformOrigin = f[0] + '% ' + (f[1] + dy) + '%';
+      const k = Math.random() < .5 ? 1 : -1; bg.style.setProperty('--s0', s0); bg.style.setProperty('--s1', s1);
+      bg.style.setProperty('--x0', (k * 1.5) + '%'); bg.style.setProperty('--x1', (-k * 1.5) + '%'); bg.style.setProperty('--y0', '0%'); bg.style.setProperty('--y1', '0%');
+      bg.classList.remove('show'); void bg.offsetWidth; bg.classList.add('show');
+      const t = String(txt);
+      tx.className = 'cine-txt slam' + (t.length > 12 ? ' long' : ''); tx.innerHTML = (sub ? '<small>' + esc(sub) + '</small>' : '') + '<span data-t="' + esc(t) + '">' + esc(t) + '</span>';
+      fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+      cv.classList.remove('shake'); void cv.offsetWidth; cv.classList.add('shake');
+      SFX.impact(false);
+    };
+    cv.className = 'cine on'; bg.className = 'cine-bg'; tx.className = 'cine-txt'; tx.innerHTML = ''; fl.className = 'cine-flash';
+    auInit(); SFX.riser(5.6);
+    await sleep(60); cv.classList.add('bars');
+    // 1. Le noir, le cœur
+    tx.className = 'cine-txt line'; tx.textContent = 'Il n\'y en a qu\'un';
+    SFX.heart(); await sleepH(950); if (!OP.hurry) SFX.heart(); await sleepH(950);
+    // 2. Le montage
+    const shots = [[1.25, 1.45, 4, c.game, 'Jeu'], [2.6, 2.9, -2, c.year || 'Légende', 'Époque'], [1.8, 2, 0, GOAT_HOOK[c.name] || 'Champion', 'Palmarès'], [1.15, 1, 0, 'Greatest of all time', '']];
+    for (let i = 0; i < shots.length && !OP.hurry; i++) { const sh = shots[i]; cut(sh[0], sh[1], sh[2], sh[3], sh[4]); await sleepH(i === 3 ? 900 : 680); }
+    // 3. Le silence, puis le nom
+    bg.classList.remove('show'); tx.innerHTML = ''; SFX.whoosh();
+    if (!OP.hurry) await sleepH(380);
+    tx.className = 'cine-txt name'; const nm = c.name.toUpperCase();
+    for (let i = 0; i < nm.length; i++) { tx.insertAdjacentHTML('beforeend', '<b>' + esc(nm[i]) + '</b>'); if (!OP.hurry) { SFX.tick(i); await sleepH(95); } }
+    await sleepH(520);
+    fl.className = 'cine-flash white'; await sleepH(420);
+    // 4. BOOM
+    SFX.stop(); SFX.boom();
+    cv.classList.add('out'); await sleep(330);
+    cv.className = 'cine';
+  }
 
   // ---------- Ouverture ----------
   function openerShow() {
@@ -849,30 +926,24 @@
     const r = el.dataset.r, lvl = RORDER[r], col = RC[r], inner = el.querySelector('.rv-in'), c = OP.list[OP.idx].c;
     setRc(col); $('#opRays').classList.toggle('goat', r === 'goat');
     OP.crackle = null;
-    if (lvl >= 3) {
+    if (r === 'goat') {
+      // GOAT : cinématique avec montage, son, puis BOOM
+      $('#opHint').textContent = ''; $('#opChips').innerHTML = '';
+      await goatCine(c);
+      el.classList.remove('teased');
+    } else if (lvl >= 3) {
       // Walkout : écran noir, indices un par un, puis la carte se charge d'énergie
       opener.classList.add('dark');
       $('#opHint').textContent = ''; $('#opChips').innerHTML = '';
-      if (r === 'goat') {
-        // Battements de cœur dans le noir avant les indices
-        el.classList.add('beat');
-        for (let i = 0; i < 3; i++) { await sleepH(460); flash('rgba(255,217,138,.28)'); }
-        el.classList.remove('beat');
-      }
-      // Les indices : jeu, époque, catégorie… puis la rareté
       opReveal.classList.add('hush'); await sleepH(420);
       await clue(c.game, 'Jeu', 1000);
       if (c.year) await clue(c.year, r === 'legend' ? 'Année' : 'Époque', 950);
       if (r !== 'legend' && c.type) await clue(c.type, 'Catégorie', 900);
       if (r === 'secret') await clue('Carte secrète', 'Rareté', 1000);
-      if (r === 'goat') {
-        if (GOAT_HOOK[c.name]) await clue(GOAT_HOOK[c.name], 'Palmarès', 1150);
-        await clue('Greatest of all time', 'Rareté', 1300);
-      }
       opReveal.classList.remove('hush'); await sleepH(380);
       el.classList.add('lift', 'tense', 'charging');
-      implode(FXC[r], r === 'goat' ? 140 : 90, 950);
-      await sleepH(r === 'goat' ? 1150 : 980);
+      implode(FXC[r], 90, 950);
+      await sleepH(980);
       el.classList.remove('tense', 'charging', 'teased');
     } else if (lvl === 2) {
       el.classList.add('tense', 'charging'); implode(FXC.epic, 45, 520); await sleepH(540); el.classList.remove('tense', 'charging', 'teased');
@@ -906,6 +977,8 @@
     await sleep(dur * .6);
     OP.busy = false; OP.seq = false;
   }
+  $('#opSnd').addEventListener('click', function (e) { e.stopPropagation(); AU.on = !AU.on; try { localStorage.setItem('clutch-son', AU.on ? '1' : '0'); } catch (er) {} if (!AU.on) SFX.stop(); sndBtn(); });
+  sndBtn();
   // Un toucher pendant la séquence fait défiler les indices plus vite
   opener.addEventListener('pointerdown', function () { if (OP.seq) OP.hurry = true; });
   // La carte part dans la direction du lancer, avec la vitesse du geste
