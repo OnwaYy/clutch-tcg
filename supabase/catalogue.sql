@@ -1,4 +1,4 @@
--- Catalogue de la série Origines (généré depuis data/origines.js) : 175 cartes + 4 GOAT
+-- Catalogue de la série Origines (généré depuis data/origines.js) : 175 cartes + 5 GOAT
 insert into public.cartes (id, serie, rarete, nom) values
   (1, 'ori', 'common', 'mTw'),
   (2, 'ori', 'common', '4Kings'),
@@ -178,5 +178,6 @@ insert into public.cartes (id, serie, rarete, nom) values
   (176, 'ori', 'goat', 'Faker'),
   (177, 'ori', 'goat', 'ZywOo'),
   (178, 'ori', 'goat', 'Kaydop'),
-  (179, 'ori', 'goat', 'Shotzzy')
+  (179, 'ori', 'goat', 'Shotzzy'),
+  (180, 'ori', 'goat', 'N0tail')
 on conflict (id) do update set rarete = excluded.rarete, nom = excluded.nom;

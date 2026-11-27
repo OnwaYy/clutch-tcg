@@ -152,6 +152,7 @@ window.ORIGINES = {
     "OG — Le doublé TI8 & TI9": {"img": "assets/cartes/og-le-double-ti8-ti9.jpg?v=08a4fe05", "color": "#2fd08a", "photo": true},
     "Kaydop": {"img": "assets/cartes/kaydop-goat.jpg?v=aa8a387f", "color": "#5aa9ff", "photo": true},
     "Shotzzy": {"img": "assets/cartes/shotzzy-goat.jpg?v=2f5beb79", "color": "#92c83e", "photo": true},
+    "N0tail": {"img": "assets/cartes/n0tail-goat.jpg?v=d08e1c27", "color": "#e84a3a", "photo": true},
     "Kaydop — Triple champion du monde": {"img": "assets/cartes/kaydop-triple-champion-du-monde.jpg?v=8e10b0b5", "color": "#f5c935", "photo": true},
     "ZywOo": {"img": "assets/cartes/zywoo-goat.jpg?v=33563a72", "color": "#f5c935", "photo": true},
     "apEX — Le capitaine": {"img": "assets/cartes/apex-le-capitaine.jpg?v=ba0c87d5", "color": "#f5c935", "photo": true},
@@ -367,6 +368,7 @@ window.ORIGINES = {
     ["Faker", "G", "Joueur", "League of Legends", "2013-2025", "Six fois champion du monde : 2013, 2015, 2016, 2023, 2024 et 2025"],
     ["ZywOo", "G", "Joueur", "Counter-Strike", "2019-2025", "Le GOAT de Counter-Strike : numéro 1 mondial HLTV en 2019 et 2020, triple champion du Major"],
     ["Kaydop", "G", "Joueur", "Rocket League", "2016-2025", "Le GOAT de Rocket League : triple champion du monde RLCS, avec Gale Force, Dignitas puis Vitality"],
-    ["Shotzzy", "G", "Joueur", "Call of Duty", "2018-2025", "Champion du monde de Halo en 2018, puis triple champion du monde de Call of Duty : 2020 avec Dallas Empire, 2024 et 2025 avec OpTic Texas"]
+    ["Shotzzy", "G", "Joueur", "Call of Duty", "2018-2025", "Champion du monde de Halo en 2018, puis triple champion du monde de Call of Duty : 2020 avec Dallas Empire, 2024 et 2025 avec OpTic Texas"],
+    ["N0tail", "G", "Joueur", "Dota 2", "2018-2019", "Le GOAT de Dota 2 : double champion de The International avec OG, en 2018 et 2019, et joueur le mieux payé de l'histoire de l'e-sport"]
   ]
 };
