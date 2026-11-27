@@ -56,10 +56,7 @@
   .top-in { display: flex; align-items: center; gap: 28px; height: 64px; }
   .logo { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 900; font-stretch: 112%; font-size: 18px; letter-spacing: .02em; text-decoration: none; color: var(--fg); white-space: nowrap; flex: none; }
   .logo b { color: var(--gold); font-weight: 900; }
-  .logo-mark { width: 34px; height: 34px; border-radius: 9px; position: relative; flex: none; background: linear-gradient(150deg, #f6d27a, var(--gold-deep)); box-shadow: inset 0 -3px 0 rgba(0,0,0,.25); }
-  .logo-mark::before, .logo-mark::after { content:""; position:absolute; width:11px; height:16px; border-radius:2px; border:2px solid #1a1200; top: 9px; }
-  .logo-mark::before { left:8px; transform: rotate(-12deg); opacity:.5; }
-  .logo-mark::after { right:8px; transform: rotate(8deg); background: rgba(26,18,0,.2); }
+  .logo-mark { width: 34px; height: 35px; flex: none; background: url(assets/marque/embleme.webp?v=1) center / contain no-repeat; filter: drop-shadow(0 2px 6px rgba(242,194,91,.25)); }
   .nav { display: flex; gap: 4px; flex: 1; min-width: 0; }
   .nav a { position: relative; padding: 8px 12px; color: var(--muted); text-decoration: none; font-family: var(--f-display); font-weight: 800; font-stretch: 105%; font-size: 14px; letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; transition: color .15s; }
   .nav a:hover { color: var(--fg); }
@@ -159,15 +156,11 @@
   .hero-art .fan .cc { --u: 1.75px; width: 175px; box-shadow: 0 24px 40px -14px rgba(0,0,0,.95); pointer-events: none; }
   .hero-art .fan.l { transform: translate(-50%, -50%) translateX(-138px) translateY(14px) rotate(-15deg); }
   .hero-art .fan.r { transform: translate(-50%, -50%) translateX(138px) translateY(14px) rotate(15deg); }
-  .hero-art .pack { --pw: 205px; width: var(--pw); max-width: none; position: relative; z-index: 2; cursor: pointer; animation: float 4s ease-in-out infinite, foil 5s linear infinite; transition: transform .25s; box-shadow: 0 40px 70px -24px rgba(0,0,0,.95), 0 0 90px -30px rgba(242,194,91,.6), inset 0 0 0 1px color-mix(in srgb, var(--edge) 50%, transparent); }
+  .hero-art .pack { --pw: 225px; width: var(--pw); max-width: none; position: relative; z-index: 2; cursor: pointer; animation: float 4s ease-in-out infinite, foil 5s linear infinite; transition: transform .25s; filter: drop-shadow(0 30px 30px rgba(0,0,0,.8)) drop-shadow(0 0 34px rgba(242,194,91,.28)); }
   .hero-art .pack:hover { transform: scale(1.05) rotate(-2deg); }
-  .hero-art .pack .pack-emblem div { font-size: calc(var(--pw) * .12); }
-  .hero-art .pack .pack-title { font-size: calc(var(--pw) * .1); }
   .hero-hint { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); z-index: 3; font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 
   .offer .pack { width: 170px; max-width: none; }
-  .offer .pack .pack-emblem div { font-size: 20px; }
-  .offer .pack .pack-title { font-size: 17px; }
 
 
   /* Bouton d'ouverture : relief, reflet qui passe, et le booster réagit */
@@ -181,7 +174,7 @@
   .open-count b { font-size: 20px; font-weight: 500; }
   .open-count .pk { width: 13px; height: 18px; }
   .btn-open:disabled .open-count { color: var(--muted); }
-  .hero-card:has(.btn-open:hover:not(:disabled)) .hero-art .pack { transform: scale(1.07) rotate(-3deg); box-shadow: 0 40px 70px -24px rgba(0,0,0,.95), 0 0 120px -10px rgba(242,194,91,.8), inset 0 0 0 1px var(--edge); }
+  .hero-card:has(.btn-open:hover:not(:disabled)) .hero-art .pack { transform: scale(1.07) rotate(-3deg); filter: drop-shadow(0 30px 30px rgba(0,0,0,.8)) drop-shadow(0 0 50px rgba(242,194,91,.7)); }
   .hero-card:has(.btn-open:hover:not(:disabled)) .hero-art .fan.l { transform: translate(-50%, -50%) translateX(-158px) translateY(10px) rotate(-19deg); }
   .hero-card:has(.btn-open:hover:not(:disabled)) .hero-art .fan.r { transform: translate(-50%, -50%) translateX(158px) translateY(10px) rotate(19deg); }
   .hero-art .fan { transition: transform .3s cubic-bezier(.3,.7,.3,1.3); }
@@ -209,35 +202,17 @@
   .wheel-panel.ready .ticket-ico { animation: spinmini 6s linear infinite; }
   @keyframes spinmini { to { rotate: 360deg; } }
 
-  /* Booster (sachet) */
-  .pack {
-    --p1: #2b1d5e; --p2: #4b2a8c; --p3: #1a1238; --edge: #f2c25b; --edge2: #8c6420;
-    --zig: polygon(0 0,100% 0,100% 60%,97% 100%,94% 60%,91% 100%,88% 60%,85% 100%,82% 60%,79% 100%,76% 60%,73% 100%,70% 60%,67% 100%,64% 60%,61% 100%,58% 60%,55% 100%,52% 60%,49% 100%,46% 60%,43% 100%,40% 60%,37% 100%,34% 60%,31% 100%,28% 60%,25% 100%,22% 60%,19% 100%,16% 60%,13% 100%,10% 60%,7% 100%,4% 60%,0 100%);
-    position: relative; width: 230px; max-width: 70%; aspect-ratio: 23 / 36; border-radius: 6px; flex: none;
-    background:
-      linear-gradient(115deg, transparent 30%, rgba(255,255,255,.28) 45%, transparent 60%) 0 0 / 300% 100% no-repeat,
-      linear-gradient(160deg, var(--p1) 0%, var(--p2) 35%, var(--p3) 70%, #0f0b22 100%);
-    box-shadow: 0 30px 50px -20px rgba(0,0,0,.9), inset 0 0 0 1px color-mix(in srgb, var(--edge) 50%, transparent);
-    animation: foil 5s linear infinite; z-index: 1;
-  }
+  /* Booster (sachet) : visuel en image, bande du haut séparée pour la déchirure */
+  .pack { --img: url(assets/marque/booster-origines.webp?v=1); position: relative; width: 230px; max-width: 70%; aspect-ratio: 600 / 1019; flex: none; z-index: 1; filter: drop-shadow(0 24px 26px rgba(0,0,0,.7)); }
+  .pack > i { position: absolute; left: 0; right: 0; display: block; background-image: var(--img); background-repeat: no-repeat; }
+  .pack .pk-body { top: 0; bottom: 0; background-size: 100% 100%; }
+  .pack .pk-top { top: 0; height: 7%; background-size: 100% auto; background-position: top center; opacity: 0; }
+  .pack .pk-shine { inset: 0; background: linear-gradient(112deg, transparent 38%, rgba(255,255,255,.42) 48%, rgba(255,236,190,.18) 53%, transparent 62%) 0 0 / 320% 100% no-repeat;
+    -webkit-mask: var(--img) 0 0 / 100% 100% no-repeat; mask: var(--img) 0 0 / 100% 100% no-repeat; mix-blend-mode: soft-light; animation: sheen 4.5s ease-in-out infinite; }
+  @keyframes sheen { 0%, 25% { background-position: 120% 0; } 75%, 100% { background-position: -40% 0; } }
   @keyframes float { 50% { translate: 0 -10px; } }
-  @keyframes foil { from { background-position: 120% 0, 0 0; } to { background-position: -120% 0, 0 0; } }
-  .pack::before, .pack::after { content:""; position:absolute; left:0; right:0; height: 16px; background: repeating-linear-gradient(90deg, var(--edge2) 0 6px, var(--edge) 6px 12px); clip-path: var(--zig); border-radius: 6px 6px 0 0; }
-  .pack::before { top: 0; }
-  .pack::after { bottom: 0; transform: scaleY(-1); }
-  .pack-inner { position: absolute; inset: 22px 14px; display: grid; align-content: space-between; justify-items: center; text-align: center; }
-  .pack-emblem { width: 40%; aspect-ratio: 1; margin-top: 10%; border-radius: 50%; padding: 3px; background: conic-gradient(from 0deg, #f2c25b, #b46bff, #4fa8ff, #5fd39a, #f2c25b); }
-  .pack-emblem div { width: 100%; height: 100%; border-radius: 50%; background: #120c2a; display: grid; place-items: center; font-family: 'Oxanium', var(--f-display); font-weight: 800; font-size: clamp(14px, 3vw, 30px); color: var(--edge); }
-  .pack-title { font-family: 'Oxanium', var(--f-display); font-weight: 800; font-size: 22px; letter-spacing: .1em; line-height: 1.1; }
-  .pack-title small { display: block; font-size: 11px; letter-spacing: .3em; color: var(--edge); margin-top: 4px; }
-  .pack-count { font-family: var(--f-mono); font-size: 11px; color: #b9b3d6; border-top: 1px solid color-mix(in srgb, var(--edge) 35%, transparent); padding-top: 8px; width: 100%; }
+  @keyframes foil { to { opacity: 1; } }
   .pack.mini { width: 104px; max-width: none; }
-  .pack.mini::before, .pack.mini::after { height: 9px; }
-  .pack.mini .pack-inner { inset: 14px 8px; }
-  .pack.mini .pack-emblem div { font-size: 14px; }
-  .pack.mini .pack-title { font-size: 11px; }
-  .pack.mini .pack-title small { font-size: 7px; letter-spacing: .2em; }
-  .pack.mini .pack-count { display: none; }
   .pack.off { filter: grayscale(.85) brightness(.7); }
   .pack.shake { animation: shake .5s !important; }
   @keyframes shake { 20%,60% { translate: -6px 0; rotate: -2deg; } 40%,80% { translate: 6px 0; rotate: 2deg; } }
@@ -632,19 +607,22 @@
 
   /* ---------- Ouverture ---------- */
   .opener { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; overflow: auto; --cw: min(188px, 17.5vw); }
-  .op-bg { position: fixed; inset: 0; background: radial-gradient(circle at 50% 45%, #22201a 0%, #0d0f13 50%, #050608 85%); }
+  .op-bg { position: fixed; inset: 0; background: radial-gradient(circle at 50% 45%, #2a1f45 0%, #110d1c 50%, #050408 85%); }
+  .op-bg::after { content:""; position: absolute; left: 50%; top: 50%; width: min(70vmin, 640px); aspect-ratio: 295 / 300; transform: translate(-50%, -50%); background: url(assets/marque/embleme.webp?v=1) center / contain no-repeat; opacity: .07; filter: grayscale(.3); }
   .op-flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 50%, var(--fc, #fff), transparent 70%); }
   .op-flash.go { animation: flash .7s ease-out; }
   @keyframes flash { 0% { opacity: .9; } 100% { opacity: 0; } }
   .op-stage { position: relative; display: grid; justify-items: center; gap: 24px; padding: 24px 16px; width: 100%; }
   .op-hint { margin: 0; font-family: var(--f-display); font-weight: 700; letter-spacing: .2em; text-transform: uppercase; font-size: 15px; color: var(--muted); }
   .op-pack { background: none; border: 0; padding: 0; perspective: 900px; }
-  .op-pack .pack { width: 240px; animation: float 3s ease-in-out infinite, foil 4s linear infinite; }
+  .op-pack .pack { width: 260px; max-width: none; animation: float 3s ease-in-out infinite; }
   .op-pack:hover .pack { filter: brightness(1.12); }
   .op-pack.charge .pack { animation: charge .55s ease-in-out infinite; }
   @keyframes charge { 0%,100% { rotate: -2deg; scale: 1.02; } 50% { rotate: 2deg; scale: 1.05; } }
   .op-pack.tear .pack { animation: none; }
-  .op-pack.tear .pack::before { animation: tear .5s forwards; }
+  .op-pack.tear .pk-top { opacity: 1; animation: tear .5s forwards; }
+  .op-pack.tear .pk-body { clip-path: inset(7% 0 0 0); }
+  .op-pack.tear .pk-shine { display: none; }
   @keyframes tear { to { transform: translate(60px, -90px) rotate(25deg); opacity: 0; } }
   .op-pack.gone { animation: packgone .45s forwards; }
   @keyframes packgone { to { transform: translateY(60px) scale(.8); opacity: 0; } }
@@ -659,11 +637,10 @@
   .face.front { transform: rotateY(180deg); }
   .face.front .cc { --u: calc(var(--cw) / 100); width: var(--cw); }
   .cback { display: grid; place-items: center; overflow: hidden;
-    background: repeating-linear-gradient(45deg, rgba(242,194,91,.08) 0 2px, transparent 2px 9px), radial-gradient(circle at 50% 42%, #4b2a8c, #1a1238 70%);
-    box-shadow: inset 0 0 0 calc(var(--cw) * .03) #f2c25b, inset 0 0 0 calc(var(--cw) * .045) #8c6420, 0 20px 40px -16px rgba(0,0,0,.9); }
-  .cback .pack-emblem { width: 46%; margin: 0; }
-  .cback .pack-emblem div { font-size: calc(var(--cw) * .12); color: var(--gold); }
-  .cback::after { content: "CLUTCH TCG"; position: absolute; bottom: 9%; font-family: 'Oxanium', var(--f-display); font-weight: 800; letter-spacing: .2em; font-size: calc(var(--cw) * .07); color: var(--gold); opacity: .8; }
+    background: radial-gradient(circle at 50% 44%, rgba(242,194,91,.28), transparent 42%), repeating-linear-gradient(45deg, rgba(242,194,91,.07) 0 2px, transparent 2px 10px), radial-gradient(circle at 50% 42%, #3f2777, #160f2c 72%);
+    box-shadow: inset 0 0 0 calc(var(--cw) * .03) #f2c25b, inset 0 0 0 calc(var(--cw) * .045) #8c6420, inset 0 0 0 calc(var(--cw) * .07) rgba(10,7,20,.6), 0 20px 40px -16px rgba(0,0,0,.9); }
+  .cback-logo { width: 56%; height: auto; margin-bottom: 8%; filter: drop-shadow(0 6px 10px rgba(0,0,0,.6)); }
+  .cback::after { content: "CLUTCH TCG"; position: absolute; bottom: 10%; font-family: var(--f-display); font-weight: 900; font-stretch: 118%; letter-spacing: .06em; font-size: calc(var(--cw) * .085); color: var(--gold); text-shadow: 0 2px 6px rgba(0,0,0,.6); }
   .flip[data-r="epic"]:not(.on) .cback, .flip[data-r="legend"]:not(.on) .cback, .flip[data-r="secret"]:not(.on) .cback, .flip[data-r="goat"]:not(.on) .cback { animation: aura 1.4s ease-in-out infinite; }
   .flip[data-r="epic"] { --glow: #b46bff; } .flip[data-r="legend"] { --glow: #f2c25b; } .flip[data-r="secret"] { --glow: #ff7ad9; } .flip[data-r="goat"] { --glow: #ffffff; }
   @keyframes aura { 50% { box-shadow: inset 0 0 0 calc(var(--cw) * .03) #f2c25b, inset 0 0 0 calc(var(--cw) * .045) #8c6420, 0 0 34px 6px var(--glow); } }
@@ -775,11 +752,7 @@
         <div class="fan l" id="fanL"></div>
         <div class="fan r" id="fanR"></div>
         <div class="pack" id="heroPack" role="button" tabindex="0" aria-label="Ouvrir un booster Origines">
-          <div class="pack-inner">
-            <div class="pack-emblem"><div>ORI</div></div>
-            <div class="pack-title">ORIGINES<small>ÉDITION 1</small></div>
-            <div class="pack-count">5 CARTES · ÉDITION 1</div>
-          </div>
+          <i class="pk-body"></i><i class="pk-top"></i><i class="pk-shine"></i>
           <span class="pack-badge" data-auth hidden><b data-bind="packTotal">0</b><small>à ouvrir</small></span>
         </div>
         <span class="hero-hint">Clique sur le booster</span>
@@ -1026,6 +999,6 @@
 <script src="data/origines.js?v=6c4c9bf5"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=c1e853b2"></script>
+<script src="js/app.js?v=f4217708"></script>
 </body>
 </html>

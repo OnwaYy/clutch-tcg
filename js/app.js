@@ -47,10 +47,7 @@
   }
   function bump(id) { const el = $(id); if (!el) return; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
   function packHTML(s, mini) {
-    return '<div class="pack' + (mini ? ' mini' : '') + (s.status === 'off' ? ' off' : '') + '" style="--p1:' + s.p[0] + ';--p2:' + s.p[1] + ';--p3:' + s.p[2] + ';--edge:' + s.edge[0] + ';--edge2:' + s.edge[1] + '">' +
-      '<div class="pack-inner"><div class="pack-emblem"><div>' + s.code + '</div></div>' +
-      '<div class="pack-title">' + esc(s.name.split(' ')[0].toUpperCase()) + '<small>' + esc((s.edition || 'BOOSTER').toUpperCase()) + '</small></div>' +
-      '<div class="pack-count">5 CARTES · ' + esc((s.edition || '').toUpperCase()) + '</div></div></div>';
+    return '<div class="pack' + (mini ? ' mini' : '') + (s.status === 'off' ? ' off' : '') + '" aria-label="Booster ' + esc(s.name) + '"><i class="pk-body"></i><i class="pk-top"></i><i class="pk-shine"></i></div>';
   }
   function gainHTML(p, b) {
     return (p ? '<span class="gain"><i class="coin"></i>+' + fmt(p) + '</span>' : '') + (b ? '<span class="gain"><i class="pk"></i>+' + b + ' booster' + (b > 1 ? 's' : '') + '</span>' : '');
@@ -581,7 +578,7 @@
     $('#opCards').innerHTML = list.map(function (x, k) {
       const c = x.c;
       return '<button class="flip" type="button" data-flip data-r="' + c.rarity + '" data-id="' + c.id + '" style="--i:' + k + '" aria-label="Retourner la carte ' + (k + 1) + '">' +
-        '<div class="flip-inner"><div class="face cback"><div class="pack-emblem"><div>ORI</div></div></div>' +
+        '<div class="flip-inner"><div class="face cback"><img class="cback-logo" src="assets/marque/embleme.webp?v=1" alt=""></div>' +
         '<div class="face front"><div class="cc reveal ' + finish(c) + '" style="' + cardStyle(c) + '">' + cardInner(c).replace(' loading="lazy"', '') + corners(c) + '</div>' + (x.neu ? '<span class="newtag">NOUVELLE</span>' : '') + '</div></div></button>';
     }).join('');
     requestAnimationFrame(function () { $$('#opCards .flip').forEach(function (f) { f.classList.add('in'); }); });
