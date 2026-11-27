@@ -620,6 +620,7 @@
     opener.hidden = false; document.body.style.overflow = 'hidden'; fxInit(); FX.ps = [];
     Object.assign(OP, { phase: 'pack', res: null, req: null, err: null, list: [], idx: 0, busy: false, tearing: false, tp: 0, emit: null });
     opener.classList.remove('dark', 'rays'); setRc('#ffffff');
+    opPack.getAnimations().concat(opReveal.getAnimations()).forEach(function (an) { an.cancel(); });
     opPack.hidden = false; opPack.className = 'op-pack'; opPack.style.setProperty('--tp', 0);
     opPack.innerHTML = packHTML(SETS[0]).replace(/<\/div>$/, '<div class="pk-strip"></div><i class="pk-slit"></i><i class="pk-guide"></i></div>');
     packTilt.cur = { x: 0, y: 0, o: 0 }; packTilt.tgt = { x: 0, y: 0, o: 0 };
