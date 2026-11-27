@@ -314,7 +314,7 @@ window.ORIGINES = {
     ["Fnatic — Champions du monde Saison 1", "S", "Moment", "League of Legends", 2011, "Fnatic remporte les tout premiers Worlds de LoL, à la DreamHack"],
     ["Na'Vi — Le premier The International", "S", "Moment", "Dota 2", 2011, "Na'Vi remporte le premier The International et 1 million de dollars"],
     ["Zen — Le prodige de Rocket League", "S", "Joueur", "Rocket League", 2023, "Champion du monde RLCS avec Team Vitality, à Düsseldorf"],
-    ["Evo Moment 37", "S", "Moment", "Street Fighter III", 2004, "Daigo pare toute la super de Justin Wong et retourne le match, à Evo 2004"],
+    ["donk — Le prodige de Spirit", "S", "Joueur", "Counter-Strike", 2024, "Plus jeune MVP de l'histoire des Majors, il offre à Team Spirit le Major de Shanghai"],
     ["BoxeR — L'Empereur des Terrans", "S", "Joueur", "StarCraft: Brood War", 2001, "La première star de StarCraft"],
     ["Flash — Le Dieu", "S", "Joueur", "StarCraft: Brood War", 2010, "Le joueur le plus dominant de Brood War"],
     ["Grubby — La légende de Warcraft III", "S", "Joueur", "Warcraft III", null, "Le Néerlandais roi de Warcraft III"],
