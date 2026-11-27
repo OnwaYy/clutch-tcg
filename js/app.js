@@ -742,6 +742,7 @@
   const AU = { ctx: null, out: null, on: true, live: [] };
   try { AU.on = localStorage.getItem('clutch-son') !== '0'; } catch (e) {}
   function auInit() {
+    return null; // son désactivé
     if (!AU.on) return null;
     if (!AU.ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; AU.ctx = new C(); AU.out = AU.ctx.createDynamicsCompressor(); AU.out.connect(AU.ctx.destination); }
     if (AU.ctx.state === 'suspended') AU.ctx.resume();
@@ -1081,7 +1082,7 @@
     OP.busy = false; OP.seq = false;
   }
   $('#opSnd').addEventListener('click', function (e) { e.stopPropagation(); AU.on = !AU.on; try { localStorage.setItem('clutch-son', AU.on ? '1' : '0'); } catch (er) {} if (!AU.on) SFX.stop(); sndBtn(); });
-  sndBtn();
+  sndBtn(); $('#opSnd').hidden = true;
   // Un toucher pendant la séquence fait défiler les indices plus vite
   opener.addEventListener('pointerdown', function () { if (OP.seq) OP.hurry = true; });
   // La carte part dans la direction du lancer, avec la vitesse du geste
