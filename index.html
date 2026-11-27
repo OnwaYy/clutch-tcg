@@ -391,8 +391,8 @@
   .cc.l-legend .cc-crest::before, .cc.l-legend .cc-crest::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #f6d77c); }
   .cc.l-legend .cc-crest::after { background: linear-gradient(90deg, #f6d77c, transparent); }
   .cc.l-legend .cc-crest b { color: #fff1c4; letter-spacing: .1em; font-weight: 700; }
-  .cc.l-legend .cc-band h3 { text-align: center; }
-  .cc.l-legend .cc-band p.cc-story { text-align: center; }
+  .cc.l-legend .cc-band h3 { text-align: center; max-width: 100%; padding: 0 .12em; overflow-wrap: break-word; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .cc.l-legend .cc-band p, .cc.l-legend .cc-band p.cc-story { text-align: center; }
   /* holo doré */
   .cc.l-legend .cc-photo::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background:
