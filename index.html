@@ -457,7 +457,7 @@
     background-size: 300% 300%, auto, auto; background-position: var(--mx, 50%) var(--my, 50%), 0 0, 0 0; opacity: .12; }
   .cc.big.l-legend.s-secret .cc-photo::after { opacity: calc(.08 + var(--o, 0) * .14); }
   .cc.big.l-legend.s-secret::before { background: radial-gradient(closest-side, rgba(255,122,217,.6), transparent); }
-  /* ---------- GOAT : une seule carte, cadre obsidienne irisé, titre chrome, 6 étoiles (6 titres mondiaux) ---------- */
+  /* ---------- GOAT : les plus grands, hors numérotation, cadre obsidienne irisé, titre chrome, 6 étoiles (6 titres mondiaux) ---------- */
   .cc.l-legend.g-goat { background-image:
       repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 1px, transparent 1px 3px),
       linear-gradient(125deg, #ff7eb6, #ffd36b 17%, #7dffc4 34%, #6fd0ff 51%, #b996ff 68%, #ff7eb6 85%, #ffd36b),
@@ -893,17 +893,18 @@
     { id: 'epic', name: 'Épique', color: 'var(--c-epic)', pts: 10, odds: '15 %', note: 'Stars et grands rendez-vous' },
     { id: 'legend', name: 'Légendaire', color: 'var(--c-legend)', pts: 50, odds: '4,5 %', note: 'Moments historiques' },
     { id: 'secret', name: 'Secrète', color: 'var(--c-secret)', pts: 100, odds: '0,49 %', note: 'Hors numérotation, 151 à 175' },
-    { id: 'goat', name: 'GOAT', color: 'var(--c-goat)', pts: 500, odds: '0,01 %', note: 'Une seule carte, sans numéro' }
+    { id: 'goat', name: 'GOAT', color: 'var(--c-goat)', pts: 500, odds: '0,01 %', note: 'Les plus grands de l\'histoire, sans numéro' }
   ];
   const PRICE = 500, PRICE5 = 2250, FREE_EVERY = 4 * 3600 * 1000;
   // Catalogue : emplacements vides, rareté répartie par extension
   // Nombre de cartes par rareté, dans l'ordre de numérotation (proportions inspirées de Pokémon 151)
   const RCODE = { C: 'common', P: 'uncommon', R: 'rare', E: 'epic', L: 'legend', S: 'secret', G: 'goat' };
   // Les cartes GOAT n'ont pas de numéro : elles suivent les 175, marquées « GOAT »
+  let goatN = 0;
   const ORI_ALL = window.ORIGINES ? window.ORIGINES.cards.concat(window.ORIGINES.goat || []) : [];
   const CATALOG = ORI_ALL.map(function (c, i) {
     const art = (window.ORIGINES.art || {})[c[0]] || {};
-    return { set: 'ori', num: c[1] === 'G' ? 'GOAT' : i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null, dark: !!art.dark, map: !!art.map, fade: !!art.fade, player: !!art.player, photo: !!art.photo };
+    return { set: 'ori', num: c[1] === 'G' ? 'GOAT' + (++goatN > 1 ? goatN : '') : i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null, dark: !!art.dark, map: !!art.map, fade: !!art.fade, player: !!art.player, photo: !!art.photo };
   });
   if (false) SETS.forEach(function (s) {
     let num = 1;
@@ -1072,7 +1073,7 @@
   }
 
   const n3 = function (n) { return String(n).padStart(3, '0'); };
-  const numText = function (c) { return c.num === 'GOAT' ? 'GOAT' : n3(c.num) + '/' + setById(c.set).size; };
+  const numText = function (c) { return c.rarity === 'goat' ? 'GOAT' : n3(c.num) + '/' + setById(c.set).size; };
   const initialsOf = function (name) {
     const w = name.split(' — ')[0].replace(/[^A-Za-z0-9À-ÿ ]/g, '').split(' ').filter(Boolean);
     if (w.length === 1) return (w[0].length <= 4 ? w[0] : w[0].slice(0, 2)).toUpperCase();

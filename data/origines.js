@@ -152,7 +152,7 @@ window.ORIGINES = {
     "Astralis — La dynastie des 4 Majors": {"img": "assets/cartes/astralis-la-dynastie-des-4-majors.jpg", "color": "#e21c30", "photo": true},
     "OG — Le doublé TI8 & TI9": {"img": "assets/cartes/og-le-double-ti8-ti9.jpg", "color": "#2fd08a", "photo": true},
     "Kaydop — Triple champion du monde": {"img": "assets/cartes/kaydop-triple-champion-du-monde.jpg", "color": "#f5c935", "photo": true},
-    "ZywOo — Numéro 1 mondial": {"img": "assets/cartes/zywoo-numero-1-mondial.jpg", "color": "#f5c935", "photo": true},
+    "ZywOo": {"img": "assets/cartes/zywoo-goat.jpg", "color": "#f5c935", "photo": true},
     "apEX — Le capitaine": {"img": "assets/cartes/apex-le-capitaine.jpg", "color": "#f5c935", "photo": true},
     "s1mple — Le sacre de Stockholm": {"img": "assets/cartes/s1mple-le-sacre-de-stockholm.jpg", "color": "#f5d100", "photo": true},
     "Le trophée du Major": {"img": "assets/cartes/le-trophee-du-major.jpg", "color": "#7a8aa8", "photo": true},
@@ -180,7 +180,8 @@ window.ORIGINES = {
     "Bugha — Champion de la Fortnite World Cup": {"img": "assets/cartes/bugha-champion-de-la-fortnite-world-cup.jpg", "color": "#d9a93a", "photo": true},
     "Vitality — Champions du Major de Paris": {"img": "assets/cartes/vitality-champions-du-major-de-paris.jpg", "color": "#f5d100", "photo": true},
     "La Coupe de l'Invocateur": {"img": "assets/cartes/la-coupe-de-l-invocateur.jpg", "color": "#4fb8d8", "photo": true},
-    "L'Aegis des Champions": {"img": "assets/cartes/l-aegis-des-champions.jpg", "color": "#2a4fa8", "photo": true}
+    "L'Aegis des Champions": {"img": "assets/cartes/l-aegis-des-champions.jpg", "color": "#2a4fa8", "photo": true},
+    "ZywOo — Triple champion du Major": {"img": "assets/cartes/zywoo-triple-champion-du-major.jpg", "color": "#f5d100", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
@@ -346,7 +347,7 @@ window.ORIGINES = {
     ["Serral — Premier champion non coréen", "S", "Joueur", "StarCraft II", 2018, "WCS Global Finals"],
     ["Bugha — Champion de la Fortnite World Cup", "S", "Moment", "Fortnite", 2019, "Bugha, 16 ans, remporte la Fortnite World Cup et 3 millions de dollars"],
     ["Kaydop — Triple champion du monde", "S", "Joueur", "Rocket League", null, "Joueur français de Rocket League"],
-    ["ZywOo — Numéro 1 mondial", "S", "Joueur", "Counter-Strike", "2019-2020", "Meilleur joueur HLTV deux années de suite"],
+    ["ZywOo — Triple champion du Major", "S", "Moment", "Counter-Strike", "2023-2025", "Sacré au Major avec Vitality à Paris en 2023, puis à Austin et Budapest en 2025"],
     ["apEX — Le capitaine", "S", "Joueur", "Counter-Strike", null, "Capitaine sacré à quatre Majors : Cluj 2015, Paris 2023, Austin et Budapest 2025"],
     ["s1mple — Le sacre de Stockholm", "S", "Moment", "Counter-Strike", 2021, "Natus Vincere et s1mple remportent le Major de Stockholm"],
     ["Vitality — Champions du Major de Paris", "S", "Moment", "Counter-Strike", 2023, "Vitality remporte le Major de Paris devant son public"],
@@ -359,8 +360,9 @@ window.ORIGINES = {
     ["Ceb — Le Français de OG", "S", "Joueur", "Dota 2", "2018-2019", "Le Français double champion de The International avec OG, en 2018 et 2019"],
     ["Gotaga — Le Roi de Call of Duty", "S", "Joueur", "Call of Duty", null, "La légende française de CoD"]
   ],
-  // GOAT : une seule carte, sans numéro, hors des 175
+  // GOAT : les plus grands de l'histoire, sans numéro, hors des 175
   goat: [
-    ["Faker", "G", "Joueur", "League of Legends", "2013-2025", "Six fois champion du monde : 2013, 2015, 2016, 2023, 2024 et 2025"]
+    ["Faker", "G", "Joueur", "League of Legends", "2013-2025", "Six fois champion du monde : 2013, 2015, 2016, 2023, 2024 et 2025"],
+    ["ZywOo", "G", "Joueur", "Counter-Strike", "2019-2025", "Le GOAT de Counter-Strike : numéro 1 mondial HLTV en 2019 et 2020, triple champion du Major"]
   ]
 };
