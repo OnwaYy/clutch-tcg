@@ -203,10 +203,10 @@
   @keyframes spinmini { to { rotate: 360deg; } }
 
   /* Booster (sachet) : visuel en image, bande du haut séparée pour la déchirure */
-  .pack { --img: url(assets/marque/booster-origines.webp?v=1); position: relative; width: 230px; max-width: 70%; aspect-ratio: 600 / 1019; flex: none; z-index: 1; filter: drop-shadow(0 24px 26px rgba(0,0,0,.7)); }
+  .pack { --img: url(assets/marque/booster-origines-v2.webp?v=1); position: relative; width: 230px; max-width: 70%; aspect-ratio: 600 / 971; flex: none; z-index: 1; filter: drop-shadow(0 24px 26px rgba(0,0,0,.7)); }
   .pack > i { position: absolute; left: 0; right: 0; display: block; background-image: var(--img); background-repeat: no-repeat; }
   .pack .pk-body { top: 0; bottom: 0; background-size: 100% 100%; }
-  .pack .pk-top { top: 0; height: 7%; background-size: 100% auto; background-position: top center; opacity: 0; }
+  .pack .pk-top { top: 0; height: 5.8%; background-size: 100% auto; background-position: top center; opacity: 0; }
   .pack .pk-shine { inset: 0; background: linear-gradient(112deg, transparent 38%, rgba(255,255,255,.42) 48%, rgba(255,236,190,.18) 53%, transparent 62%) 0 0 / 320% 100% no-repeat;
     -webkit-mask: var(--img) 0 0 / 100% 100% no-repeat; mask: var(--img) 0 0 / 100% 100% no-repeat; mix-blend-mode: soft-light; animation: sheen 4.5s ease-in-out infinite; }
   @keyframes sheen { 0%, 25% { background-position: 120% 0; } 75%, 100% { background-position: -40% 0; } }
@@ -640,8 +640,8 @@
   .op-pack .pk-top { display: none; }
   .pk-strip { position: absolute; left: 0; top: 0; width: 100%; height: 0; z-index: 4; pointer-events: none; filter: drop-shadow(0 8px 6px rgba(0,0,0,.45)); will-change: transform, opacity; }
   .pk-strip i { position: absolute; top: 0; display: none; background-repeat: no-repeat; backface-visibility: visible; }
-  .op-pack .pk-slit { position: absolute; z-index: 3; left: 0; top: 7.2%; height: 3px; width: calc(var(--tp) * 100%); border-radius: 2px; background: #fff; box-shadow: 0 0 10px 3px var(--rc), 0 0 30px 8px color-mix(in srgb, var(--rc) 60%, transparent); opacity: calc(var(--tp) * 8); }
-  .op-pack .pk-guide { position: absolute; z-index: 3; left: 4%; right: 4%; top: 6.6%; height: 2px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.8) 0 6px, transparent 6px 12px); opacity: .7; animation: guide 1.6s ease-in-out infinite; }
+  .op-pack .pk-slit { position: absolute; z-index: 3; left: 0; top: 5.9%; height: 3px; width: calc(var(--tp) * 100%); border-radius: 2px; background: #fff; box-shadow: 0 0 10px 3px var(--rc), 0 0 30px 8px color-mix(in srgb, var(--rc) 60%, transparent); opacity: calc(var(--tp) * 8); }
+  .op-pack .pk-guide { position: absolute; z-index: 3; left: 4%; right: 4%; top: 5.6%; height: 2px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.8) 0 6px, transparent 6px 12px); opacity: .7; animation: guide 1.6s ease-in-out infinite; }
   .op-pack .pk-guide::after { content: ""; position: absolute; top: -9px; left: 0; width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle, #fff, rgba(255,255,255,0) 70%); animation: guidedot 1.6s ease-in-out infinite; }
   @keyframes guide { 50% { opacity: .35; } }
   @keyframes guidedot { 0% { left: 0; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: calc(100% - 20px); opacity: 0; } }
@@ -667,7 +667,7 @@
   .rv-f { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 5% / 3.58%; }
   .rv-front { transform: rotateY(180deg); }
   .rv-front .cc.big { width: var(--rw); }
-  .rv .cback { box-shadow: inset 0 0 0 calc(var(--cw) * .03) #f2c25b, inset 0 0 0 calc(var(--cw) * .045) #8c6420, inset 0 0 0 calc(var(--cw) * .07) rgba(10,7,20,.6), 0 30px 50px -18px rgba(0,0,0,.95); }
+  .rv .cback { box-shadow: 0 30px 50px -18px rgba(0,0,0,.95); }
   .rv[data-r="epic"] { --glow: #b46bff; } .rv[data-r="legend"] { --glow: #f2c25b; } .rv[data-r="secret"] { --glow: #ff7ad9; } .rv[data-r="goat"] { --glow: #ffffff; }
   /* Signe qu'une grosse carte arrive : aura de fumée colorée et énergie qui court sur le cadre */
   @property --ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
@@ -687,8 +687,8 @@
   .rv.teased .cback::before { opacity: 1; }
   .rv.charging .cback::before { animation-duration: .45s; }
   @keyframes spinang { to { --ang: 360deg; } }
-  .rv.teased .cback-logo { animation: logoglow 2.2s ease-in-out infinite; }
-  @keyframes logoglow { 50% { filter: drop-shadow(0 0 14px var(--glow)) brightness(1.25); } }
+  .rv.teased .cback { animation: backglow 2.2s ease-in-out infinite; }
+  @keyframes backglow { 50% { filter: brightness(1.18) saturate(1.15); } }
   .op-reveal { transition: opacity .45s, scale .45s; }
   .op-reveal.hush { opacity: .08; scale: .9; }
   .rv[data-r="goat"] .rv-aura { --glow: #ffd98a; }
@@ -748,11 +748,8 @@
   #cardModal { z-index: 58; }
 
   /* Dos des cartes */
-  .cback { display: grid; place-items: center; overflow: hidden;
-    background: radial-gradient(circle at 50% 44%, rgba(242,194,91,.28), transparent 42%), repeating-linear-gradient(45deg, rgba(242,194,91,.07) 0 2px, transparent 2px 10px), radial-gradient(circle at 50% 42%, #3f2777, #160f2c 72%);
-    box-shadow: inset 0 0 0 calc(var(--cw) * .03) #f2c25b, inset 0 0 0 calc(var(--cw) * .045) #8c6420, inset 0 0 0 calc(var(--cw) * .07) rgba(10,7,20,.6), 0 20px 40px -16px rgba(0,0,0,.9); }
-  .cback-logo { width: 56%; height: auto; margin-bottom: 8%; filter: drop-shadow(0 6px 10px rgba(0,0,0,.6)); pointer-events: none; }
-  .cback::after { content: "CLUTCH TCG"; position: absolute; bottom: 10%; font-family: var(--f-display); font-weight: 900; font-stretch: 118%; letter-spacing: .06em; font-size: calc(var(--cw) * .085); color: var(--gold); text-shadow: 0 2px 6px rgba(0,0,0,.6); }
+  .cback { display: grid; place-items: center; overflow: hidden; background: url(assets/marque/dos-carte.webp?v=1) center / 100% 100% no-repeat; box-shadow: 0 20px 40px -16px rgba(0,0,0,.9); }
+  .cback-logo { display: none; }
   @media (max-width: 760px) { .op-cards { --cw: min(120px, 28vw); gap: 10px; } }
   @media (prefers-reduced-motion: reduce) { .op-rays { animation: none; } .rv.tense .rv-in, .rv.beat { animation: none; } }
 
@@ -1124,6 +1121,6 @@
 <script src="data/origines.js?v=6c4c9bf5"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=b60967d8"></script>
+<script src="js/app.js?v=2ae79cb3"></script>
 </body>
 </html>

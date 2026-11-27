@@ -692,7 +692,7 @@
   const TEAR = { n: 30 };
   function buildStrip() {
     const pack = opPack.querySelector('.pack'), strip = opPack.querySelector('.pk-strip'); if (!pack || !strip) return;
-    const W = pack.offsetWidth, H = pack.offsetHeight, sh = H * .072, w = W / TEAR.n;
+    const W = pack.offsetWidth, H = pack.offsetHeight, sh = H * .058, w = W / TEAR.n;
     Object.assign(TEAR, { W: W, H: H, sh: sh, w: w, jag: [] });
     for (let i = 0; i <= TEAR.n; i++) TEAR.jag.push((Math.random() - .5) * sh * .32 + (i % 2 ? sh * .06 : -sh * .06));
     let h = '';
@@ -784,7 +784,7 @@
     const v = Math.min(1, dx / (tearDrag.w * .85));
     if (v > OP.tp) {
       setTp(v);
-      if (Math.random() < .6) { spawn(r.left + r.width * v, r.top + r.height * .072, ['#ffffff', getComputedStyle(opener).getPropertyValue('--rc').trim() || '#fff'], (Math.random() - .3) * 3, -Math.random() * 3, 2 + Math.random() * 2, .03, .15); fxRun(); }
+      if (Math.random() < .6) { spawn(r.left + r.width * v, r.top + r.height * .058, ['#ffffff', getComputedStyle(opener).getPropertyValue('--rc').trim() || '#fff'], (Math.random() - .3) * 3, -Math.random() * 3, 2 + Math.random() * 2, .03, .15); fxRun(); }
     }
     if (OP.tp >= 1) { tearDrag = null; opPack.classList.remove('drag'); tearPack(); }
   });
