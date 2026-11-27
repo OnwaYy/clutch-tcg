@@ -160,6 +160,7 @@ window.ORIGINES = {
     "T1 — Logo 6 étoiles": {"img": "assets/cartes/t1-logo-6-etoiles.jpg", "color": "#c8a86a", "photo": true},
     "Deft — Le rêve de DRX": {"img": "assets/cartes/deft-le-reve-de-drx.jpg", "color": "#3a6fd8", "photo": true},
     "Ceb — Le Français de OG": {"img": "assets/cartes/ceb-le-francais-de-og.jpg", "color": "#2fd08a", "photo": true},
+    "Gotaga — Le Roi de Call of Duty": {"img": "assets/cartes/gotaga-le-roi-de-call-of-duty.jpg", "color": "#ff9614", "photo": true},
     "Faker": {"img": "assets/cartes/faker.png", "color": "#e2012d", "player": true},
     "Fortnite World Cup — Arthur Ashe Stadium": {"img": "assets/cartes/fortnite-world-cup-arthur-ashe-stadium.jpg", "color": "#5b3df5", "photo": true},
     "Evil Geniuses — Champions de TI5": {"img": "assets/cartes/evil-geniuses-champions-de-ti5.jpg", "color": "#1d3c6e", "photo": true},
