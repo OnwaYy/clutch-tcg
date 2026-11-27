@@ -181,7 +181,7 @@ window.ORIGINES = {
     "La Coupe de l'Invocateur": {"img": "assets/cartes/la-coupe-de-l-invocateur.jpg?v=68ff3760", "color": "#4fb8d8", "photo": true},
     "L'Aegis des Champions": {"img": "assets/cartes/l-aegis-des-champions.jpg?v=d6024a94", "color": "#2a4fa8", "photo": true},
     "ZywOo — Triple champion du Major": {"img": "assets/cartes/zywoo-triple-champion-du-major.jpg?v=acc3a044", "color": "#f5d100", "photo": true},
-    "Anders Blume": {"img": "assets/cartes/anders-blume.png?v=f8d5c5d0", "color": "#1e2a44", "player": true}
+    "Anders Blume": {"img": "assets/cartes/anders-blume.png?v=ac947318", "color": "#1e2a44", "player": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
