@@ -399,3 +399,31 @@ revoke execute on all functions in schema public from public, anon, authenticate
 grant execute on function public.pseudo_libre(text), public.classement(text) to anon, authenticated;
 grant execute on function public.choisir_pseudo(text), public.mon_etat(), public.acheter_boosters(int), public.recuperer_gratuit(),
   public.tourner_roue(), public.ouvrir_booster(), public.recuperer_quete(text), public.recuperer_recompense(text) to authenticated;
+
+-- ---------------------------------------------------------------------
+-- Outil de test TEMPORAIRE : se donner des boosters (comptes testeurs uniquement).
+-- À supprimer avant la sortie : drop function public.test_boosters(int), public.suis_testeur(); drop table public.testeurs;
+-- ---------------------------------------------------------------------
+create table if not exists public.testeurs (joueur uuid primary key references auth.users(id) on delete cascade);
+alter table public.testeurs enable row level security;
+revoke all on public.testeurs from anon, authenticated;
+
+create or replace function public.suis_testeur() returns boolean
+language sql security definer set search_path = '' stable as $$
+  select exists (select 1 from public.testeurs where joueur = auth.uid());
+$$;
+
+create or replace function public.test_boosters(n int) returns int
+language plpgsql security definer set search_path = '' as $$
+declare u uuid := public._moi(); total int;
+begin
+  if not exists (select 1 from public.testeurs where joueur = u) then raise exception 'Réservé aux testeurs.'; end if;
+  if n is null or n < 1 or n > 50 then raise exception 'Entre 1 et 50 boosters.'; end if;
+  update public.profils set boosters = boosters + n where id = u returning boosters into total;
+  return total;
+end $$;
+
+revoke all on function public.suis_testeur() from public, anon;
+revoke all on function public.test_boosters(int) from public, anon;
+grant execute on function public.suis_testeur() to authenticated;
+grant execute on function public.test_boosters(int) to authenticated;

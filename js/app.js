@@ -106,7 +106,9 @@
       recuperer_quete: function (a) { const d = me(), q = QS.find(function (x) { return x[0] === a.q; }), st = d.q[a.q]; if (!q || !st || st.ok || st.p < q[2]) throw new Error('Quête pas encore terminée ou déjà récupérée.'); st.ok = true; d.pieces += q[3]; d.boosters += q[4]; save(d); return { pieces: q[3], boosters: q[4] }; },
       recuperer_recompense: function (a) { const d = me(), r = RW.find(function (x) { return x[0] === a.r; }); if (!r) throw new Error('Récompense inconnue.'); const m = total(r[2]) - owned(d, r[2]); if (m > 0) throw new Error('Il te manque encore ' + m + ' carte(s).'); if (d.rw[a.r]) throw new Error('Récompense déjà récupérée.'); d.rw[a.r] = 1; d.pieces += r[3]; d.boosters += r[4]; save(d); return { pieces: r[3], boosters: r[4] }; },
       classement: function () { const d = load(); if (!d) return []; let sc = 0, lg = 0, n = 0; Object.keys(d.col).forEach(function (id) { const c = BY_ID[id]; if (!c) return; n++; sc += RAR.find(function (r) { return r.id === c.rarity; }).pts; if (RORDER[c.rarity] >= 3) lg++; }); return [{ pseudo: d.pseudo, score: sc, legendaires: lg, cartes: n }]; },
-      pseudo_libre: function (a) { return NAME_OK.test(a.p); }
+      pseudo_libre: function (a) { return NAME_OK.test(a.p); },
+      suis_testeur: function () { return !!load(); },
+      test_boosters: function (a) { const d = me(); d.boosters += a.n; save(d); return d.boosters; }
     };
     return api;
   })();
@@ -413,9 +415,11 @@
   // =====================================================================
   async function setUser(u) {
     USER = u ? { email: u.email } : null;
+    $('#testPanel').hidden = true;
     if (!USER) { S = null; renderAll(); return; }
     closeModal($('#authModal'));
     await refresh();
+    try { $('#testPanel').hidden = !(await rpc('suis_testeur')); } catch (e) {}
   }
 
   // Force du mot de passe (indication seulement : le minimum imposé est 8 caractères)
@@ -837,6 +841,11 @@
     if (t.dataset.closeModal !== undefined) { closeModal(t.closest('.modal')); return; }
     if (t.id === 'wheelSpin') { spinWheel(); return; }
     if (t.dataset.op === 'skip') { showSummary(); return; }
+    if (t.dataset.testBoosters) {
+      t.disabled = true;
+      try { await rpc('test_boosters', { n: +t.dataset.testBoosters }); toast('+' + t.dataset.testBoosters + ' booster' + (+t.dataset.testBoosters > 1 ? 's' : '') + ' ajouté' + (+t.dataset.testBoosters > 1 ? 's' : '') + '.'); bump('#packChip'); await refresh(); } catch (err) { toast(err.message, true); }
+      t.disabled = false; return;
+    }
     if (t.dataset.op === 'next') { openerShow(); return; }
     if (t.dataset.op === 'close') { openerHide(); return; }
     if (t.dataset.setLink) { F.set = t.dataset.setLink; F.rarity = t.dataset.rarLink || 'all'; renderCollection(); }
