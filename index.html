@@ -763,6 +763,13 @@
   @media (prefers-reduced-motion: reduce) { .op-rays { animation: none; } .rv.tense .rv-in, .rv.beat { animation: none; } }
 
 
+  /* Photo de carrière derrière les indices du walkout GOAT */
+  .op-photo { position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0; transition: opacity .35s; overflow: hidden; }
+  .op-photo.on { opacity: 1; }
+  .op-photo i { position: absolute; inset: -4%; background: center 30% / cover no-repeat; filter: grayscale(.35) contrast(1.15) brightness(.55) saturate(1.2); }
+  .op-photo i.kb { animation: phkb 1.4s ease-out forwards; }
+  @keyframes phkb { from { transform: scale(1.18); filter: grayscale(.35) contrast(1.15) brightness(.9) blur(4px); } to { transform: scale(1.04); } }
+  .op-photo::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,.15), rgba(0,0,0,.75) 80%), linear-gradient(135deg, rgba(255,211,107,.18), rgba(185,150,255,.18)); }
   /* ---------- Cinématique GOAT ---------- */
   .op-snd { position: absolute; top: 14px; left: 14px; z-index: 11; background: rgba(0,0,0,.35); font-size: 16px; }
   .cine { position: absolute; inset: 0; z-index: 10; overflow: hidden; background: #000; display: none; cursor: pointer; }
@@ -1132,6 +1139,7 @@
   <div class="op-rays" id="opRays"></div>
   <div class="op-wave" id="opWave"></div>
   <div class="op-wave" id="opWave2"></div>
+  <div class="op-photo" id="opPhoto"><i></i></div>
   <div class="op-clue" id="opClue"></div>
   <div class="op-chips" id="opChips"></div>
   <div class="op-stage" id="opStage">
@@ -1180,6 +1188,6 @@
 <script src="data/origines.js?v=de4fd81f"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=8ef8809d"></script>
+<script src="js/app.js?v=c82b56d8"></script>
 </body>
 </html>

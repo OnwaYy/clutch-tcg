@@ -645,9 +645,10 @@
   // Attente qu'un toucher peut écourter (pour passer les indices)
   function sleepH(ms) { return new Promise(function (done) { const t0 = performance.now(); (function chk() { if (OP.hurry || performance.now() - t0 >= ms) done(); else requestAnimationFrame(chk); })(); }); }
   // Un indice arrive en claquant au centre, puis se range en étiquette au-dessus de la carte
-  async function clue(text, sub, ms, chip) {
+  async function clue(text, sub, ms, chip, photo) {
     if (!text) return;
     text = String(text);
+    if (photo) photoOn(photo); else photoOff();
     const el = $('#opClue'); el.innerHTML = (sub ? '<small>' + esc(sub) + '</small>' : '') + esc(text);
     el.className = 'op-clue' + (text.length > 12 ? ' long' : ''); void el.offsetWidth; el.classList.add('in');
     setTimeout(function () { const r = OP.list[OP.idx] ? OP.list[OP.idx].c.rarity : 'legend'; flash(RC[r] || '#fff'); shake(); burst(FX.w / 2, FX.h * .46, FXC[r] || FXC.legend, 34, 9); }, 230);
@@ -656,6 +657,14 @@
     await sleepH(300); el.className = 'op-clue';
   }
   // Palmarès mis en avant pendant le walkout des GOAT
+  // Photos de carrière affichées derrière les indices du walkout (dans l'ordre : jeu, époque, catégorie, palmarès, GOAT)
+  const GOAT_PHOTOS = {};
+  function photoOn(src) {
+    const el = $('#opPhoto'), img = el.querySelector('i');
+    img.style.backgroundImage = 'url("' + src + '")'; el.classList.add('on');
+    img.classList.remove('kb'); void img.offsetWidth; img.classList.add('kb');
+  }
+  function photoOff() { $('#opPhoto').classList.remove('on'); }
   const GOAT_FACE = { Faker: [74, 55], ZywOo: [52, 43], Kaydop: [64, 46], Shotzzy: [84, 54], N0tail: [50, 54] };
   const GOAT_HOOK = { Faker: '6× champion du monde', ZywOo: '3× champion du Major', Kaydop: '3× champion du monde', Shotzzy: '3× champion du monde', N0tail: '2× champion de The International' };
   function wave(id, delay) { setTimeout(function () { const w = $(id); w.classList.remove('go'); void w.offsetWidth; w.classList.add('go'); }, delay || 0); }
@@ -753,7 +762,7 @@
     requestAnimationFrame(buildStrip);
     setTimeout(function () { opPack.focus({ preventScroll: true }); }, 50);
   }
-  function openerHide() { OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; OP.rain = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
+  function openerHide() { photoOff(); OP.phase = 'off'; OP.emit = null; OP.crackle = null; OP.sway = false; OP.rain = false; opener.hidden = true; document.body.style.overflow = ''; renderAll(); }
   async function startOpen() {
     if (!USER) { openAuth('signup'); return; }
     if (!S || S.boosters < 1) { toast('Tu n\'as plus de booster. Récupère le gratuit, tourne la roue ou achètes-en un.', true); location.hash = '#boosters'; return; }
@@ -927,10 +936,24 @@
     setRc(col); $('#opRays').classList.toggle('goat', r === 'goat');
     OP.crackle = null;
     if (r === 'goat') {
-      // GOAT : cinématique avec montage, son, puis BOOM
-      $('#opHint').textContent = ''; $('#opChips').innerHTML = '';
-      await goatCine(c);
-      el.classList.remove('teased');
+      // GOAT : battements dans le noir, indices sur des photos de sa carrière, puis la carte se charge
+      opener.classList.add('dark'); $('#opHint').textContent = ''; $('#opChips').innerHTML = '';
+      el.classList.add('beat');
+      for (let i = 0; i < 3; i++) { await sleepH(460); flash('rgba(255,217,138,.28)'); }
+      el.classList.remove('beat');
+      opReveal.classList.add('hush'); await sleepH(420);
+      const ph = GOAT_PHOTOS[c.name] || [];
+      await clue(c.game, 'Jeu', 1000, true, ph[0]);
+      if (c.year) await clue(c.year, 'Époque', 950, true, ph[1]);
+      if (c.type) await clue(c.type, 'Catégorie', 900, true, ph[2]);
+      if (GOAT_HOOK[c.name]) await clue(GOAT_HOOK[c.name], 'Palmarès', 1150, true, ph[3]);
+      await clue('Greatest of all time', 'Rareté', 1300, true, ph[4]);
+      photoOff();
+      opReveal.classList.remove('hush'); await sleepH(380);
+      el.classList.add('lift', 'tense', 'charging');
+      implode(FXC.goat, 140, 950);
+      await sleepH(1150);
+      el.classList.remove('tense', 'charging', 'teased');
     } else if (lvl >= 3) {
       // Walkout : écran noir, indices un par un, puis la carte se charge d'énergie
       opener.classList.add('dark');
@@ -978,7 +1001,7 @@
     OP.busy = false; OP.seq = false;
   }
   $('#opSnd').addEventListener('click', function (e) { e.stopPropagation(); AU.on = !AU.on; try { localStorage.setItem('clutch-son', AU.on ? '1' : '0'); } catch (er) {} if (!AU.on) SFX.stop(); sndBtn(); });
-  sndBtn();
+  sndBtn(); $('#opSnd').hidden = true;
   // Un toucher pendant la séquence fait défiler les indices plus vite
   opener.addEventListener('pointerdown', function () { if (OP.seq) OP.hurry = true; });
   // La carte part dans la direction du lancer, avec la vitesse du geste
