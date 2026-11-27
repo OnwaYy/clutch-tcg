@@ -232,7 +232,7 @@
     return '<span class="g3-holo"></span><span class="g3-clip" style="--c:' + g[1] + '"><span class="g3-bg" style="background-image:url(assets/goat/' + slug + '-1.webp?v=1)"></span><span class="g3-dust far"></span><span class="g3-light"></span>' +
       '<span class="g3-beam a"></span><span class="g3-beam b"></span><span class="g3-word">GOAT</span><span class="g3-dust"></span></span>' +
       '<img class="g3-cut" src="assets/goat/cut-' + slug + '.webp?v=1" alt="' + esc(c.name) + '" loading="lazy"><span class="g3-shade"></span>' + CROWN +
-      '<span class="g3-tag"><b>GOAT</b><small>HORS SÉRIE</small></span><span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span>' +
+      '<span class="g3-tag"><b>GOAT</b><small>HORS SÉRIE</small></span><span class="cc-ed">PREMIÈRE ÉDITION</span>' +
       '<span class="g3-plate"><small>Greatest of all time</small><b>' + esc(c.name) + '</b><span class="g3-meta">' + esc(c.game) + (c.year ? ' · ' + esc(String(c.year)) : '') + '</span>' +
       (g[0] ? '<span class="g3-hook">' + esc(g[0]) + '</span>' : '') + '</span>';
   }
