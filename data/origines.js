@@ -150,6 +150,7 @@ window.ORIGINES = {
     "NiP — Les 87-0": {"img": "assets/cartes/nip-les-87-0.jpg?v=e2946e08", "color": "#c9a24a", "photo": true},
     "Astralis — La dynastie des 4 Majors": {"img": "assets/cartes/astralis-la-dynastie-des-4-majors.jpg?v=9c628fb0", "color": "#e21c30", "photo": true},
     "OG — Le doublé TI8 & TI9": {"img": "assets/cartes/og-le-double-ti8-ti9.jpg?v=08a4fe05", "color": "#2fd08a", "photo": true},
+    "Kaydop": {"img": "assets/cartes/kaydop-goat.jpg?v=aa8a387f", "color": "#5aa9ff", "photo": true},
     "Kaydop — Triple champion du monde": {"img": "assets/cartes/kaydop-triple-champion-du-monde.jpg?v=8e10b0b5", "color": "#f5c935", "photo": true},
     "ZywOo": {"img": "assets/cartes/zywoo-goat.jpg?v=33563a72", "color": "#f5c935", "photo": true},
     "apEX — Le capitaine": {"img": "assets/cartes/apex-le-capitaine.jpg?v=ba0c87d5", "color": "#f5c935", "photo": true},
@@ -360,9 +361,10 @@ window.ORIGINES = {
     ["Ceb — Le Français de OG", "S", "Joueur", "Dota 2", "2018-2019", "Le Français double champion de The International avec OG, en 2018 et 2019"],
     ["Gotaga — Le Roi de Call of Duty", "S", "Joueur", "Call of Duty", null, "La légende française de CoD"]
   ],
-  // GOAT : les plus grands de l'histoire, sans numéro, hors des 175
+  // GOAT : le plus grand de chaque jeu, sans numéro, hors des 175
   goat: [
     ["Faker", "G", "Joueur", "League of Legends", "2013-2025", "Six fois champion du monde : 2013, 2015, 2016, 2023, 2024 et 2025"],
-    ["ZywOo", "G", "Joueur", "Counter-Strike", "2019-2025", "Le GOAT de Counter-Strike : numéro 1 mondial HLTV en 2019 et 2020, triple champion du Major"]
+    ["ZywOo", "G", "Joueur", "Counter-Strike", "2019-2025", "Le GOAT de Counter-Strike : numéro 1 mondial HLTV en 2019 et 2020, triple champion du Major"],
+    ["Kaydop", "G", "Joueur", "Rocket League", "2016-2025", "Le GOAT de Rocket League : triple champion du monde RLCS, avec Gale Force, Dignitas puis Vitality"]
   ]
 };

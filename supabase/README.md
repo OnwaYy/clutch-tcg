@@ -6,7 +6,7 @@ sont gérés par Supabase.
 ## Fichiers
 
 - `schema.sql` : tables, règles de sécurité (RLS) et fonctions du jeu.
-- `catalogue.sql` : les 177 cartes (régénérer si `data/origines.js` change).
+- `catalogue.sql` : les 178 cartes (régénérer si `data/origines.js` change).
 
 Ordre d'installation : `schema.sql`, puis `catalogue.sql` (SQL Editor de Supabase).
 
