@@ -278,6 +278,7 @@
     $$('[data-action="claim-free"]').forEach(function (b) { const h = !(S && free <= 0); if (b.hidden !== h) b.hidden = h; });
     $$('[data-wheel-btn]').forEach(function (b) { const d = !(S && wheel <= 0); if (b.disabled !== d) b.disabled = d; });
     $$('.wheel-panel').forEach(function (p) { p.classList.toggle('ready', !!(S && wheel <= 0)); });
+    $$('.pack-badge').forEach(function (el) { const n = S ? S.boosters : 0, z = n <= 0; el.classList.toggle('zero', z); if (el._n !== undefined && n > el._n) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } el._n = n; });
     $$('[data-open-btn]').forEach(function (b) { const d = !(S && S.boosters > 0); if (b.disabled !== d) b.disabled = d; });
   }
 

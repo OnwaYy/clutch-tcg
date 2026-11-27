@@ -169,6 +169,31 @@
   .offer .pack .pack-emblem div { font-size: 20px; }
   .offer .pack .pack-title { font-size: 17px; }
 
+
+  /* Bouton d'ouverture : relief, reflet qui passe, et le booster réagit */
+  .btn-open { position: relative; overflow: hidden; gap: 16px; padding-right: 14px; transition: transform .18s cubic-bezier(.3,.7,.3,1.4), box-shadow .18s, filter .15s; }
+  .btn-open::after { content:""; position:absolute; top:0; bottom:0; left:-60%; width:40%; transform: skewX(-20deg); background: linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent); pointer-events: none; }
+  .btn-open:hover:not(:disabled) { transform: translateY(-3px) scale(1.03); filter: none; box-shadow: 0 8px 0 #a8a296, 0 0 0 3px rgba(242,194,91,.55), 0 18px 44px -8px rgba(242,194,91,.55); }
+  .btn-open:hover:not(:disabled)::after { animation: shine .7s ease-out; }
+  .btn-open:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #a8a296, 0 0 0 3px rgba(242,194,91,.55); }
+  @keyframes shine { to { left: 130%; } }
+  .open-count { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 10px; border-radius: 10px; background: #121016; color: var(--gold); font-family: var(--f-mono); font-size: 16px; font-weight: 500; }
+  .open-count b { font-size: 20px; font-weight: 500; }
+  .open-count .pk { width: 13px; height: 18px; }
+  .btn-open:disabled .open-count { color: var(--muted); }
+  .hero-card:has(.btn-open:hover:not(:disabled)) .hero-art .pack { transform: scale(1.07) rotate(-3deg); box-shadow: 0 40px 70px -24px rgba(0,0,0,.95), 0 0 120px -10px rgba(242,194,91,.8), inset 0 0 0 1px var(--edge); }
+  .hero-card:has(.btn-open:hover:not(:disabled)) .hero-art .fan.l { transform: translate(-50%, -50%) translateX(-158px) translateY(10px) rotate(-19deg); }
+  .hero-card:has(.btn-open:hover:not(:disabled)) .hero-art .fan.r { transform: translate(-50%, -50%) translateX(158px) translateY(10px) rotate(19deg); }
+  .hero-art .fan { transition: transform .3s cubic-bezier(.3,.7,.3,1.3); }
+  /* Nombre de boosters sur le sachet */
+  .pack-badge { position: absolute; z-index: 5; top: -22px; right: -26px; min-width: 74px; height: 74px; padding: 0 10px; border-radius: 50%; display: grid; place-content: center; text-align: center; line-height: 1;
+    background: radial-gradient(circle at 35% 28%, #fff3c9, var(--gold) 48%, var(--gold-deep)); color: #1a1200; border: 3px solid #121016; box-shadow: 0 10px 24px -6px rgba(0,0,0,.8), 0 0 0 2px rgba(242,194,91,.4); }
+  .pack-badge b { font-family: var(--f-display); font-weight: 900; font-stretch: 112%; font-size: 30px; }
+  .pack-badge small { font-family: var(--f-mono); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; margin-top: 3px; }
+  .pack-badge.zero { background: #2a2731; color: var(--muted); box-shadow: 0 10px 24px -6px rgba(0,0,0,.8); }
+  .pack-badge.pop { animation: badgepop .5s cubic-bezier(.3,.7,.3,1.6); }
+  @keyframes badgepop { 40% { transform: scale(1.3); } }
+
   .daily { position: relative; overflow: hidden; border-radius: 20px; border: 1px solid rgba(242,194,91,.28); padding: 30px 32px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 24px; align-items: center;
     background: radial-gradient(600px 300px at 100% 0%, rgba(242,194,91,.22), transparent 70%), linear-gradient(120deg, #2a1d48, #3c2770 55%, #4a3184); }
   .daily-copy { display: grid; gap: 12px; }
@@ -670,6 +695,8 @@
     .hero-art { order: -1; min-height: 330px; margin-bottom: 14px; }
     .hero-hint { display: none; }
     .hero-art .pack { --pw: 190px; }
+    .pack-badge { min-width: 62px; height: 62px; top: -16px; right: -18px; }
+    .pack-badge b { font-size: 24px; }
     .hero-art .fan, .hero-art .fan .cc { width: 140px; }
     .hero-art .fan .cc { --u: 1.4px; }
     .hero-art .fan.l { transform: translate(-50%, -50%) translateX(-92px) rotate(-14deg); }
@@ -736,9 +763,9 @@
         <span class="tag">Série de base · Édition 1</span>
         <h1>Origines</h1>
         <p>Les grands moments de l'histoire de l'e-sport, tous jeux confondus. 150 cartes, 25 secrètes et 2 GOAT à trouver.</p>
-        <div class="hero-meta"><span>5 cartes par booster</span><span data-auth hidden>Tes boosters <b data-bind="packTotal">0</b></span></div>
+        <div class="hero-meta"><span>5 cartes par booster</span><span>Commune à GOAT</span></div>
         <div class="cta-row">
-          <button class="btn btn-light btn-lg" type="button" data-action="open" data-open-btn data-auth hidden>Ouvrir un booster</button>
+          <button class="btn btn-light btn-lg btn-open" type="button" data-action="open" data-open-btn data-auth hidden><span>Ouvrir un booster</span><span class="open-count"><i class="pk"></i>×<b data-bind="packTotal">0</b></span></button>
           <button class="btn btn-light btn-lg" type="button" data-action="signup" data-guest>Jouer · 3 boosters offerts</button>
           <a class="btn btn-dark" href="#collection">Voir la série</a>
         </div>
@@ -753,6 +780,7 @@
             <div class="pack-title">ORIGINES<small>ÉDITION 1</small></div>
             <div class="pack-count">5 CARTES · ÉDITION 1</div>
           </div>
+          <span class="pack-badge" data-auth hidden><b data-bind="packTotal">0</b><small>à ouvrir</small></span>
         </div>
         <span class="hero-hint">Clique sur le booster</span>
       </div>
@@ -998,6 +1026,6 @@
 <script src="data/origines.js?v=6c4c9bf5"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=6187b1d3"></script>
+<script src="js/app.js?v=c1e853b2"></script>
 </body>
 </html>
