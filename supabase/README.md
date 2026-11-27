@@ -6,9 +6,10 @@ sont gérés par Supabase.
 ## Fichiers
 
 - `schema.sql` : tables, règles de sécurité (RLS) et fonctions du jeu.
+- `marche.sql` : le marché entre joueurs (annonces, ventes, cours, taxe de 5 %).
 - `catalogue.sql` : les 180 cartes (régénérer si `data/origines.js` change).
 
-Ordre d'installation : `schema.sql`, puis `catalogue.sql` (SQL Editor de Supabase).
+Ordre d'installation : `schema.sql`, puis `catalogue.sql`, puis `marche.sql` (SQL Editor de Supabase).
 
 ## Sécurité
 

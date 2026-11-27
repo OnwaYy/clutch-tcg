@@ -551,6 +551,44 @@
 
 
 
+
+  /* ---------- Marché ---------- */
+  .mk-ticker { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); height: 40px; display: flex; align-items: center; mask: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); -webkit-mask: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+  .mk-tape { display: flex; gap: 34px; white-space: nowrap; animation: tape 60s linear infinite; padding-left: 100%; font-family: var(--f-mono); font-size: 13px; }
+  .mk-tape span b { color: var(--fg); font-weight: 500; margin-right: 6px; } .mk-tape .up { color: var(--ok); } .mk-tape .down { color: var(--bad); }
+  @keyframes tape { to { transform: translateX(-100%); } }
+  .mk-search { flex: 1; min-width: 200px; }
+  .mk-sort { width: auto; }
+  .mk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 14px; }
+  .mk-tile { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center; padding: 12px; text-align: left; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); cursor: pointer; transition: border-color .15s, transform .15s, background .15s; color: inherit; font: inherit; }
+  .mk-tile:hover { border-color: var(--line-2); background: var(--panel-2); transform: translateY(-2px); }
+  .mk-tile .cc { --u: .96px; width: 96px; pointer-events: none; }
+  .mk-name { font-family: var(--f-display); font-weight: 800; font-size: 15px; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .mk-rar { font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; margin-top: 2px; }
+  .mk-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-top: 8px; }
+  .mk-price { font-family: var(--f-mono); font-size: 20px; line-height: 1; display: flex; align-items: center; gap: 6px; }
+  .mk-price small { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; letter-spacing: .06em; }
+  .mk-var { font-family: var(--f-mono); font-size: 12px; padding: 3px 7px; border-radius: 6px; white-space: nowrap; }
+  .mk-var.up { background: rgba(95,211,154,.14); color: var(--ok); } .mk-var.down { background: rgba(255,90,104,.14); color: var(--bad); } .mk-var.flat { background: rgba(145,140,156,.14); color: var(--muted); }
+  .mk-spark { width: 100%; height: 34px; margin-top: 8px; display: block; }
+  .mk-meta { font-size: 12px; color: var(--muted); margin-top: 6px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .mk-box { position: relative; width: min(1000px, 100%); max-height: calc(100vh - 32px); overflow: auto; display: grid; grid-template-columns: 340px 1fr; gap: 28px; padding: 28px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 20px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.95); }
+  .mk-cardcol { display: grid; place-items: start center; }
+  .mk-cardcol .cc.big { width: 100%; max-width: 340px; }
+  .mk-info { display: grid; gap: 18px; align-content: start; min-width: 0; }
+  .mk-info h2 { font-size: clamp(24px, 3vw, 34px); }
+  .mk-big { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .mk-big .num { font-size: 40px; line-height: 1; }
+  .mk-chart { width: 100%; height: 190px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); display: block; }
+  .mk-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .mk-stats div { background: var(--panel-2); padding: 10px 12px; } .mk-stats b { display: block; font-family: var(--f-mono); font-size: 17px; font-weight: 500; } .mk-stats span { font-size: 12px; color: var(--muted); }
+  .mk-list { display: grid; gap: 6px; max-height: 230px; overflow: auto; }
+  .mk-offer { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); }
+  .mk-offer .num { font-size: 17px; min-width: 90px; display: flex; align-items: center; gap: 6px; } .mk-offer .who { flex: 1; color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mk-sell { display: grid; gap: 10px; padding: 14px; border-radius: 12px; border: 1px dashed rgba(242,194,91,.45); }
+  .mk-sell .row .input { max-width: 180px; }
+  .mk-hint { font-size: 13px; color: var(--muted); } .mk-hint b { color: var(--fg); font-weight: 600; }
+  @media (max-width: 860px) { .mk-box { grid-template-columns: 1fr; padding: 22px 16px; } .mk-cardcol .cc.big { max-width: 240px; } .mk-grid { grid-template-columns: 1fr; } }
   /* ---------- Classement ---------- */
   .board { width: 100%; border-collapse: collapse; }
   .board th { text-align: left; font-family: var(--f-display); font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 14px 12px; }
@@ -915,7 +953,7 @@
       <a href="#collection" data-link="collection">Collection</a>
       <a href="#boosters" data-link="boosters">Boutique</a>
       <a href="#classement" data-link="classement">Classement</a>
-      <a href="#echanges" data-link="echanges">Échanges<span class="soon-tag">bientôt</span></a>
+      <a href="#marche" data-link="marche">Marché</a>
     </nav>
     <div class="wallet">
       <span class="chip" id="coinChip" title="Pièces" data-auth hidden><i class="coin"></i><span data-bind="coins">0</span></span>
@@ -1040,14 +1078,30 @@
     </div>
   </div>
 
-  <!-- ================= ÉCHANGES ================= -->
-  <div data-view="echanges" class="wrap page" hidden>
-    <div class="page-head"><div><h1>Échanges</h1><p>Ajoute tes amis et échange tes doubles avec eux.</p></div></div>
-    <div class="empty">
-      <div class="empty-ico">⇄</div>
-      <strong>Bientôt disponible</strong>
-      <span>Garde tes doubles : tu pourras bientôt les échanger avec tes amis.</span>
+  <!-- ================= MARCHÉ ================= -->
+  <div data-view="marche" class="wrap page" hidden>
+    <div class="page-head">
+      <div><h1>Marché</h1><p>Achète et vends tes cartes aux autres joueurs. Le cours de chaque carte bouge avec les ventes, comme en bourse.</p></div>
+      <div class="seg" id="mkTabs">
+        <button type="button" data-mk-tab="marche" aria-pressed="true">Marché</button>
+        <button type="button" data-mk-tab="vendre" aria-pressed="false">Vendre</button>
+        <button type="button" data-mk-tab="mes" aria-pressed="false">Mes annonces</button>
+        <button type="button" data-mk-tab="echanges" aria-pressed="false">Échanges</button>
+      </div>
     </div>
+    <div class="mk-ticker" id="mkTicker" aria-hidden="true"><div class="mk-tape" id="mkTape"></div></div>
+    <div class="panel filters" id="mkFilters">
+      <div class="filters-row">
+        <input class="input mk-search" id="mkSearch" type="search" placeholder="Rechercher une carte…" autocomplete="off">
+        <select class="input mk-sort" id="mkSort">
+          <option value="pop">Les plus échangées</option><option value="hausse">Plus fortes hausses</option><option value="baisse">Plus fortes baisses</option>
+          <option value="cher">Prix décroissant</option><option value="pascher">Prix croissant</option><option value="rare">Rareté</option>
+        </select>
+      </div>
+      <div class="filters-row"><span class="eyebrow">Rareté</span><div class="seg" id="mkRarity"></div></div>
+    </div>
+    <div class="mk-grid" id="mkGrid"></div>
+    <div class="empty" id="mkEmpty" hidden><div class="empty-ico">€</div><strong id="mkEmptyT">Rien ici pour l'instant</strong><span id="mkEmptyS"></span></div>
   </div>
 
   <!-- ================= PROFIL ================= -->
@@ -1111,6 +1165,16 @@
   <div class="modal-box" role="dialog" aria-label="Carte">
     <div class="tilt" id="tiltBox"><article class="cc big" id="bigCard"></article></div>
     <div class="modal-meta"><span id="bigRarity" class="muted"></span><button class="btn btn-ghost btn-sm" data-close-card>Fermer</button></div>
+  </div>
+</div>
+
+<!-- Fiche marché d'une carte -->
+<div class="modal" id="mkModal" aria-hidden="true">
+  <div class="modal-bg" data-mk-close></div>
+  <div class="mk-box" role="dialog" aria-label="Fiche de la carte">
+    <button class="x" type="button" data-mk-close aria-label="Fermer">×</button>
+    <div class="mk-cardcol"><article class="cc big" id="mkCard"></article></div>
+    <div class="mk-info" id="mkInfo"></div>
   </div>
 </div>
 
@@ -1235,6 +1299,6 @@
 <script src="data/origines.js?v=de4fd81f"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/app.js?v=42295189"></script>
+<script src="js/app.js?v=d92ef295"></script>
 </body>
 </html>

@@ -73,6 +73,19 @@
     function day() { return new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }); }
     function me() { const d = load(); if (!d) throw new Error('Connecte-toi pour jouer.'); if (d.qday !== day()) { d.qday = day(); d.q = {}; } return d; }
     function pick(w) { const t = Object.values(w).reduce(function (a, b) { return a + b; }, 0); let r = Math.floor(Math.random() * t); for (const k of Object.keys(w).sort(function (a, b) { return w[b] - w[a]; })) { if (r < w[k]) return k; r -= w[k]; } return 'common'; }
+    // Marché de démo, généré une fois puis gardé dans le navigateur
+    function mkSave(m) { try { localStorage.setItem(K + '-mk', JSON.stringify(m)); } catch (e) {} }
+    function mkDemo() {
+      let m = null; try { m = JSON.parse(localStorage.getItem(K + '-mk') || 'null'); } catch (e) {}
+      if (m) return m;
+      m = { n: 0, ann: [], ventes: [] }; const now = Date.now() / 1000, base = { common: 20, uncommon: 40, epic: 150, legend: 600, secret: 1500, goat: 20000 }, names = ['Kevin', 'Lea_99', 'Shadow', 'Nyx', 'Max.R', 'Zed'];
+      CATALOG.filter(function (c, i) { return i % 6 === 0 || c.rarity === 'goat' || c.rarity === 'secret'; }).forEach(function (c) {
+        let p = base[c.rarity] * (.7 + Math.random() * .8); const n = 6 + Math.floor(Math.random() * 18);
+        for (let i = 0; i < n; i++) { p = Math.max(10, p * (1 + (Math.random() - .47) * .18)); m.ventes.push({ carte: c.id, prix: Math.round(p), t: now - (n - i) * (30 * 86400 / n) * (.8 + Math.random() * .4) }); }
+        const k = Math.floor(Math.random() * 4); for (let j = 0; j < k; j++) m.ann.push({ id: ++m.n, carte: c.id, prix: Math.round(p * (1 + Math.random() * .25)), vendeur: names[Math.floor(Math.random() * names.length)] });
+      });
+      mkSave(m); return m;
+    }
     function quest(d, id, n) { d.q[id] = d.q[id] || { p: 0, ok: false }; d.q[id].p += n; }
     function owned(d, rar) { return CATALOG.filter(function (c) { return c.rarity !== 'goat' && (!rar || c.rarity === rar); }).filter(function (c) { return d.col[c.id]; }).length; }
     function total(rar) { return CATALOG.filter(function (c) { return c.rarity !== 'goat' && (!rar || c.rarity === rar); }).length; }
@@ -110,6 +123,22 @@
       pseudo_libre: function (a) { return NAME_OK.test(a.p); },
       suis_testeur: function () { return !!load(); },
       test_boosters: function (a) { const d = me(); d.boosters += a.n; save(d); return d.boosters; },
+      // Marché simulé (démo locale) : quelques vendeurs fictifs et un historique de ventes
+      marche: function () { const m = mkDemo(), now = Date.now() / 1000, ids = {};
+        m.ann.forEach(function (a) { ids[a.carte] = 1; }); m.ventes.forEach(function (v) { ids[v.carte] = 1; });
+        return Object.keys(ids).map(function (id) { id = +id; const an = m.ann.filter(function (a) { return a.carte === id; }), vs = m.ventes.filter(function (v) { return v.carte === id; }).sort(function (x, y) { return x.t - y.t; });
+          const old = vs.filter(function (v) { return v.t <= now - 86400; });
+          return { carte: id, annonces: an.length, prix_min: an.length ? Math.min.apply(null, an.map(function (a) { return a.prix; })) : null, dernier: vs.length ? vs[vs.length - 1].prix : null, ref_24h: old.length ? old[old.length - 1].prix : null, ventes_7j: vs.filter(function (v) { return v.t > now - 7 * 86400; }).length, spark: vs.slice(-20).map(function (v) { return v.prix; }) }; }); },
+      fiche_marche: function (a) { const m = mkDemo(), vs = m.ventes.filter(function (v) { return v.carte === a.p_carte; }).sort(function (x, y) { return x.t - y.t; }), ps = vs.map(function (v) { return v.prix; });
+        return { annonces: m.ann.filter(function (x) { return x.carte === a.p_carte; }).sort(function (x, y) { return x.prix - y.prix; }).map(function (x) { return { id: x.id, prix: x.prix, vendeur: x.vendeur, moi: !!x.moi }; }),
+          cours: vs.filter(function (v) { return v.t > Date.now() / 1000 - 30 * 86400; }).map(function (v) { return [v.t, v.prix]; }), plus_haut: ps.length ? Math.max.apply(null, ps) : null, plus_bas: ps.length ? Math.min.apply(null, ps) : null, volume: vs.length, taxe: 5 }; },
+      mes_annonces: function () { return mkDemo().ann.filter(function (a) { return a.moi; }); },
+      mettre_en_vente: function (a) { const d = me(), m = mkDemo(); if (!d.col[a.p_carte]) throw new Error('Tu ne possèdes pas cette carte.'); if (a.p_prix < 10 || a.p_prix > 1e6) throw new Error('Prix entre 10 et 1000000 pièces.');
+        d.col[a.p_carte]--; if (!d.col[a.p_carte]) delete d.col[a.p_carte]; save(d); m.ann.push({ id: ++m.n, carte: a.p_carte, prix: a.p_prix, vendeur: d.pseudo, moi: true }); mkSave(m); return m.n; },
+      retirer_annonce: function (a) { const d = me(), m = mkDemo(), x = m.ann.find(function (y) { return y.id === a.p_id && y.moi; }); if (!x) throw new Error('Annonce introuvable.');
+        m.ann = m.ann.filter(function (y) { return y !== x; }); d.col[x.carte] = (d.col[x.carte] || 0) + 1; save(d); mkSave(m); },
+      acheter_annonce: function (a) { const d = me(), m = mkDemo(), x = m.ann.find(function (y) { return y.id === a.p_id; }); if (!x) throw new Error('Cette carte vient d\'être vendue ou retirée.'); if (x.moi) throw new Error('C\'est ta propre annonce.'); if (d.pieces < x.prix) throw new Error('Pas assez de pièces.');
+        d.pieces -= x.prix; d.col[x.carte] = (d.col[x.carte] || 0) + 1; save(d); m.ann = m.ann.filter(function (y) { return y !== x; }); m.ventes.push({ carte: x.carte, prix: x.prix, t: Date.now() / 1000 }); mkSave(m); return { carte: x.carte, prix: x.prix }; },
       test_truquer: function (a) { const d = me(); d.forced = a.r || null; save(d); return a.r; },
       test_toutes_cartes: function () { const d = me(); let n = 0; CATALOG.forEach(function (c) { if (!d.col[c.id]) { d.col[c.id] = 1; n++; } }); save(d); return n; }
     };
@@ -382,10 +411,10 @@
   // =====================================================================
   // Navigation
   // =====================================================================
-  const VIEWS = ['accueil', 'boosters', 'collection', 'echanges', 'classement', 'profil'];
-  const TITLES = { accueil: 'Accueil', boosters: 'Boosters', collection: 'Collection', echanges: 'Échanges', classement: 'Classement', profil: 'Profil' };
+  const VIEWS = ['accueil', 'boosters', 'collection', 'marche', 'classement', 'profil'];
+  const TITLES = { accueil: 'Accueil', boosters: 'Boosters', collection: 'Collection', marche: 'Marché', classement: 'Classement', profil: 'Profil' };
   function route() {
-    const v = location.hash.slice(1);
+    let v = location.hash.slice(1); if (v === 'echanges') v = 'marche';
     let view = VIEWS.indexOf(v) >= 0 ? v : 'accueil';
     const needLogin = view === 'profil' && !USER; if (needLogin) view = 'accueil';
     $$('[data-view]').forEach(function (el) { el.hidden = el.dataset.view !== view; });
@@ -393,6 +422,7 @@
     $$('#wheelModal.open, #authModal.open').forEach(closeModal); closeCard();
     if (view === 'profil' && S) $('#pseudoInput').value = S.pseudo || '';
     if (view === 'classement') loadBoard();
+    if (view === 'marche') loadMarket();
     if (needLogin) openAuth('login');
     window.scrollTo(0, 0);
   }
@@ -1278,7 +1308,145 @@
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
     if ($('#cardModal').classList.contains('open')) { closeCard(); return; }
+    if ($('#mkModal').classList.contains('open')) { closeMk(); return; }
     const m = $('#authModal.open, #wheelModal.open'); if (m) closeModal(m);
+  });
+
+  // =====================================================================
+  // Marché : annonces entre joueurs, cours de chaque carte
+  // =====================================================================
+  const MK = { tab: 'marche', rows: [], mine: [], rar: 'all', q: '', sort: 'pop', cur: null };
+  const MK_BASE = { common: 20, uncommon: 40, epic: 150, legend: 600, secret: 1500, goat: 20000 };
+  function mkVar(r) { return r && r.dernier && r.ref_24h ? (r.dernier - r.ref_24h) / r.ref_24h * 100 : null; }
+  function mkChip(v) {
+    if (v === null || !isFinite(v)) return '<span class="mk-var flat">—</span>';
+    const k = v > .05 ? 'up' : v < -.05 ? 'down' : 'flat';
+    return '<span class="mk-var ' + k + '">' + (v > .05 ? '▲ +' : v < -.05 ? '▼ ' : '') + v.toFixed(1).replace('.', ',') + ' %</span>';
+  }
+  function mkSpark(pts) {
+    if (!pts || pts.length < 2) return '<svg class="mk-spark" viewBox="0 0 100 30"><line x1="0" y1="15" x2="100" y2="15" stroke="var(--line-2)" stroke-dasharray="3 3"/></svg>';
+    const mn = Math.min.apply(null, pts), mx = Math.max.apply(null, pts), d = mx - mn || 1;
+    const xy = pts.map(function (p, i) { return (i / (pts.length - 1) * 100).toFixed(1) + ',' + (27 - (p - mn) / d * 24).toFixed(1); }).join(' ');
+    const col = pts[pts.length - 1] >= pts[0] ? 'var(--ok)' : 'var(--bad)';
+    return '<svg class="mk-spark" viewBox="0 0 100 30" preserveAspectRatio="none"><polyline points="' + xy + '" fill="none" stroke="' + col + '" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>';
+  }
+  function mkRow(id) { return MK.rows.find(function (r) { return String(r.carte) === String(id); }) || null; }
+  async function loadMarket() {
+    try { MK.rows = (await rpc('marche')) || []; } catch (e) { MK.rows = []; }
+    if (USER) { try { MK.mine = (await rpc('mes_annonces')) || []; } catch (e) { MK.mine = []; } } else MK.mine = [];
+    renderMarket();
+  }
+  function renderMarket() {
+    $$('#mkTabs button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.mkTab === MK.tab ? 'true' : 'false'); });
+    if (!$('#mkRarity').firstChild) $('#mkRarity').innerHTML = '<button type="button" data-mk-rar="all" aria-pressed="true">Toutes</button>' + RAR.map(function (r) { return '<button type="button" data-mk-rar="' + r.id + '" aria-pressed="false">' + r.name + '</button>'; }).join('');
+    $$('#mkRarity button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.mkRar === MK.rar ? 'true' : 'false'); });
+    // Bande des cours qui défile, comme en bourse
+    const moves = MK.rows.filter(function (r) { return r.dernier; }).slice(0, 40);
+    $('#mkTicker').hidden = !moves.length;
+    $('#mkTape').innerHTML = moves.map(function (r) { const c = BY_ID[r.carte], v = mkVar(r); if (!c) return ''; return '<span><b>' + esc(c.name.split(' — ')[0]) + '</b>' + fmt(r.dernier) + ' <span class="' + (v > 0 ? 'up' : v < 0 ? 'down' : '') + '">' + (v === null ? '' : (v > 0 ? '▲' : v < 0 ? '▼' : '') + Math.abs(v).toFixed(1).replace('.', ',') + '%') + '</span></span>'; }).join('');
+    const ech = MK.tab === 'echanges';
+    $('#mkFilters').hidden = ech;
+    let items = [];
+    if (MK.tab === 'marche') items = MK.rows.map(function (r) { return { c: BY_ID[r.carte], r: r }; });
+    else if (MK.tab === 'vendre' && S) items = Object.keys(S.collection || {}).map(function (id) { return { c: BY_ID[id], r: mkRow(id), n: S.collection[id] }; });
+    else if (MK.tab === 'mes') items = MK.mine.map(function (a) { return { c: BY_ID[a.carte], r: mkRow(a.carte), a: a }; });
+    items = items.filter(function (x) { return x.c && (MK.rar === 'all' || x.c.rarity === MK.rar) && (!MK.q || x.c.name.toLowerCase().indexOf(MK.q) >= 0 || (x.c.game || '').toLowerCase().indexOf(MK.q) >= 0); });
+    const price = function (x) { return x.a ? x.a.prix : x.r ? (x.r.prix_min || x.r.dernier || 0) : 0; };
+    const sorts = {
+      pop: function (a, b) { return ((b.r && b.r.ventes_7j) || 0) - ((a.r && a.r.ventes_7j) || 0) || ((b.r && b.r.annonces) || 0) - ((a.r && a.r.annonces) || 0); },
+      hausse: function (a, b) { return (mkVar(b.r) || -1e9) - (mkVar(a.r) || -1e9); },
+      baisse: function (a, b) { return (mkVar(a.r) || 1e9) - (mkVar(b.r) || 1e9); },
+      cher: function (a, b) { return price(b) - price(a); }, pascher: function (a, b) { return (price(a) || 1e12) - (price(b) || 1e12); },
+      rare: function (a, b) { return RORDER[b.c.rarity] - RORDER[a.c.rarity]; }
+    };
+    items.sort(sorts[MK.sort] || sorts.pop);
+    $('#mkGrid').hidden = ech;
+    $('#mkGrid').innerHTML = items.map(function (x) {
+      const c = x.c, r = x.r, rr = RAR.find(function (q) { return q.id === c.rarity; });
+      let lab, val;
+      if (x.a) { lab = 'Ton prix'; val = x.a.prix; }
+      else if (r && r.prix_min) { lab = 'Dès'; val = r.prix_min; }
+      else if (r && r.dernier) { lab = 'Dernière vente'; val = r.dernier; }
+      else { lab = 'Pas encore de cours'; val = null; }
+      return '<button class="mk-tile" type="button" data-mk="' + c.id + '">' + '<div class="cc mini ' + finish(c) + '" style="' + cardStyle(c) + '">' + cardInner(c) + corners(c) + '</div>' +
+        '<div style="min-width:0"><div class="mk-name">' + esc(c.name) + '</div><div class="mk-rar" style="color:' + rr.color + '">' + rr.name + (x.n ? ' · ×' + x.n : '') + '</div>' +
+        '<div class="mk-row"><div class="mk-price"><div><small>' + lab + '</small>' + (val ? '<i class="coin"></i> ' + fmt(val) : '—') + '</div></div>' + mkChip(mkVar(r)) + '</div>' +
+        mkSpark(r && r.spark) + '<div class="mk-meta"><span>' + ((r && r.annonces) || 0) + ' en vente</span><span>' + ((r && r.ventes_7j) || 0) + ' ventes / 7 j</span></div></div></button>';
+    }).join('');
+    const empty = !ech && !items.length;
+    $('#mkEmpty').hidden = !empty && !ech;
+    if (ech) { $('#mkEmptyT').textContent = 'Échanges entre amis : bientôt'; $('#mkEmptyS').textContent = 'Tu pourras proposer une carte contre une carte à tes amis.'; }
+    else if (MK.tab === 'vendre' && !S) { $('#mkEmptyT').textContent = 'Connecte-toi pour vendre'; $('#mkEmptyS').textContent = ''; }
+    else if (MK.tab === 'vendre') { $('#mkEmptyT').textContent = 'Aucune carte à vendre'; $('#mkEmptyS').textContent = 'Ouvre des boosters pour remplir ta collection.'; }
+    else if (MK.tab === 'mes') { $('#mkEmptyT').textContent = USER ? 'Aucune annonce en cours' : 'Connecte-toi pour voir tes annonces'; $('#mkEmptyS').textContent = USER ? 'Va dans « Vendre » pour mettre une carte en vente.' : ''; }
+    else { $('#mkEmptyT').textContent = 'Le marché est vide pour l\'instant'; $('#mkEmptyS').textContent = 'Sois le premier à mettre une carte en vente.'; }
+  }
+  // Courbe du cours sur 30 jours
+  function mkChart(cours) {
+    const W = 600, H = 190, P = 14;
+    if (!cours || !cours.length) return '<svg class="mk-chart" viewBox="0 0 ' + W + ' ' + H + '"><text x="' + W / 2 + '" y="' + H / 2 + '" text-anchor="middle" fill="var(--muted)" font-family="JetBrains Mono, monospace" font-size="14">Pas encore de vente</text></svg>';
+    const pts = cours.length === 1 ? [cours[0], [cours[0][0] + 1, cours[0][1]]] : cours;
+    const t0 = pts[0][0], t1 = pts[pts.length - 1][0], ps = pts.map(function (p) { return p[1]; }), mn = Math.min.apply(null, ps), mx = Math.max.apply(null, ps), d = mx - mn || 1;
+    const X = function (t) { return P + (t - t0) / ((t1 - t0) || 1) * (W - 2 * P); }, Y = function (p) { return H - 28 - (p - mn) / d * (H - 56); };
+    const line = pts.map(function (p) { return X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1); }).join(' ');
+    const up = ps[ps.length - 1] >= ps[0], col = up ? '#5fd39a' : '#ff5a68';
+    const last = pts[pts.length - 1], dt = function (t) { return new Date(t * 1000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }); };
+    return '<svg class="mk-chart" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none"><defs><linearGradient id="mkg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + col + '" stop-opacity=".35"/><stop offset="1" stop-color="' + col + '" stop-opacity="0"/></linearGradient></defs>' +
+      [0, 1, 2, 3].map(function (i) { const y = 28 + i * (H - 56) / 3; return '<line x1="' + P + '" x2="' + (W - P) + '" y1="' + y + '" y2="' + y + '" stroke="rgba(255,255,255,.05)"/>'; }).join('') +
+      '<polygon points="' + X(t0).toFixed(1) + ',' + (H - 28) + ' ' + line + ' ' + X(t1).toFixed(1) + ',' + (H - 28) + '" fill="url(#mkg)"/>' +
+      '<polyline points="' + line + '" fill="none" stroke="' + col + '" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>' +
+      '<circle cx="' + X(last[0]).toFixed(1) + '" cy="' + Y(last[1]).toFixed(1) + '" r="5" fill="' + col + '" stroke="#0b0a0e" stroke-width="2"/>' +
+      '<text x="' + (W - P) + '" y="18" text-anchor="end" fill="var(--muted)" font-family="JetBrains Mono, monospace" font-size="12">max ' + fmt(mx) + '</text>' +
+      '<text x="' + (W - P) + '" y="' + (H - 34) + '" text-anchor="end" fill="var(--muted)" font-family="JetBrains Mono, monospace" font-size="12">min ' + fmt(mn) + '</text>' +
+      '<text x="' + P + '" y="' + (H - 8) + '" fill="var(--dim)" font-family="JetBrains Mono, monospace" font-size="12">' + dt(t0) + '</text>' +
+      '<text x="' + (W - P) + '" y="' + (H - 8) + '" text-anchor="end" fill="var(--dim)" font-family="JetBrains Mono, monospace" font-size="12">' + dt(t1) + '</text></svg>';
+  }
+  async function openMk(id) {
+    const c = BY_ID[id]; if (!c) return; MK.cur = c.id;
+    const el = $('#mkCard'); el.className = 'cc big ' + finish(c); el.style.cssText = cardStyle(c);
+    el.innerHTML = cardInner(c) + corners(c) + '<span class="cc-holo"></span><span class="cc-glare"></span>';
+    $('#mkInfo').innerHTML = '<p class="muted">Chargement du cours…</p>';
+    openModal('#mkModal');
+    let f; try { f = await rpc('fiche_marche', { p_carte: c.id }); } catch (e) { $('#mkInfo').innerHTML = '<p class="form-msg err">' + esc(e.message) + '</p>'; return; }
+    if (MK.cur !== c.id) return;
+    const r = mkRow(c.id), rr = RAR.find(function (q) { return q.id === c.rarity; }), own = S && S.collection ? (S.collection[c.id] || 0) : 0;
+    const cur = (r && r.dernier) || (f.annonces[0] && f.annonces[0].prix) || null;
+    const sugg = (r && r.dernier) || (f.annonces[0] && f.annonces[0].prix) || MK_BASE[c.rarity];
+    $('#mkInfo').innerHTML =
+      '<div><div class="mk-rar" style="color:' + rr.color + '">' + rr.name + ' · ' + esc(c.game || '') + '</div><h2>' + esc(c.name) + '</h2></div>' +
+      '<div class="mk-big"><span class="num">' + (cur ? fmt(cur) : '—') + '</span><span class="muted">pièces</span>' + mkChip(mkVar(r)) + '<span class="muted" style="font-size:13px">sur 24 h</span></div>' +
+      mkChart(f.cours) +
+      '<div class="mk-stats"><div><b>' + (f.plus_bas ? fmt(f.plus_bas) : '—') + '</b><span>Plus bas</span></div><div><b>' + (f.plus_haut ? fmt(f.plus_haut) : '—') + '</b><span>Plus haut</span></div><div><b>' + fmt(f.volume || 0) + '</b><span>Ventes</span></div></div>' +
+      '<div><div class="panel-head" style="margin-bottom:8px"><h2 style="font-size:17px">En vente (' + f.annonces.length + ')</h2></div><div class="mk-list">' +
+      (f.annonces.length ? f.annonces.map(function (a) {
+        return '<div class="mk-offer"><span class="num"><i class="coin"></i>' + fmt(a.prix) + '</span><span class="who">' + (a.moi ? 'Ton annonce' : 'par ' + esc(a.vendeur)) + '</span>' +
+          (a.moi ? '<button class="btn btn-dark btn-sm" type="button" data-mk-del="' + a.id + '">Retirer</button>' : USER ? '<button class="btn btn-gold btn-sm" type="button" data-mk-buy="' + a.id + '" data-prix="' + a.prix + '"' + (S && S.pieces < a.prix ? ' disabled title="Pas assez de pièces"' : '') + '>Acheter</button>' : '') + '</div>';
+      }).join('') : '<p class="muted" style="margin:0">Personne ne vend cette carte pour l\'instant.</p>') + '</div></div>' +
+      (!USER ? '<p class="mk-hint"><button class="linkish" type="button" data-action="login">Connecte-toi</button> pour acheter ou vendre.</p>' :
+        own ? '<form class="mk-sell" id="mkSellForm"><div class="mk-hint">Tu en as <b>×' + own + '</b>. Mets-en une en vente :</div><div class="row"><input class="input" id="mkPrice" type="number" min="10" max="1000000" step="1" value="' + sugg + '" inputmode="numeric"><button class="btn btn-gold" type="submit">Mettre en vente</button></div><div class="mk-hint" id="mkNet"></div></form>' :
+        '<p class="mk-hint">Tu n\'as pas cette carte.</p>');
+    const net = function () { const p = +($('#mkPrice') || {}).value || 0, t = Math.ceil(p * f.taxe / 100); $('#mkNet').innerHTML = 'Tu toucheras <b>' + fmt(Math.max(0, p - t)) + '</b> pièces après la taxe de ' + f.taxe + ' %. La carte quitte ta collection tant qu\'elle est en vente.'; };
+    if ($('#mkPrice')) { net(); $('#mkPrice').addEventListener('input', net); }
+  }
+  function closeMk() { MK.cur = null; closeModal($('#mkModal')); }
+  async function mkAction(fn, args, msg) {
+    try { await rpc(fn, args); toast(msg); await refresh(); await loadMarket(); if (MK.cur) openMk(MK.cur); }
+    catch (e) { toast(e.message, true); }
+  }
+  $('#mkTabs').addEventListener('click', function (e) { const b = e.target.closest('[data-mk-tab]'); if (!b) return; MK.tab = b.dataset.mkTab; renderMarket(); });
+  $('#mkRarity').addEventListener('click', function (e) { const b = e.target.closest('[data-mk-rar]'); if (!b) return; MK.rar = b.dataset.mkRar; renderMarket(); });
+  $('#mkSearch').addEventListener('input', function () { MK.q = this.value.trim().toLowerCase(); renderMarket(); });
+  $('#mkSort').addEventListener('change', function () { MK.sort = this.value; renderMarket(); });
+  $('#mkGrid').addEventListener('click', function (e) { const t = e.target.closest('[data-mk]'); if (t) openMk(t.dataset.mk); });
+  $('#mkModal').addEventListener('click', function (e) {
+    if (e.target.closest('[data-mk-close]')) { closeMk(); return; }
+    const buy = e.target.closest('[data-mk-buy]'); if (buy) { buy.disabled = true; mkAction('acheter_annonce', { p_id: +buy.dataset.mkBuy }, 'Carte achetée pour ' + fmt(+buy.dataset.prix) + ' pièces !'); return; }
+    const del = e.target.closest('[data-mk-del]'); if (del) { del.disabled = true; mkAction('retirer_annonce', { p_id: +del.dataset.mkDel }, 'Annonce retirée : la carte est revenue dans ta collection.'); }
+  });
+  $('#mkModal').addEventListener('submit', function (e) {
+    if (e.target.id !== 'mkSellForm') return; e.preventDefault();
+    const p = Math.round(+$('#mkPrice').value);
+    mkAction('mettre_en_vente', { p_carte: MK.cur, p_prix: p }, 'Carte mise en vente pour ' + fmt(p) + ' pièces.');
   });
 
   // =====================================================================
