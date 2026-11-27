@@ -37,7 +37,7 @@ alter table public.annonces enable row level security;
 alter table public.ventes enable row level security;
 revoke all on public.annonces, public.ventes from anon, authenticated;
 
--- Mettre une carte en vente
+-- Mettre une carte en vente (le profil du vendeur est verrouillé : ses actions passent une par une)
 create or replace function public.mettre_en_vente(p_carte int, p_prix int) returns bigint
 language plpgsql security definer set search_path = '' as $$
 declare u uuid := public._moi(); n int; nid bigint;
@@ -45,6 +45,7 @@ begin
   if p_prix is null or p_prix < (public.reglage('marche_prix_min'))::int or p_prix > (public.reglage('marche_prix_max'))::int then
     raise exception 'Prix entre % et % pièces.', public.reglage('marche_prix_min'), public.reglage('marche_prix_max');
   end if;
+  perform 1 from public.profils where id = u for update;
   if (select count(*) from public.annonces where vendeur = u) >= (public.reglage('marche_max_annonces'))::int then
     raise exception 'Tu as déjà trop d''annonces en cours.';
   end if;
@@ -67,23 +68,26 @@ begin
     on conflict (joueur, carte) do update set nombre = co.nombre + 1;
 end $$;
 
--- Acheter une annonce
+-- Acheter une annonce : l'annonce puis les deux profils sont verrouillés, toujours dans le même ordre
+-- (deux achats simultanés de la même annonce : le second échoue proprement ; aucun blocage entre achats croisés)
 create or replace function public.acheter_annonce(p_id bigint) returns jsonb
 language plpgsql security definer set search_path = '' as $$
-declare u uuid := public._moi(); a public.annonces; taxe int;
+declare u uuid := public._moi(); a public.annonces; taxe int; solde int;
 begin
   select * into a from public.annonces where id = p_id for update;
   if a.id is null then raise exception 'Cette carte vient d''être vendue ou retirée.'; end if;
   if a.vendeur = u then raise exception 'C''est ta propre annonce.'; end if;
-  update public.profils set pieces = pieces - a.prix where id = u and pieces >= a.prix;
-  if not found then raise exception 'Pas assez de pièces.'; end if;
+  perform 1 from public.profils where id in (u, a.vendeur) order by id for update;
+  select pieces into solde from public.profils where id = u;
+  if solde < a.prix then raise exception 'Pas assez de pièces.'; end if;
   taxe := ceil(a.prix * (public.reglage('marche_taxe'))::numeric / 100);
+  update public.profils set pieces = pieces - a.prix where id = u;
   update public.profils set pieces = pieces + (a.prix - taxe) where id = a.vendeur;
   insert into public.collection as co (joueur, carte) values (u, a.carte)
     on conflict (joueur, carte) do update set nombre = co.nombre + 1;
   insert into public.ventes (carte, prix, vendeur, acheteur) values (a.carte, a.prix, a.vendeur, u);
   delete from public.annonces where id = a.id;
-  return jsonb_build_object('carte', a.carte, 'prix', a.prix, 'pieces', (select pieces from public.profils where id = u));
+  return jsonb_build_object('carte', a.carte, 'prix', a.prix, 'pieces', solde - a.prix);
 end $$;
 
 -- Vue d'ensemble du marché : une ligne par carte avec annonces ou ventes récentes
