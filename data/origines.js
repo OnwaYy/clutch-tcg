@@ -157,6 +157,7 @@ window.ORIGINES = {
     "s1mple — Le sacre de Stockholm": {"img": "assets/cartes/s1mple-le-sacre-de-stockholm.jpg", "color": "#f5d100", "photo": true},
     "Le trophée du Major": {"img": "assets/cartes/le-trophee-du-major.jpg", "color": "#7a8aa8", "photo": true},
     "Vitality — La saison record": {"img": "assets/cartes/vitality-la-saison-record.jpg", "color": "#f5d100", "photo": true},
+    "T1 — Logo 6 étoiles": {"img": "assets/cartes/t1-logo-6-etoiles.jpg", "color": "#c8a86a", "photo": true},
     "Faker": {"img": "assets/cartes/faker.png", "color": "#e2012d", "player": true},
     "Fortnite World Cup — Arthur Ashe Stadium": {"img": "assets/cartes/fortnite-world-cup-arthur-ashe-stadium.jpg", "color": "#5b3df5", "photo": true},
     "Evil Geniuses — Champions de TI5": {"img": "assets/cartes/evil-geniuses-champions-de-ti5.jpg", "color": "#1d3c6e", "photo": true},
