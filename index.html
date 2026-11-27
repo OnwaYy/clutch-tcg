@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Clutch TCG</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700;800&family=Barlow:wght@400;500;600&family=Oswald:wght@700&family=Barlow+Condensed:wght@800&family=JetBrains+Mono:wght@500&display=swap">
 <style>
   /* Layout : barre de jeu fixe en haut, une vue par onglet (routage par #), panneaux sombres et accents or */
@@ -176,7 +178,7 @@
   .pack.shake { animation: shake .5s !important; }
   @keyframes shake { 20%,60% { translate: -6px 0; rotate: -2deg; } 40%,80% { translate: 6px 0; rotate: 2deg; } }
 
-  .odds { display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+  .odds { display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
   .odd { padding: 14px 14px 14px 16px; min-width: 0; display: grid; gap: 4px; border-right: 1px solid var(--line); position: relative; }
   .odd:last-child { border-right: 0; }
   .odd::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background: var(--r); }
@@ -595,6 +597,120 @@
     .odd:nth-child(2n) { border-right: 0; }
     .odd:nth-child(-n+4) { border-bottom: 1px solid var(--line); }
   }
+
+  /* ---------- Comptes, boosters, roue ---------- */
+  .pk { display: inline-block; width: 11px; height: 15px; border-radius: 2px; flex: none; background: linear-gradient(160deg, #6a45c4, #2b1d5e); box-shadow: inset 0 0 0 1px var(--gold); }
+  .pk-chip { text-decoration: none; color: inherit; }
+  .home-col { display: grid; gap: 20px; align-content: start; min-width: 0; }
+  .wheel-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  .wheel-panel > div:nth-child(2) { flex: 1; min-width: 150px; }
+  .mini-wheel { width: 54px; height: 54px; border-radius: 50%; flex: none; border: 3px solid var(--gold);
+    background: conic-gradient(#2b1d5e 0 45deg, #4b2a8c 45deg 90deg, #2b1d5e 90deg 135deg, #b46bff 135deg 180deg, #2b1d5e 180deg 225deg, #4b2a8c 225deg 270deg, #f2c25b 270deg 315deg, #4b2a8c 315deg); box-shadow: 0 0 16px -4px var(--gold); }
+  .wheel-panel.ready .mini-wheel { animation: spinmini 6s linear infinite; }
+  @keyframes spinmini { to { rotate: 360deg; } }
+  .my-packs { grid-template-columns: auto 1fr; align-items: center; gap: 28px; }
+  .pack-slot { display: grid; place-items: center; width: 150px; }
+  .pack-slot .pack { width: 140px; max-width: none; }
+  .pack-slot .pack.empty-pack { filter: grayscale(1) brightness(.5); }
+  .my-packs-info { display: grid; gap: 12px; }
+  .big-count { font-family: var(--f-display); font-weight: 800; font-size: 46px; line-height: 1; display: flex; align-items: baseline; gap: 10px; }
+  .big-count small { font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .bonus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .rewards { display: grid; gap: 10px; }
+  .reward { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; align-items: center; padding: 12px 14px; border-radius: 10px; background: var(--panel-2); border-left: 3px solid var(--r, var(--gold)); }
+  .reward-name { font-weight: 600; }
+  .reward-gain { font-family: var(--f-mono); font-size: 13px; color: var(--gold); display: inline-flex; gap: 10px; align-items: center; }
+  .reward .quest-bar { grid-column: 1 / -1; }
+  .reward.claimed { opacity: .55; }
+  .gain { display: inline-flex; align-items: center; gap: 5px; }
+  .cc-count { position: absolute; z-index: 9; right: 6px; bottom: 30px; font-family: var(--f-mono); font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 999px; background: rgba(11,10,20,.85); color: var(--gold); border: 1px solid var(--gold); pointer-events: none; }
+  .mini-wrap { position: relative; }
+
+  .modal.auth { z-index: 60; }
+  .auth-box { position: relative; width: min(420px, 100%); max-height: calc(100vh - 32px); overflow: auto; display: grid; gap: 16px; padding: 26px 24px 22px; border-radius: 16px;
+    background: linear-gradient(180deg, #1a1632, var(--panel)); border: 1px solid var(--line); box-shadow: 0 30px 80px -20px rgba(0,0,0,.9), 0 0 0 1px rgba(242,194,91,.08); }
+  .auth-brand { display: flex; align-items: center; gap: 12px; }
+  .auth-brand h2 { font-size: 20px; text-transform: uppercase; letter-spacing: .06em; }
+  .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; }
+  .auth-tabs button { padding: 9px 12px; font-size: 14px; }
+  .oauth { display: grid; gap: 10px; }
+  .oauth-btn { width: 100%; padding: 12px 16px; font-size: 13px; letter-spacing: .06em; }
+  .oauth-btn svg { width: 20px; height: 20px; flex: none; }
+  .oauth-btn.google { background: #fff; color: #1f1f1f; }
+  .oauth-btn.discord { background: #5865f2; color: #fff; }
+  .oauth-btn:hover { filter: brightness(1.06); }
+  .or { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .auth-form { display: grid; gap: 12px; }
+  .hint { margin: 0; font-size: 12px; color: var(--muted); min-height: 1.2em; }
+  .hint.ok { color: var(--ok); } .hint.err { color: var(--bad); }
+  .input.err { border-color: var(--bad); } .input.ok { border-color: color-mix(in srgb, var(--ok) 70%, var(--line)); }
+  .pwd-meter { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+  .pwd-meter i { display: block; height: 100%; width: 0; background: var(--bad); transition: width .2s, background .2s; }
+  .linkish { background: none; border: 0; color: var(--muted); font-size: 13px; text-decoration: underline; justify-self: center; padding: 2px; }
+  .linkish:hover { color: var(--fg); }
+  .x { position: absolute; top: 10px; right: 12px; width: 32px; height: 32px; border-radius: 8px; background: transparent; border: 1px solid var(--line); color: var(--muted); font-size: 20px; line-height: 1; }
+  .x:hover { color: var(--fg); border-color: var(--gold); }
+  .demo-bar { cursor: pointer; position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 30; max-width: calc(100% - 32px); padding: 8px 14px; border-radius: 8px; font-size: 13px; background: rgba(79,168,255,.14); border: 1px solid rgba(79,168,255,.4); color: #cfe4ff; backdrop-filter: blur(6px); }
+
+  /* Ouverture */
+  .opener { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; overflow: auto; --cw: min(188px, 17.5vw); }
+  .op-bg { position: fixed; inset: 0; background: radial-gradient(circle at 50% 42%, #2c1856 0%, #120c26 45%, #06050c 80%); }
+  .op-flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 50%, var(--fc, #fff), transparent 70%); }
+  .op-flash.go { animation: flash .7s ease-out; }
+  @keyframes flash { 0% { opacity: .9; } 100% { opacity: 0; } }
+  .op-stage { position: relative; display: grid; justify-items: center; gap: 22px; padding: 24px 16px; width: 100%; }
+  .op-hint { margin: 0; font-family: var(--f-display); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; font-size: 13px; color: var(--muted); }
+  .op-pack { background: none; border: 0; padding: 0; perspective: 900px; }
+  .op-pack .pack { width: 230px; animation: float 3s ease-in-out infinite, foil 4s linear infinite; }
+  .op-pack:hover .pack { filter: brightness(1.12); }
+  .op-pack.charge .pack { animation: charge .55s ease-in-out infinite; }
+  @keyframes charge { 0%,100% { rotate: -2deg; scale: 1.02; } 50% { rotate: 2deg; scale: 1.05; } }
+  .op-pack.tear .pack { animation: none; }
+  .op-pack.tear .pack::before { animation: tear .5s forwards; }
+  @keyframes tear { to { transform: translate(60px, -90px) rotate(25deg); opacity: 0; } }
+  .op-pack.gone { animation: packgone .45s forwards; }
+  @keyframes packgone { to { transform: translateY(60px) scale(.8); opacity: 0; } }
+  .op-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; max-width: 1100px; }
+  .flip { width: var(--cw); aspect-ratio: 63 / 88; perspective: 1200px; background: none; border: 0; padding: 0; cursor: pointer; opacity: 0; transform: translateY(40px) scale(.9); }
+  .flip.in { animation: dealin .45s cubic-bezier(.2,.8,.3,1.2) forwards; animation-delay: calc(var(--i) * 90ms); }
+  @keyframes dealin { to { opacity: 1; transform: none; } }
+  .flip-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .6s cubic-bezier(.3,.7,.3,1); }
+  .flip.on .flip-inner { transform: rotateY(180deg); }
+  .flip.on { cursor: zoom-in; }
+  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 5% / 3.58%; }
+  .face.front { transform: rotateY(180deg); }
+  .face.front .cc { --u: calc(var(--cw) / 100); width: var(--cw); }
+  .cback { display: grid; place-items: center; overflow: hidden;
+    background: repeating-linear-gradient(45deg, rgba(242,194,91,.08) 0 2px, transparent 2px 9px), radial-gradient(circle at 50% 42%, #4b2a8c, #1a1238 70%);
+    box-shadow: inset 0 0 0 calc(var(--cw) * .03) #f2c25b, inset 0 0 0 calc(var(--cw) * .045) #8c6420, 0 20px 40px -16px rgba(0,0,0,.9); }
+  .cback .pack-emblem { width: 46%; margin: 0; }
+  .cback .pack-emblem div { font-size: calc(var(--cw) * .12); color: var(--gold); }
+  .cback::after { content: "CLUTCH TCG"; position: absolute; bottom: 9%; font-family: var(--f-display); font-weight: 800; letter-spacing: .2em; font-size: calc(var(--cw) * .07); color: var(--gold); opacity: .8; }
+  .flip[data-r="epic"]:not(.on) .cback, .flip[data-r="legend"]:not(.on) .cback, .flip[data-r="secret"]:not(.on) .cback, .flip[data-r="goat"]:not(.on) .cback { animation: aura 1.4s ease-in-out infinite; }
+  .flip[data-r="epic"] { --glow: #b46bff; } .flip[data-r="legend"] { --glow: #f2c25b; } .flip[data-r="secret"] { --glow: #ff7ad9; } .flip[data-r="goat"] { --glow: #ffffff; }
+  @keyframes aura { 50% { box-shadow: inset 0 0 0 calc(var(--cw) * .03) #f2c25b, inset 0 0 0 calc(var(--cw) * .045) #8c6420, 0 0 34px 6px var(--glow); } }
+  .flip.on[data-r="legend"] .face.front, .flip.on[data-r="secret"] .face.front, .flip.on[data-r="goat"] .face.front { animation: glowon 1.6s ease-out; }
+  @keyframes glowon { 0% { box-shadow: 0 0 80px 30px var(--glow); } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .op-stage.shake { animation: bigshake .45s; }
+  @keyframes bigshake { 20%,60% { translate: -8px 3px; } 40%,80% { translate: 8px -3px; } }
+  .newtag { position: absolute; z-index: 12; top: -9px; left: 50%; transform: translateX(-50%); font-family: var(--f-display); font-weight: 800; font-size: 11px; letter-spacing: .14em; padding: 3px 8px; border-radius: 999px; background: var(--ok); color: #062615; box-shadow: 0 4px 12px -2px rgba(95,211,154,.6); }
+  .op-sum { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: center; align-items: center; padding: 12px 18px; border-radius: 12px; background: rgba(20,18,36,.85); border: 1px solid var(--line); font-size: 14px; }
+  .op-sum b { font-family: var(--f-mono); font-size: 18px; color: var(--gold); }
+  .op-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .opener .op-zoom { position: fixed; inset: 0; z-index: 3; }
+  @media (max-width: 760px) { .opener { --cw: min(150px, 29vw); } .op-pack .pack { width: 190px; } .bonus-grid { grid-template-columns: 1fr; } .my-packs { grid-template-columns: 1fr; justify-items: center; text-align: center; } .my-packs .row { justify-content: center; } }
+
+  /* Roue */
+  .wheel-box { position: relative; display: grid; gap: 16px; justify-items: center; }
+  .wheel-wrap { position: relative; width: min(360px, 86vw); aspect-ratio: 1; }
+  .wheel { width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--gold); box-shadow: 0 0 50px -10px var(--gold), inset 0 0 0 3px #1a1238; transition: transform 4.6s cubic-bezier(.12,.75,.15,1); position: relative; overflow: hidden; }
+  .wheel span { position: absolute; font-family: var(--f-display); font-weight: 800; font-size: clamp(18px, 5vw, 26px); color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,.7); }
+  .wheel-pin { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); z-index: 2; width: 0; height: 0; border-left: 16px solid transparent; border-right: 16px solid transparent; border-top: 28px solid #fff; filter: drop-shadow(0 3px 4px rgba(0,0,0,.6)); }
+  .wheel-hub { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 26%; aspect-ratio: 1; border-radius: 50%; border: 4px solid var(--gold); background: radial-gradient(circle at 35% 30%, #3a2a6e, #120c2a); color: var(--gold); font-family: var(--f-display); font-weight: 800; font-size: clamp(16px, 4.6vw, 24px); letter-spacing: .1em; z-index: 2; }
+  .wheel-hub:disabled { opacity: 1; }
+  .wheel-res { margin: 0; font-family: var(--f-display); font-weight: 700; letter-spacing: .06em; text-align: center; min-height: 1.5em; }
+  .wheel-res b { color: var(--gold); }
   @media (max-width: 1040px) {
     nav { display: none; }
     .menu-btn { display: grid; place-items: center; }
@@ -630,9 +746,10 @@
       <a href="#classement" data-link="classement">Classement</a>
     </nav>
     <div class="wallet">
-      <span class="chip" id="coinChip" title="Pièces"><i class="coin"></i><span data-bind="coins">0</span></span>
-      <span class="chip shards" id="shardChip" title="Éclats"><i class="shard"></i><span data-bind="shards">0</span></span>
-      <a class="avatar" href="#profil" data-link="profil" title="Mon profil" data-bind="initials">?</a>
+      <span class="chip" id="coinChip" title="Pièces" data-auth hidden><i class="coin"></i><span data-bind="coins">0</span></span>
+      <a class="chip pk-chip" id="packChip" href="#boosters" title="Boosters à ouvrir" data-auth hidden><i class="pk"></i><span data-bind="packTotal">0</span></a>
+      <a class="avatar" href="#profil" data-link="profil" title="Mon profil" data-bind="initials" data-auth hidden>?</a>
+      <button class="btn btn-gold btn-sm" type="button" data-action="login" data-guest>Se connecter</button>
       <button class="menu-btn" id="menuBtn" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
     </div>
   </div>
@@ -647,10 +764,11 @@
         <h1>Ouvre. Collectionne.<br><span>Trouve les légendes.</span></h1>
         <p>La première série retrace les grands moments de l'histoire de l'e-sport, tous jeux confondus. Chaque booster contient 5 cartes, et les plus grands exploits se cachent dans les légendaires.</p>
         <div class="cta-row">
-          <a class="btn btn-gold" href="#boosters">Acheter un booster <small><i class="coin"></i> 500</small></a>
+          <button class="btn btn-gold" type="button" data-action="open" data-auth hidden>Ouvrir un booster <small>×<span data-bind="packTotal">0</span></small></button>
+          <button class="btn btn-gold" type="button" data-action="signup" data-guest>Créer mon compte <small>3 boosters offerts</small></button>
           <a class="btn btn-ghost" href="#collection" data-set-link="ori">Voir la série</a>
         </div>
-        <div class="free">
+        <div class="free" data-auth hidden>
           <div>
             <div class="eyebrow" data-bind="freeLabel">Booster gratuit dans</div>
             <div class="timer" data-bind="freeTimer">--:--:--</div>
@@ -664,7 +782,7 @@
           <div class="pack-inner">
             <div class="pack-emblem"><div>ORI</div></div>
             <div class="pack-title">ORIGINES<small>ÉDITION 1</small></div>
-            <div class="pack-count">5 CARTES · 1 RARE MINIMUM</div>
+            <div class="pack-count">5 CARTES · 1 ÉPIQUE MINIMUM</div>
           </div>
         </div>
       </div>
@@ -675,9 +793,20 @@
     </section>
 
     <section class="wrap home-grid">
-      <div class="panel">
-        <div class="panel-head"><h2>Quêtes du jour</h2><span class="eyebrow" data-bind="questCount">0 / 3</span></div>
-        <div id="quests"></div>
+      <div class="home-col">
+        <div class="panel">
+          <div class="panel-head"><h2>Quêtes du jour</h2><span class="eyebrow" data-bind="questCount">0 / 5</span></div>
+          <div id="quests"></div>
+        </div>
+        <div class="panel wheel-panel">
+          <div class="mini-wheel" aria-hidden="true"></div>
+          <div>
+            <div class="eyebrow" data-bind="wheelLabel">Roue du jour</div>
+            <div class="timer" data-bind="wheelTimer">--:--:--</div>
+            <div class="muted" style="font-size:13px">De 0 à 4 boosters, une fois par jour.</div>
+          </div>
+          <button class="btn btn-gold btn-sm" type="button" data-action="wheel" data-wheel-btn>Tourner</button>
+        </div>
       </div>
 
       <div class="panel">
@@ -700,27 +829,48 @@
     <div class="wrap page-head">
       <div>
         <h1>Boosters</h1>
-        <p>Achète des boosters avec tes pièces. Chaque booster contient 5 cartes, dont au moins une rare.</p>
+        <p>Chaque booster contient 5 cartes, dont au moins une épique. Le score du booster te rapporte autant de pièces.</p>
       </div>
     </div>
     <div class="wrap page-body">
-      <div class="panel">
-        <div class="panel-head"><h2>Mes boosters</h2><span class="eyebrow"><span data-bind="packTotal">0</span> non ouverts</span></div>
-        <div class="inv">
-          <div class="inv-list" id="invList"></div>
+      <div class="panel my-packs">
+        <div class="pack-slot" id="myPack"></div>
+        <div class="my-packs-info">
+          <div class="eyebrow">Mes boosters</div>
+          <div class="big-count"><span data-bind="packTotal">0</span><small>à ouvrir</small></div>
+          <div class="row">
+            <button class="btn btn-gold" type="button" data-action="open" data-open-btn>Ouvrir un booster</button>
+          </div>
+          <p class="muted" style="margin:0;font-size:13px">Score : commune 1, peu commune 2, épique 10, légendaire 50, secrète 100, GOAT 500.</p>
         </div>
       </div>
 
-      <div class="panel free-panel">
-        <div>
-          <div class="eyebrow" data-bind="freeLabel">Booster gratuit dans</div>
-          <div class="timer" data-bind="freeTimer">--:--:--</div>
-          <div class="muted" style="font-size:13px">Un booster Origines offert toutes les 4 heures.</div>
+      <div class="bonus-grid">
+        <div class="panel free-panel">
+          <div>
+            <div class="eyebrow" data-bind="freeLabel">Booster gratuit dans</div>
+            <div class="timer" data-bind="freeTimer">--:--:--</div>
+            <div class="muted" style="font-size:13px">Un booster offert toutes les heures.</div>
+          </div>
+          <button class="btn btn-ok btn-sm" type="button" data-action="claim-free" hidden>Récupérer</button>
         </div>
-        <button class="btn btn-ok btn-sm" data-action="claim-free" hidden>Récupérer</button>
+        <div class="panel wheel-panel">
+          <div class="mini-wheel" aria-hidden="true"></div>
+          <div>
+            <div class="eyebrow" data-bind="wheelLabel">Roue du jour</div>
+            <div class="timer" data-bind="wheelTimer">--:--:--</div>
+            <div class="muted" style="font-size:13px">De 0 à 4 boosters, une fois par jour.</div>
+          </div>
+          <button class="btn btn-gold btn-sm" type="button" data-action="wheel" data-wheel-btn>Tourner</button>
+        </div>
       </div>
 
       <div class="shop" id="shop"></div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Récompenses de collection</h2><span class="eyebrow">Une seule fois par compte</span></div>
+        <div class="rewards" id="rewards"></div>
+      </div>
     </div>
   </div>
 
@@ -759,39 +909,12 @@
         <p>Ajoute tes amis et échange tes doubles avec eux.</p>
       </div>
     </div>
-    <div class="wrap page-body trade-grid">
+    <div class="wrap page-body">
       <div class="panel">
-        <div class="panel-head"><h2>Amis</h2><span class="eyebrow"><span data-bind="friendCount">0</span> amis</span></div>
-        <form id="friendForm" class="field" novalidate>
-          <label for="friendInput">Ajouter un ami par pseudo</label>
-          <div class="row">
-            <input class="input" id="friendInput" maxlength="20" placeholder="ex. KoalaMid" autocomplete="off">
-            <button class="btn btn-gold btn-sm" type="submit">Ajouter</button>
-          </div>
-          <p class="form-msg" id="friendMsg" role="status"></p>
-        </form>
-        <div id="friendList"></div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head"><h2>Offres</h2>
-          <div class="seg" id="offerTabs">
-            <button aria-pressed="true" data-tab="recues">Reçues</button>
-            <button aria-pressed="false" data-tab="envoyees">Envoyées</button>
-          </div>
-        </div>
-        <div class="empty" id="offerEmpty">
+        <div class="empty">
           <div class="empty-ico">⇄</div>
-          <strong data-bind="offerTitle">Aucune offre reçue</strong>
-          <span>Pour proposer un échange, il te faut au moins une carte en double.</span>
-        </div>
-        <div>
-          <div class="eyebrow" style="margin-bottom:8px">Comment ça marche</div>
-          <ol class="steps">
-            <li><b>Ajoute un ami</b> avec son pseudo.</li>
-            <li><b>Choisis une carte</b> en double dans ta collection.</li>
-            <li><b>Propose l'échange</b> contre une de ses cartes. Il a 24 h pour accepter.</li>
-          </ol>
+          <strong>Les échanges arrivent bientôt</strong>
+          <span>Garde tes doubles : tu pourras bientôt les échanger avec tes amis.</span>
         </div>
       </div>
     </div>
@@ -802,7 +925,7 @@
     <div class="wrap page-head">
       <div>
         <h1>Classement</h1>
-        <p>Score de collection : commune 1 pt, peu commune 2, épique 10, légendaire 50, secrète 100. Les autres joueurs sont des exemples.</p>
+        <p>Score de collection : chaque carte différente compte une fois. Commune 1, peu commune 2, épique 10, légendaire 50, secrète 100, GOAT 500.</p>
       </div>
       <div class="seg" id="boardTabs">
         <button aria-pressed="true" data-board="score">Score</button>
@@ -838,10 +961,10 @@
       <div class="panel">
         <div class="panel-head"><h2>Statistiques</h2></div>
         <div class="stats">
-          <div class="stat"><b data-bind="owned">0</b><span>Cartes obtenues</span></div>
-          <div class="stat"><b data-bind="packTotal">0</b><span>Boosters non ouverts</span></div>
+          <div class="stat"><b data-bind="owned">0</b><span>Cartes différentes</span></div>
+          <div class="stat"><b data-bind="score">0</b><span>Score de collection</span></div>
+          <div class="stat"><b data-bind="opened">0</b><span>Boosters ouverts</span></div>
           <div class="stat"><b data-bind="bought">0</b><span>Boosters achetés</span></div>
-          <div class="stat"><b data-bind="spent">0</b><span>Pièces dépensées</span></div>
         </div>
       </div>
       <div class="panel">
@@ -849,17 +972,15 @@
         <form id="pseudoForm" class="field" novalidate>
           <label for="pseudoInput">Pseudo</label>
           <div class="row">
-            <input class="input" id="pseudoInput" maxlength="20" autocomplete="off">
+            <input class="input" id="pseudoInput" maxlength="16" autocomplete="off" spellcheck="false">
             <button class="btn btn-gold btn-sm" type="submit">Enregistrer</button>
           </div>
           <p class="form-msg" id="pseudoMsg" role="status"></p>
         </form>
         <div class="field">
-          <label>Progression</label>
-          <div class="row">
-            <button class="btn btn-danger btn-sm" id="resetBtn" type="button">Réinitialiser ma progression</button>
-          </div>
-          <p class="form-msg muted" id="resetMsg">Remet tes pièces, boosters et quêtes à zéro.</p>
+          <label>Compte</label>
+          <div class="muted" style="font-size:14px" data-bind="email"></div>
+          <div class="row"><button class="btn btn-ghost btn-sm" type="button" data-action="logout">Se déconnecter</button></div>
         </div>
       </div>
     </div>
@@ -874,409 +995,100 @@
   </div>
 </div>
 
-<footer><div class="wrap"><span>Clutch TCG · prototype</span><span>Progression enregistrée dans ce navigateur</span></div></footer>
+<!-- Connexion / inscription -->
+<div class="modal auth" id="authModal" aria-hidden="true">
+  <div class="modal-bg" data-close-modal></div>
+  <div class="auth-box" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <button class="x" type="button" data-close-modal aria-label="Fermer">×</button>
+    <div class="auth-brand"><span class="logo-mark" aria-hidden="true"></span><h2 id="authTitle">Rejoins Clutch TCG</h2></div>
+    <div class="seg auth-tabs" role="tablist">
+      <button type="button" role="tab" data-auth-tab="login" aria-pressed="true">Connexion</button>
+      <button type="button" role="tab" data-auth-tab="signup" aria-pressed="false">Inscription</button>
+    </div>
+    <div class="oauth">
+      <button class="btn oauth-btn google" type="button" data-oauth="google"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.3-1.6 3.8-5.4 3.8-3.3 0-5.9-2.7-5.9-6s2.7-6 5.9-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6H12z"/></svg>Continuer avec Google</button>
+      <button class="btn oauth-btn discord" type="button" data-oauth="discord"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>Continuer avec Discord</button>
+    </div>
+    <div class="or"><span>ou avec ton e-mail</span></div>
+
+    <form id="loginForm" class="auth-form" novalidate>
+      <div class="field"><label for="liEmail">E-mail</label><input class="input" id="liEmail" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="liPwd">Mot de passe</label><input class="input" id="liPwd" type="password" autocomplete="current-password" required></div>
+      <button class="btn btn-gold" type="submit">Se connecter</button>
+      <button class="linkish" type="button" data-action="forgot">Mot de passe oublié ?</button>
+      <p class="form-msg" id="loginMsg" role="status"></p>
+    </form>
+
+    <form id="signupForm" class="auth-form" novalidate hidden>
+      <div class="field"><label for="suPseudo">Pseudo</label><input class="input" id="suPseudo" maxlength="16" autocomplete="nickname" spellcheck="false" required><p class="hint" id="suPseudoHint">3 à 16 caractères : lettres, chiffres, point, _ ou -.</p></div>
+      <div class="field"><label for="suEmail">E-mail</label><input class="input" id="suEmail" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="suPwd">Mot de passe</label><input class="input" id="suPwd" type="password" autocomplete="new-password" minlength="8" required>
+        <div class="pwd-meter" aria-hidden="true"><i></i></div><p class="hint" id="suPwdHint">8 caractères minimum.</p></div>
+      <div class="field"><label for="suPwd2">Confirme le mot de passe</label><input class="input" id="suPwd2" type="password" autocomplete="new-password" required><p class="hint" id="suPwd2Hint"></p></div>
+      <button class="btn btn-gold" type="submit">Créer mon compte</button>
+      <p class="form-msg" id="signupMsg" role="status"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Choix du pseudo (après Google ou Discord) -->
+<div class="modal auth" id="pseudoModal" aria-hidden="true">
+  <div class="modal-bg"></div>
+  <form class="auth-box" id="pickForm" role="dialog" aria-modal="true" aria-labelledby="pickTitle" novalidate>
+    <div class="auth-brand"><span class="logo-mark" aria-hidden="true"></span><h2 id="pickTitle">Choisis ton pseudo</h2></div>
+    <p class="muted" style="margin:0">C'est le nom que les autres joueurs verront dans le classement.</p>
+    <div class="field"><label for="pickInput">Pseudo</label><input class="input" id="pickInput" maxlength="16" autocomplete="nickname" spellcheck="false" required><p class="hint" id="pickHint">3 à 16 caractères : lettres, chiffres, point, _ ou -.</p></div>
+    <button class="btn btn-gold" type="submit">Valider</button>
+    <p class="form-msg" id="pickMsg" role="status"></p>
+  </form>
+</div>
+
+<!-- Nouveau mot de passe (lien reçu par mail) -->
+<div class="modal auth" id="pwdModal" aria-hidden="true">
+  <div class="modal-bg"></div>
+  <form class="auth-box" id="pwdForm" role="dialog" aria-modal="true" aria-labelledby="pwdTitle" novalidate>
+    <div class="auth-brand"><span class="logo-mark" aria-hidden="true"></span><h2 id="pwdTitle">Nouveau mot de passe</h2></div>
+    <div class="field"><label for="npPwd">Mot de passe</label><input class="input" id="npPwd" type="password" autocomplete="new-password" minlength="8" required><p class="hint">8 caractères minimum.</p></div>
+    <div class="field"><label for="npPwd2">Confirme le mot de passe</label><input class="input" id="npPwd2" type="password" autocomplete="new-password" required></div>
+    <button class="btn btn-gold" type="submit">Enregistrer</button>
+    <p class="form-msg" id="pwdMsg" role="status"></p>
+  </form>
+</div>
+
+<!-- Ouverture de booster -->
+<div class="opener" id="opener" hidden>
+  <div class="op-bg"></div>
+  <div class="op-flash" id="opFlash"></div>
+  <div class="op-stage">
+    <p class="op-hint" id="opHint">Touche le booster pour l'ouvrir</p>
+    <button class="op-pack" id="opPack" type="button" aria-label="Ouvrir le booster"></button>
+    <div class="op-cards" id="opCards"></div>
+    <div class="op-sum" id="opSum" hidden></div>
+    <div class="op-actions" id="opActions" hidden>
+      <button class="btn btn-ghost btn-sm" type="button" data-op="reveal">Tout retourner</button>
+      <button class="btn btn-gold btn-sm" type="button" data-op="next" hidden>Ouvrir le suivant <small>×<span data-bind="packTotal">0</span></small></button>
+      <button class="btn btn-ghost btn-sm" type="button" data-op="close" hidden>Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Roue du jour -->
+<div class="modal" id="wheelModal" aria-hidden="true">
+  <div class="modal-bg" data-close-modal></div>
+  <div class="wheel-box" role="dialog" aria-modal="true" aria-label="Roue du jour">
+    <div class="wheel-wrap"><div class="wheel-pin"></div><div class="wheel" id="wheel"></div><button class="wheel-hub" type="button" id="wheelSpin">GO</button></div>
+    <p class="wheel-res" id="wheelRes">Lance la roue pour gagner de 0 à 4 boosters.</p>
+    <button class="btn btn-ghost btn-sm" type="button" data-close-modal>Fermer</button>
+  </div>
+</div>
+
+<div class="demo-bar" id="demoBar" hidden title="Cliquer pour masquer">Mode démo : le serveur n'est pas encore branché. La progression reste dans ce navigateur. ✕</div>
+<footer><div class="wrap"><span>Clutch TCG</span><span data-guest>Crée un compte pour sauvegarder ta collection</span><span data-auth hidden>Progression enregistrée sur ton compte</span></div></footer>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="data/origines.js?v=6c4c9bf5"></script>
-<script>
-(function () {
-  // ---------- Données ----------
-  // Séries : Origines est la série de base. Les séries d'événement s'ajoutent ici pendant les events.
-  const SETS = [
-    { id: 'ori', code: 'ORI', name: 'Origines', edition: 'Édition 1', desc: 'Les grands moments de l\'histoire de l\'e-sport', games: 'Tous les jeux', size: 150, secret: 25, status: 'on', note: 'Série de base', c: '#f2c25b', p: ['#2b1d5e', '#4b2a8c', '#1a1238'], edge: ['#f2c25b', '#8c6420'] }
-  ];
-  const STATUS = { on: 'Disponible', soon: 'Bientôt', off: 'Terminée' };
-  // Raretés : les 5 premières dans la numérotation (001 à 150), les secrètes hors numérotation (151 à 175)
-  const RAR = [
-    { id: 'common', name: 'Commune', color: 'var(--c-common)', pts: 1, odds: '50 %', note: 'Clubs, ligues, maps, joueurs' },
-    { id: 'uncommon', name: 'Peu commune', color: 'var(--c-uncommon)', pts: 2, odds: '30 %', note: 'Jeux, grands clubs, lieux' },
-    { id: 'epic', name: 'Épique', color: 'var(--c-epic)', pts: 10, odds: '15 %', note: 'Stars et grands rendez-vous' },
-    { id: 'legend', name: 'Légendaire', color: 'var(--c-legend)', pts: 50, odds: '4,5 %', note: 'Moments historiques' },
-    { id: 'secret', name: 'Secrète', color: 'var(--c-secret)', pts: 100, odds: '0,49 %', note: 'Hors numérotation, 151 à 175' },
-    { id: 'goat', name: 'GOAT', color: 'var(--c-goat)', pts: 500, odds: '0,01 %', note: 'Les plus grands de l\'histoire, sans numéro' }
-  ];
-  const PRICE = 500, PRICE5 = 2250, FREE_EVERY = 4 * 3600 * 1000;
-  // Catalogue : emplacements vides, rareté répartie par extension
-  // Nombre de cartes par rareté, dans l'ordre de numérotation (proportions inspirées de Pokémon 151)
-  const RCODE = { C: 'common', P: 'uncommon', R: 'rare', E: 'epic', L: 'legend', S: 'secret', G: 'goat' };
-  // Les cartes GOAT n'ont pas de numéro : elles suivent les 175, marquées « GOAT »
-  let goatN = 0;
-  const ORI_ALL = window.ORIGINES ? window.ORIGINES.cards.concat(window.ORIGINES.goat || []) : [];
-  const CATALOG = ORI_ALL.map(function (c, i) {
-    const art = (window.ORIGINES.art || {})[c[0]] || {};
-    return { set: 'ori', num: c[1] === 'G' ? 'GOAT' + (++goatN > 1 ? goatN : '') : i + 1, rarity: RCODE[c[1]], name: c[0], type: c[2], game: c[3], year: c[4], note: c[5], img: art.img || null, color: art.color || null, dark: !!art.dark, map: !!art.map, fade: !!art.fade, player: !!art.player, photo: !!art.photo };
-  });
-  if (false) SETS.forEach(function (s) {
-    let num = 1;
-    BANDS.forEach(function (b) { for (let i = 0; i < b[1]; i++) CATALOG.push({ set: s.id, num: num++, rarity: b[0] }); });
-  });
-  const SAMPLE_BOARD = [
-    ['NeoFaker', 1240, 9, 310], ['Sp1ke', 1105, 8, 296], ['MidOrFeed', 980, 6, 288], ['Lunaa', 870, 5, 260],
-    ['xKiwi', 745, 4, 241], ['TiltProof', 630, 3, 219], ['Bobby_ADC', 512, 2, 198], ['Pikachuu', 405, 2, 170],
-    ['ZeroPing', 298, 1, 142], ['Clutchy', 150, 0, 96]
-  ];
-
-  // ---------- État (sauvegardé dans le navigateur) ----------
-  const KEY = 'clutch-tcg-v2';
-  const today = function () { return new Date().toISOString().slice(0, 10); };
-  function fresh() {
-    return {
-      pseudo: 'Joueur', coins: 2000, shards: 0, packs: {}, bought: 0, spent: 0,
-      nextFree: Date.now() + (3 * 3600 + 12 * 60 + 45) * 1000,
-      joined: today(), friends: [], questDay: today(),
-      quests: { login: { n: 1, claimed: false }, buy: { n: 0, claimed: false }, visit: { n: 0, claimed: false } },
-      cards: {}
-    };
-  }
-  let S;
-  try { S = Object.assign(fresh(), JSON.parse(localStorage.getItem(KEY) || 'null') || {}); } catch (e) { S = fresh(); }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
-  if (S.questDay !== today()) { S.questDay = today(); S.quests = fresh().quests; save(); }
-  // Tant qu'il n'y a qu'un seul joueur : toute la collection est débloquée
-  const UNLOCK_ALL = true;
-  if (UNLOCK_ALL) CATALOG.forEach(function (c) { S.cards[c.set + '-' + c.num] = 1; });
-
-  const QUESTS = [
-    { id: 'login', name: 'Se connecter aujourd\'hui', goal: 1, reward: { coins: 100 } },
-    { id: 'buy', name: 'Acheter 2 boosters', goal: 2, reward: { coins: 250 } },
-    { id: 'visit', name: 'Consulter ta collection', goal: 1, reward: { shards: 40 } }
-  ];
-
-  // ---------- Outils ----------
-  const $ = function (s, r) { return (r || document).querySelector(s); };
-  const $$ = function (s, r) { return Array.from((r || document).querySelectorAll(s)); };
-  const fmt = function (n) { return n.toLocaleString('fr-FR'); };
-  const esc = function (t) { return String(t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
-  const initials = function (n) { const p = n.trim().split(/[\s_-]+/).filter(Boolean); return ((p[0] || '?')[0] + (p[1] ? p[1][0] : (p[0] || '')[1] || '')).toUpperCase(); };
-  const owned = function () { return Object.keys(S.cards).length; };
-  const packTotal = function () { return Object.values(S.packs).reduce(function (a, b) { return a + b; }, 0); };
-  const setById = function (id) { return SETS.find(function (s) { return s.id === id; }); };
-
-  const toastEl = $('#toast');
-  function toast(msg, err) {
-    toastEl.textContent = msg; toastEl.classList.toggle('err', !!err); toastEl.classList.add('show');
-    clearTimeout(toastEl._t); toastEl._t = setTimeout(function () { toastEl.classList.remove('show'); }, 2600);
-  }
-  function bump(id) { const el = $(id); el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
-  function packHTML(s, mini) {
-    return '<div class="pack' + (mini ? ' mini' : '') + (s.status === 'off' ? ' off' : '') + '" style="--p1:' + s.p[0] + ';--p2:' + s.p[1] + ';--p3:' + s.p[2] + ';--edge:' + s.edge[0] + ';--edge2:' + s.edge[1] + '">' +
-      '<div class="pack-inner"><div class="pack-emblem"><div>' + s.code + '</div></div>' +
-      '<div class="pack-title">' + esc(s.name.split(' ')[0].toUpperCase()) + '<small>' + esc((s.edition || 'BOOSTER').toUpperCase()) + '</small></div>' +
-      '<div class="pack-count">5 CARTES · 1 RARE MINIMUM</div></div></div>';
-  }
-
-  // ---------- Rendu ----------
-  function renderBinds() {
-    const ft = freeState();
-    const vals = {
-      coins: fmt(S.coins), shards: fmt(S.shards), initials: initials(S.pseudo), pseudo: S.pseudo,
-      packTotal: fmt(packTotal()), owned: fmt(owned()), catalog: fmt(CATALOG.length),
-      bought: fmt(S.bought), spent: fmt(S.spent), friendCount: S.friends.length,
-      joined: new Date(S.joined).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
-      freeTimer: ft.ready ? 'Disponible' : ft.text, freeLabel: ft.ready ? 'Booster gratuit' : 'Booster gratuit dans',
-      questCount: QUESTS.filter(function (q) { return S.quests[q.id].claimed; }).length + ' / ' + QUESTS.length
-    };
-    // On ne touche au DOM que si la valeur a changé (évite de recalculer la page chaque seconde)
-    $$('[data-bind]').forEach(function (el) { const k = el.dataset.bind; if (k in vals && el.textContent !== String(vals[k])) el.textContent = vals[k]; });
-    $$('[data-bind-width="freePct"]').forEach(function (el) { const w = ft.pct.toFixed(1) + '%'; if (el.style.width !== w) el.style.width = w; });
-    $$('[data-action="claim-free"]').forEach(function (b) { if (b.hidden !== !ft.ready) b.hidden = !ft.ready; });
-  }
-
-  function freeState() {
-    const left = S.nextFree - Date.now();
-    if (left <= 0) return { ready: true, pct: 100, text: '00:00:00' };
-    const s = Math.ceil(left / 1000);
-    const pad = function (n) { return String(n).padStart(2, '0'); };
-    return { ready: false, pct: Math.max(0, Math.min(100, 100 - left / FREE_EVERY * 100)), text: pad(Math.floor(s / 3600)) + ':' + pad(Math.floor(s % 3600 / 60)) + ':' + pad(s % 60) };
-  }
-
-  function renderQuests() {
-    $('#quests').innerHTML = QUESTS.map(function (q) {
-      const st = S.quests[q.id], n = Math.min(st.n, q.goal), done = n >= q.goal;
-      const reward = q.reward.coins ? '<i class="coin"></i>+' + q.reward.coins : '<i class="shard"></i>+' + q.reward.shards;
-      const right = st.claimed ? '<span class="claimed-tag">Récupérée</span>'
-        : done ? '<button class="claim" data-quest="' + q.id + '">Récupérer</button>'
-        : '<span class="quest-num">' + n + ' / ' + q.goal + '</span>';
-      return '<div class="quest' + (st.claimed ? ' claimed' : done ? ' done' : '') + '"><span class="quest-name">' + q.name + '</span>' +
-        '<span class="quest-reward">' + reward + '</span><div class="quest-bar"><div class="track"><i style="width:' + (n / q.goal * 100) + '%"></i></div>' + right + '</div></div>';
-    }).join('');
-  }
-
-  const EVENT_CARD = '<div class="set event"><div><span class="status soon">Pendant les events</span></div>' +
-    '<div><h3>Séries d\'événement</h3><div class="set-meta"><span>Disponibles seulement pendant un event e-sport</span><span>Aucun event en cours</span></div></div></div>';
-  function renderHome() {
-    const s = SETS[0];
-    $('#odds').innerHTML = RAR.map(function (r) {
-      return '<div class="odd" style="--r:' + r.color + '"><span class="odd-name">' + r.name + '</span><span class="odd-pct">' + r.odds + '</span><span class="odd-note">' + r.note + '</span></div>';
-    }).join('');
-    $('#homeLegend').innerHTML = RAR.map(function (r) {
-      const have = CATALOG.filter(function (c) { return c.rarity === r.id && S.cards[c.set + '-' + c.num]; }).length;
-      return '<span style="--r:' + r.color + '"><i></i>' + r.name + 's ' + have + '</span>';
-    }).join('');
-    $('#homeGames').innerHTML = RAR.slice().reverse().map(function (r) {
-      const total = CATALOG.filter(function (c) { return c.set === s.id && c.rarity === r.id; }).length;
-      const have = CATALOG.filter(function (c) { return c.set === s.id && c.rarity === r.id && S.cards[c.set + '-' + c.num]; }).length;
-      const pct = Math.round(have / total * 100);
-      return '<a class="game" href="#collection" data-set-link="' + s.id + '" data-rar-link="' + r.id + '" style="--g:' + r.color + '"><div class="r-ico">' + r.name[0] + '</div>' +
-        '<div><div class="game-name">' + r.name + 's</div><div class="game-sub">' + have + ' / ' + total + ' cartes</div><div class="track"><i style="width:' + pct + '%"></i></div></div>' +
-        '<span class="game-pct">' + pct + ' %</span></a>';
-    }).join('');
-    $('#homeSets').innerHTML = SETS.map(function (s) {
-      return '<a class="set" href="#boosters" style="--c:' + s.c + '"><div class="row" style="justify-content:space-between"><span class="status ' + s.status + '">' + STATUS[s.status] + '</span>' +
-        '<span class="stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + s.code + '<span class="ed1">ÉDITION 1</span></span></div>' +
-        '<div><h3>' + s.name + '</h3><div class="set-meta"><span>' + s.desc + '</span><span>' + s.size + ' + ' + s.secret + ' secrètes</span></div></div></a>';
-    }).join('') + EVENT_CARD;
-  }
-
-  function renderBoosters() {
-    const inv = SETS.filter(function (s) { return S.packs[s.id] > 0; });
-    $('#invList').innerHTML = inv.length ? inv.map(function (s) {
-      return '<div class="inv-item"><span>' + s.name + '</span><b>×' + S.packs[s.id] + '</b><button class="btn btn-gold btn-sm" data-open="' + s.id + '">Ouvrir</button></div>';
-    }).join('') : '<span class="muted">Aucun booster pour l\'instant. Achètes-en un ci-dessous ou récupère le booster gratuit.</span>';
-
-    $('#shop').innerHTML = SETS.map(function (s) {
-      const on = s.status === 'on';
-      const buy = on
-        ? '<div class="offer-buy"><button class="btn btn-gold btn-sm" data-buy="' + s.id + '" data-qty="1"' + (S.coins < PRICE ? ' disabled' : '') + '>Acheter <small><i class="coin"></i> ' + PRICE + '</small></button>' +
-          '<button class="btn btn-ghost btn-sm" data-buy="' + s.id + '" data-qty="5"' + (S.coins < PRICE5 ? ' disabled' : '') + '>Lot de 5 <small class="num" style="font-size:12px;opacity:.8"><i class="coin"></i> ' + fmt(PRICE5) + '</small></button></div>'
-        : '<div class="offer-buy"><button class="btn btn-ghost btn-sm" disabled>' + (s.status === 'soon' ? 'Bientôt disponible' : 'Plus en vente') + '</button></div>';
-      return '<div class="panel offer">' + packHTML(s, true) + '<div class="offer-info"><div class="row"><span class="status ' + s.status + '">' + STATUS[s.status] + '</span>' +
-        '<span class="stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + s.code + '<span class="ed1">ÉDITION 1</span></span></div>' +
-        '<h3>' + s.name + '</h3><ul><li>' + s.desc + '</li><li>' + s.games + ' · ' + s.size + ' cartes + ' + s.secret + ' secrètes</li><li>5 cartes par booster, 1 rare minimum</li></ul>' + buy + '</div></div>';
-    }).join('') + '<div class="panel event-panel"><span class="status soon">Pendant les events</span><h3 style="font-size:19px;text-transform:uppercase;letter-spacing:.04em">Séries d\'événement</h3>' +
-      '<p class="muted" style="margin:0">Des séries spéciales sortent uniquement pendant les grands events e-sport, avec leur propre symbole. Aucun event en cours.</p></div>';
-  }
-
-  const F = { set: 'all', rarity: 'all', ownedOnly: false };
-  function renderCollection() {
-    $('#setFilter').innerHTML = [{ id: 'all', name: 'Toutes' }].concat(SETS).map(function (s) {
-      return '<button data-fset="' + s.id + '" aria-pressed="' + (F.set === s.id) + '">' + s.name + '</button>';
-    }).join('');
-    $('#rarityFilter').innerHTML = [{ id: 'all', name: 'Toutes' }].concat(RAR).map(function (r) {
-      return '<button data-frar="' + r.id + '" aria-pressed="' + (F.rarity === r.id) + '">' + r.name + '</button>';
-    }).join('');
-    $('#ownedOnly').checked = F.ownedOnly;
-    const list = CATALOG.filter(function (c) {
-      return (F.set === 'all' || c.set === F.set) && (F.rarity === 'all' || c.rarity === F.rarity) && (!F.ownedOnly || S.cards[c.set + '-' + c.num]);
-    });
-    $('#slotCount').textContent = list.length + ' emplacement' + (list.length > 1 ? 's' : '');
-    $('#collEmpty').hidden = list.length > 0;
-    $('#slots').hidden = list.length === 0;
-    const rc = {}; RAR.forEach(function (r) { rc[r.id] = r; });
-    $('#slots').innerHTML = list.map(function (c) {
-      const s = setById(c.set);
-      if (S.cards[c.set + '-' + c.num]) return ownedSlot(c);
-      return '<div class="slot" style="--r:' + rc[c.rarity].color + '" title="' + s.name + ' · ' + s.edition + ' · ' + numText(c) + ' · ' + rc[c.rarity].name + ' · non obtenue">' +
-        '<span class="slot-ed">ÉD.1</span><span class="slot-r"></span><span class="lock"></span>' +
-        '<span class="slot-stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + numText(c) + '</span></div>';
-    }).join('');
-  }
-
-  const n3 = function (n) { return String(n).padStart(3, '0'); };
-  const numText = function (c) { return c.rarity === 'goat' ? 'GOAT' : n3(c.num) + '/' + setById(c.set).size; };
-  const initialsOf = function (name) {
-    const w = name.split(' — ')[0].replace(/[^A-Za-z0-9À-ÿ ]/g, '').split(' ').filter(Boolean);
-    if (w.length === 1) return (w[0].length <= 4 ? w[0] : w[0].slice(0, 2)).toUpperCase();
-    return w.slice(0, 2).map(function (x) { return x[0]; }).join('').toUpperCase() || '?';
-  };
-  // ---------- Carte (modèle des communes, pour l'instant pour toutes les raretés) ----------
-  function hexRgb(h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16); }); }
-  const RHEX = { common: '#a7a3b8', uncommon: '#4fd1c5', rare: '#4fa8ff', epic: '#b46bff', legend: '#f2c25b', secret: '#ff7ad9', goat: '#e2012d' };
-  function mixc(c, d, k) { return 'rgb(' + c.map(function (v, i) { return Math.round(v + (d[i] - v) * k); }).join(',') + ')'; }
-  function cardStyle(c) {
-    const r = RAR.find(function (x) { return x.id === c.rarity; });
-    const rgb = hexRgb(c.color || RHEX[c.rarity]), W = [255, 255, 255], K = [0, 0, 0];
-    const lum = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
-    // dark : fond sombre derrière le visuel, pour les logos clairs
-    return '--p1:' + mixc(rgb, W, .25) + ';--p2:' + mixc(rgb, K, .18) + ';--ph1:' + (c.dark ? mixc(rgb, K, .3) : mixc(rgb, W, .85)) + ';--ph2:' + (c.dark ? mixc(rgb, K, .68) : mixc(rgb, W, .45)) +
-      ';--foot:' + (lum > .5 ? mixc(rgb, K, .55) : mixc(rgb, W, .62)) + ';--foot-strong:' + (lum > .5 ? mixc(rgb, K, .78) : mixc(rgb, W, .88)) +
-      ';--ghost:' + (c.dark ? 'rgba(255,255,255,.2)' : 'rgba(28,27,34,.24)') + ';--rr:' + r.color;
-  }
-  function cardInner(c) {
-    const s = setById(c.set);
-    const fr = /fran[cç]/i.test((c.note || '') + ' ' + c.name), goat = c.rarity === 'goat';
-    // « Nom — Sous-titre » : le nom en gros, le sous-titre en dessous
-    const parts = c.name.split(' — ');
-    const title = parts[0];
-    const sub = parts[1] ? parts[1] + (c.year ? ' · ' + c.year : '') : ([c.note, c.year].filter(Boolean).join(' · ') || c.type);
-    // Moments et événements : la note raconte ce qui s'est passé
-    const story = (parts[1] || c.type === 'Moment' || c.type === 'Événement' || c.rarity === 'goat') && c.note ? c.note : '';
-    const subLine = story && !parts[1] ? (c.year ? String(c.year) : c.type) : sub;
-    return '<div class="cc-panel"><div class="cc-photo"><span class="cc-ghost">' + (goat ? 'GOAT' : n3(c.num)) + '</span>' +
-      (c.img ? '<img' + (c.map ? ' class="is-map' + (c.fade ? ' is-fade' : '') + '"' : c.player ? ' class="is-player"' : c.photo ? ' class="is-photo"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
-      (goat ? '<span class="cc-num"><b>GOAT</b><small>HORS SÉRIE</small></span>' : '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>') +
-      '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-ed">PREMIÈRE ÉDITION</span>' + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
-      '<div class="cc-band' + (fr ? ' fr' : '') + (story ? ' has-story' : '') + '">' + (c.rarity === 'legend' ? '<span class="cc-crest"><b>★</b> LÉGENDAIRE <b>★</b></span>' : c.rarity === 'secret' ? '<span class="cc-crest"><b>★</b> SECRÈTE <b>★</b></span>' : goat ? '<span class="cc-crest"><b>★★★</b> GREATEST OF ALL TIME <b>★★★</b></span>' : '') + (story ? '<h3>' + esc(title) + '</h3><p class="cc-story">' + esc(story) + '</p>' : '<h3>' + esc(title) + '</h3><p>' + esc(subLine) + '</p>') + '</div>' +
-      '<div class="cc-foot"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + numText(c) + '<i></i></span></div></div>';
-  }
-  // Finition selon la rareté
-  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend l-glass', goat: 'l-legend g-goat', secret: 'l-legend s-secret' };
-  const finish = function (c) { return FINISH[c.rarity] || ''; };
-  // Cadre HUD des légendaires : coins coupés, accents dorés sur les angles, losanges au centre
-  const HUD = '<svg class="cc-hud" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">' +
-    '<polygon class="thin" points="9,3.6 91,3.6 96.4,7.4 96.4,132.6 91,136.4 9,136.4 3.6,132.6 3.6,7.4"/>' +
-    '<polyline class="bold" points="3.6,16 3.6,7.4 9,3.6 22,3.6"/><polyline class="bold" points="78,3.6 91,3.6 96.4,7.4 96.4,16"/>' +
-    '<polyline class="bold" points="3.6,124 3.6,132.6 9,136.4 22,136.4"/><polyline class="bold" points="78,136.4 91,136.4 96.4,132.6 96.4,124"/>' +
-    '<polygon class="gem" points="50,1.9 52.6,3.6 50,5.3 47.4,3.6"/><polygon class="gem" points="50,134.7 52.6,136.4 50,138.1 47.4,136.4"/>' +
-    '</svg>';
-  const corners = function (c) { return c.rarity === 'legend' || c.rarity === 'goat' || c.rarity === 'secret' ? HUD : ''; };
-  function ownedSlot(c) {
-    return '<button class="cc mini ' + finish(c) + '" data-card="' + c.num + '" style="' + cardStyle(c) + '" aria-label="' + esc(c.name) + '">' + cardInner(c) + corners(c) + '</button>';
-  }
-  function openCard(num) {
-    const c = CATALOG.find(function (x) { return String(x.num) === String(num); }), r = RAR.find(function (x) { return x.id === c.rarity; });
-    const el = $('#bigCard');
-    el.className = 'cc big ' + finish(c);
-    el.style.cssText = cardStyle(c);
-    el.innerHTML = cardInner(c) + corners(c) + '<span class="cc-holo"></span><span class="cc-glare"></span>';
-    if (c.rarity === 'legend' || c.rarity === 'goat' || c.rarity === 'secret') el.querySelector('.cc-panel').insertAdjacentHTML('beforeend', '<span class="cc-glint"></span>');
-    $('#bigRarity').textContent = r.name;
-    const mo = $('#cardModal'); mo.classList.add('open'); mo.setAttribute('aria-hidden', 'false');
-    tiltReset();
-  }
-
-  // ---------- Inclinaison 3D qui suit la souris / le doigt ----------
-  const tiltBox = $('#tiltBox');
-  function tiltSet(px, py, on) {
-    const card = $('#bigCard');
-    card.style.setProperty('--rx', ((0.5 - py) * 24).toFixed(2) + 'deg');
-    card.style.setProperty('--ry', ((px - 0.5) * 28).toFixed(2) + 'deg');
-    card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
-    card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
-    card.style.setProperty('--o', on ? 1 : 0);
-  }
-  function tiltReset() { tiltSet(0.5, 0.5, false); }
-  let tiltRaf = 0, tiltPt = null;
-  function tiltMove(e) {
-    const p = e.touches ? e.touches[0] : e;
-    tiltPt = [p.clientX, p.clientY];
-    if (tiltRaf) return;
-    tiltRaf = requestAnimationFrame(function () {
-      tiltRaf = 0; const r = $('#bigCard').getBoundingClientRect();
-      tiltSet(Math.min(1, Math.max(0, (tiltPt[0] - r.left) / r.width)), Math.min(1, Math.max(0, (tiltPt[1] - r.top) / r.height)), true);
-    });
-  }
-  tiltBox.addEventListener('pointermove', tiltMove);
-  tiltBox.addEventListener('touchmove', function (e) { tiltMove(e); }, { passive: true });
-  tiltBox.addEventListener('pointerleave', tiltReset);
-  tiltBox.addEventListener('touchend', tiltReset);
-  function closeCard() { const mo = $('#cardModal'); mo.classList.remove('open'); mo.setAttribute('aria-hidden', 'true'); }
-
-  let offerTab = 'recues';
-  function renderTrades() {
-    $('#friendList').innerHTML = S.friends.length ? S.friends.map(function (f, i) {
-      return '<div class="friend"><span class="avatar">' + esc(initials(f)) + '</span><span class="friend-name">' + esc(f) + '</span>' +
-        '<div class="friend-actions"><button class="icon-btn" data-trade="' + i + '">Proposer</button><button class="icon-btn" data-unfriend="' + i + '" aria-label="Retirer ' + esc(f) + '">Retirer</button></div></div>';
-    }).join('') : '<div class="muted" style="font-size:14px">Tu n\'as pas encore d\'amis. Ajoute un pseudo ci-dessus.</div>';
-    $$('#offerTabs button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.tab === offerTab); });
-    $('[data-bind="offerTitle"]').textContent = offerTab === 'recues' ? 'Aucune offre reçue' : 'Aucune offre envoyée';
-  }
-
-  let board = 'score';
-  function renderBoard() {
-    const idx = { score: 1, legend: 2, cards: 3 }[board];
-    const label = { score: 'Score', legend: 'Légendaires', cards: 'Cartes' }[board];
-    let meScore = 0;
-    Object.keys(S.cards).forEach(function (k) { const c = CATALOG.find(function (x) { return x.set + '-' + x.num === k; }); if (c) meScore += RAR.find(function (r) { return r.id === c.rarity; }).pts; });
-    const me = [S.pseudo, meScore, 0, owned(), true];
-    const rows = SAMPLE_BOARD.concat([me]).sort(function (a, b) { return b[idx] - a[idx] || (a[4] ? 1 : b[4] ? -1 : 0); });
-    $('#boardCol').textContent = label;
-    $$('#boardTabs button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.board === board); });
-    $('#boardBody').innerHTML = rows.map(function (r, i) {
-      return '<tr' + (r[4] ? ' class="me"' : '') + '><td class="rank' + (i < 3 ? ' top' : '') + '">' + (i + 1) + '</td>' +
-        '<td><div class="who"><span class="avatar">' + esc(initials(r[0])) + '</span><span>' + esc(r[0]) + (r[4] ? ' <span class="muted">(toi)</span>' : '') + '</span></div></td>' +
-        '<td class="r num">' + fmt(r[idx]) + '</td></tr>';
-    }).join('');
-  }
-
-  function renderAll() { renderBinds(); renderQuests(); renderHome(); renderBoosters(); renderCollection(); renderTrades(); renderBoard(); }
-
-  // ---------- Navigation ----------
-  const VIEWS = ['accueil', 'boosters', 'collection', 'echanges', 'classement', 'profil'];
-  function route() {
-    const v = location.hash.slice(1);
-    const view = VIEWS.indexOf(v) >= 0 ? v : 'accueil';
-    $$('[data-view]').forEach(function (el) { el.hidden = el.dataset.view !== view; });
-    $$('[data-link]').forEach(function (a) { if (a.dataset.link === view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-    $('#nav').classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded', 'false');
-    if (view === 'collection' && S.quests.visit.n < 1) { S.quests.visit.n = 1; save(); renderQuests(); }
-    if (view === 'profil') $('#pseudoInput').value = S.pseudo;
-    window.scrollTo(0, 0);
-  }
-  window.addEventListener('hashchange', route);
-
-  // ---------- Actions ----------
-  document.addEventListener('click', function (e) {
-    const t = e.target.closest('button, a');
-    if (!t) return;
-    if (t.dataset.setLink) { F.set = t.dataset.setLink; F.rarity = t.dataset.rarLink || 'all'; renderCollection(); }
-    if (t.dataset.quest) {
-      const q = QUESTS.find(function (x) { return x.id === t.dataset.quest; }), st = S.quests[q.id];
-      if (st.claimed || st.n < q.goal) return;
-      st.claimed = true;
-      if (q.reward.coins) { S.coins += q.reward.coins; bump('#coinChip'); toast('+' + q.reward.coins + ' pièces'); }
-      if (q.reward.shards) { S.shards += q.reward.shards; bump('#shardChip'); toast('+' + q.reward.shards + ' éclats'); }
-      save(); renderAll();
-    }
-    if (t.dataset.buy) {
-      const s = setById(t.dataset.buy), qty = +t.dataset.qty, cost = qty === 5 ? PRICE5 : PRICE;
-      if (S.coins < cost) { toast('Il te manque ' + fmt(cost - S.coins) + ' pièces.', true); return; }
-      S.coins -= cost; S.spent += cost; S.bought += qty; S.packs[s.id] = (S.packs[s.id] || 0) + qty;
-      S.quests.buy.n += qty; save(); bump('#coinChip'); renderAll();
-      toast(qty === 1 ? 'Booster ' + s.name + ' ajouté à tes boosters.' : qty + ' boosters ' + s.name + ' ajoutés.');
-    }
-    if (t.dataset.action === 'claim-free') {
-      if (!freeState().ready) return;
-      S.packs.ori = (S.packs.ori || 0) + 1; S.nextFree = Date.now() + FREE_EVERY; save(); renderAll();
-      toast('Booster gratuit Origines récupéré.');
-    }
-    if (t.dataset.open) { toast('L\'ouverture des boosters arrive bientôt. Ton booster est gardé.'); }
-    if (t.dataset.fset) { F.set = t.dataset.fset; renderCollection(); }
-    if (t.dataset.frar) { F.rarity = t.dataset.frar; renderCollection(); }
-    if (t.dataset.tab) { offerTab = t.dataset.tab; renderTrades(); }
-    if (t.dataset.board) { board = t.dataset.board; renderBoard(); }
-    if (t.dataset.trade) { toast('Il te faut au moins une carte en double pour proposer un échange.', true); }
-    if (t.dataset.card) { openCard(t.dataset.card); return; }
-    if (t.dataset.closeCard !== undefined) { closeCard(); return; }
-    if (t.dataset.unfriend) { const n = S.friends.splice(+t.dataset.unfriend, 1)[0]; save(); renderAll(); toast(n + ' retiré de tes amis.'); }
-  });
-  $('#heroPack').addEventListener('click', function () { const p = this; p.classList.remove('shake'); void p.offsetWidth; p.classList.add('shake'); });
-  $('#heroPack').addEventListener('animationend', function (e) { if (e.animationName === 'shake') this.classList.remove('shake'); });
-  $('#ownedOnly').addEventListener('change', function () { F.ownedOnly = this.checked; renderCollection(); });
-  $('#menuBtn').addEventListener('click', function () { const o = $('#nav').classList.toggle('open'); this.setAttribute('aria-expanded', o); });
-
-  const NAME_OK = /^[A-Za-z0-9À-ÿ_\- ]{3,20}$/;
-  $('#friendForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const v = $('#friendInput').value.trim(), msg = $('#friendMsg');
-    msg.className = 'form-msg err';
-    if (!NAME_OK.test(v)) { msg.textContent = 'Le pseudo doit faire 3 à 20 caractères (lettres, chiffres, _ ou -).'; return; }
-    if (v.toLowerCase() === S.pseudo.toLowerCase()) { msg.textContent = 'Tu ne peux pas t\'ajouter toi-même.'; return; }
-    if (S.friends.some(function (f) { return f.toLowerCase() === v.toLowerCase(); })) { msg.textContent = v + ' est déjà dans tes amis.'; return; }
-    S.friends.push(v); save(); $('#friendInput').value = '';
-    msg.className = 'form-msg ok'; msg.textContent = v + ' ajouté à tes amis.'; renderAll();
-  });
-  $('#pseudoForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const v = $('#pseudoInput').value.trim(), msg = $('#pseudoMsg');
-    if (!NAME_OK.test(v)) { msg.className = 'form-msg err'; msg.textContent = 'Le pseudo doit faire 3 à 20 caractères (lettres, chiffres, _ ou -).'; return; }
-    S.pseudo = v; save(); renderAll(); msg.className = 'form-msg ok'; msg.textContent = 'Pseudo enregistré.';
-  });
-  const resetBtn = $('#resetBtn');
-  resetBtn.addEventListener('click', function () {
-    if (!resetBtn.classList.contains('armed')) {
-      resetBtn.classList.add('armed'); resetBtn.textContent = 'Confirmer la réinitialisation';
-      $('#resetMsg').textContent = 'Clique encore pour confirmer. Cette action est définitive.';
-      clearTimeout(resetBtn._t); resetBtn._t = setTimeout(disarm, 4000); return;
-    }
-    const keep = S.pseudo; S = fresh(); S.pseudo = keep; save(); disarm(); renderAll(); toast('Progression réinitialisée.');
-  });
-  function disarm() { resetBtn.classList.remove('armed'); resetBtn.textContent = 'Réinitialiser ma progression'; $('#resetMsg').textContent = 'Remet tes pièces, boosters et quêtes à zéro.'; }
-
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeCard(); });
-  setInterval(renderBinds, 1000);
-  renderAll(); route();
-})();
-</script>
+<script src="js/vendor/supabase.js?v=43b205e2"></script>
+<script src="config.js?v=9127befc"></script>
+<script src="js/app.js?v=4ece1df4"></script>
 </body>
 </html>
