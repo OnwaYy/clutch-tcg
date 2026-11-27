@@ -50,7 +50,7 @@
     return '<div class="pack' + (mini ? ' mini' : '') + (s.status === 'off' ? ' off' : '') + '" style="--p1:' + s.p[0] + ';--p2:' + s.p[1] + ';--p3:' + s.p[2] + ';--edge:' + s.edge[0] + ';--edge2:' + s.edge[1] + '">' +
       '<div class="pack-inner"><div class="pack-emblem"><div>' + s.code + '</div></div>' +
       '<div class="pack-title">' + esc(s.name.split(' ')[0].toUpperCase()) + '<small>' + esc((s.edition || 'BOOSTER').toUpperCase()) + '</small></div>' +
-      '<div class="pack-count">5 CARTES · 1 ÉPIQUE MINIMUM</div></div></div>';
+      '<div class="pack-count">5 CARTES · ' + esc((s.edition || '').toUpperCase()) + '</div></div></div>';
   }
   function gainHTML(p, b) {
     return (p ? '<span class="gain"><i class="coin"></i>+' + fmt(p) + '</span>' : '') + (b ? '<span class="gain"><i class="pk"></i>+' + b + ' booster' + (b > 1 ? 's' : '') + '</span>' : '');
@@ -294,43 +294,22 @@
     }).join('');
   }
 
-  const EVENT_CARD = '<div class="set event"><div><span class="status soon">Pendant les events</span></div>' +
-    '<div><h3>Séries d\'événement</h3><div class="set-meta"><span>Disponibles seulement pendant un event e-sport</span><span>Aucun event en cours</span></div></div></div>';
   function renderHome() {
-    const s = SETS[0];
     $('#odds').innerHTML = RAR.map(function (r) {
       return '<div class="odd" style="--r:' + r.color + '"><span class="odd-name">' + r.name + '</span><span class="odd-pct">' + r.odds + '</span><span class="odd-note">' + r.note + '</span></div>';
     }).join('');
-    $('#homeLegend').innerHTML = RAR.map(function (r) {
-      const have = CATALOG.filter(function (c) { return c.rarity === r.id && owns(c.id); }).length;
-      return '<span style="--r:' + r.color + '"><i></i>' + r.name + 's ' + have + '</span>';
-    }).join('');
-    $('#homeGames').innerHTML = RAR.slice().reverse().map(function (r) {
-      const total = CATALOG.filter(function (c) { return c.rarity === r.id; }).length;
-      const have = CATALOG.filter(function (c) { return c.rarity === r.id && owns(c.id); }).length;
-      const pct = Math.round(have / total * 100);
-      return '<a class="game" href="#collection" data-set-link="' + s.id + '" data-rar-link="' + r.id + '" style="--g:' + r.color + '"><div class="r-ico">' + r.name[0] + '</div>' +
-        '<div><div class="game-name">' + r.name + 's</div><div class="game-sub">' + have + ' / ' + total + ' cartes</div><div class="track"><i style="width:' + pct + '%"></i></div></div>' +
-        '<span class="game-pct">' + pct + ' %</span></a>';
-    }).join('');
-    $('#homeSets').innerHTML = SETS.map(function (s) {
-      return '<a class="set" href="#boosters" style="--c:' + s.c + '"><div class="row" style="justify-content:space-between"><span class="status ' + s.status + '">' + STATUS[s.status] + '</span>' +
-        '<span class="stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + s.code + '<span class="ed1">ÉDITION 1</span></span></div>' +
-        '<div><h3>' + s.name + '</h3><div class="set-meta"><span>' + s.desc + '</span><span>' + s.size + ' + ' + s.secret + ' secrètes</span></div></div></a>';
-    }).join('') + EVENT_CARD;
+    const w = (ownedCount() / CATALOG.length * 100).toFixed(1) + '%';
+    $('#homeProg').style.width = w; $('#collProg').style.width = w;
   }
 
   function renderBoosters() {
     const s = SETS[0], prix = S ? S.prix : { un: 200, cinq: 900 }, coins = S ? S.pieces : 0;
-    $('#myPack').innerHTML = packHTML(s).replace('class="pack"', 'class="pack' + (S && S.boosters > 0 ? '' : ' empty-pack') + '"');
-    const buy = !S ? '<div class="offer-buy"><button class="btn btn-gold btn-sm" type="button" data-action="login">Se connecter pour acheter</button></div>'
-      : '<div class="offer-buy"><button class="btn btn-gold btn-sm" type="button" data-buy="1"' + (coins < prix.un ? ' disabled' : '') + '>Acheter <small><i class="coin"></i> ' + fmt(prix.un) + '</small></button>' +
-        '<button class="btn btn-ghost btn-sm" type="button" data-buy="5"' + (coins < prix.cinq ? ' disabled' : '') + '>Lot de 5 <small class="num" style="font-size:12px;opacity:.8"><i class="coin"></i> ' + fmt(prix.cinq) + '</small></button></div>';
-    $('#shop').innerHTML = '<div class="panel offer">' + packHTML(s, true) + '<div class="offer-info"><div class="row"><span class="status ' + s.status + '">' + STATUS[s.status] + '</span>' +
+    const buy = !S ? '<div class="offer-buy"><button class="btn btn-gold" type="button" data-action="login">Se connecter pour acheter</button></div>'
+      : '<div class="offer-buy"><button class="btn btn-gold" type="button" data-buy="1"' + (coins < prix.un ? ' disabled' : '') + '>Acheter <small><i class="coin"></i> ' + fmt(prix.un) + '</small></button>' +
+        '<button class="btn btn-ghost" type="button" data-buy="5"' + (coins < prix.cinq ? ' disabled' : '') + '>Lot de 5 <small class="num" style="font-size:12px;opacity:.8"><i class="coin"></i> ' + fmt(prix.cinq) + '</small></button></div>';
+    $('#shop').innerHTML = packHTML(s) + '<div class="offer-info"><div class="row"><span class="status ' + s.status + '">' + STATUS[s.status] + '</span>' +
       '<span class="stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + s.code + '<span class="ed1">ÉDITION 1</span></span></div>' +
-      '<h3>' + s.name + '</h3><ul><li>' + s.desc + '</li><li>' + s.games + ' · ' + s.size + ' cartes + ' + s.secret + ' secrètes + GOAT</li><li>5 cartes par booster, au hasard</li></ul>' + buy + '</div></div>' +
-      '<div class="panel event-panel"><span class="status soon">Pendant les events</span><h3 style="font-size:19px;text-transform:uppercase;letter-spacing:.04em">Séries d\'événement</h3>' +
-      '<p class="muted" style="margin:0">Des séries spéciales sortent uniquement pendant les grands events e-sport, avec leur propre symbole. Aucun event en cours.</p></div>';
+      '<h3>' + s.name + '</h3><ul><li>' + s.desc + '</li><li>' + s.size + ' cartes + ' + s.secret + ' secrètes + GOAT</li><li>5 cartes par booster, au hasard</li></ul>' + buy + '</div>';
     const rc = {}; RAR.forEach(function (r) { rc[r.id] = r; });
     $('#rewards').innerHTML = !S ? '<div class="muted" style="font-size:14px">Complète une rareté ou toute la série pour gagner des pièces et des boosters.</div>'
       : S.recompenses.map(function (r) {
@@ -392,13 +371,14 @@
   // Navigation
   // =====================================================================
   const VIEWS = ['accueil', 'boosters', 'collection', 'echanges', 'classement', 'profil'];
+  const TITLES = { accueil: 'Accueil', boosters: 'Boosters', collection: 'Collection', echanges: 'Échanges', classement: 'Classement', profil: 'Profil' };
   function route() {
     const v = location.hash.slice(1);
     let view = VIEWS.indexOf(v) >= 0 ? v : 'accueil';
     const needLogin = view === 'profil' && !USER; if (needLogin) view = 'accueil';
     $$('[data-view]').forEach(function (el) { el.hidden = el.dataset.view !== view; });
     $$('[data-link]').forEach(function (a) { if (a.dataset.link === view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-    $('#nav').classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded', 'false');
+    $('#topTitle').textContent = TITLES[view];
     $$('#wheelModal.open, #authModal.open').forEach(closeModal); closeCard();
     if (view === 'profil' && S) $('#pseudoInput').value = S.pseudo || '';
     if (view === 'classement') loadBoard();
@@ -708,7 +688,7 @@
   $('#heroPack').addEventListener('animationend', function (e) { if (e.animationName === 'shake') this.classList.remove('shake'); });
   $('#demoBar').addEventListener('click', function () { this.hidden = true; });
   $('#ownedOnly').addEventListener('change', function () { F.ownedOnly = this.checked; renderCollection(); });
-  $('#menuBtn').addEventListener('click', function () { const o = $('#nav').classList.toggle('open'); this.setAttribute('aria-expanded', o); });
+  $('#heroPack').addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); } });
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
     if ($('#cardModal').classList.contains('open')) { closeCard(); return; }
