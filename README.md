@@ -23,7 +23,7 @@ Les visuels sont dans `assets/cartes/` (nommés d'après la carte). Ceux des car
 ## Économie
 
 - 3 boosters et 300 pièces offerts à l'inscription.
-- Booster : 5 cartes, la 5e est au moins épique. Le score du booster (commune 1, peu commune 2, épique 10, légendaire 50, secrète 100, GOAT 500) rapporte autant de pièces.
+- Booster : 5 cartes, toutes tirées avec les mêmes chances (aucune garantie). Le score du booster (commune 1, peu commune 2, épique 10, légendaire 50, secrète 100, GOAT 500) rapporte autant de pièces.
 - Booster gratuit toutes les heures, roue toutes les 24 h (0 à 4 boosters), 5 quêtes du jour.
 - Récompenses une fois par compte pour chaque rareté complétée et pour la série complète.
 - Prix : 200 pièces le booster, 900 le lot de 5.

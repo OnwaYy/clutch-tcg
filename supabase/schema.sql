@@ -20,10 +20,8 @@ insert into public.reglages (cle, valeur) values
   ('gratuit_minutes',   '60'),
   ('roue_heures',       '24'),
   ('cadeau_depart',     '{"pieces": 300, "boosters": 3}'),
-  -- chance par carte (sur 100 000) pour les 4 premières cartes du booster
+  -- chance par carte (sur 100 000), identique pour les 5 cartes du booster
   ('chances',           '{"common": 50000, "uncommon": 30000, "epic": 15000, "legend": 4500, "secret": 490, "goat": 10}'),
-  -- 5e carte : au moins une épique
-  ('chances_rare',      '{"epic": 88000, "legend": 10000, "secret": 1900, "goat": 100}'),
   ('points',            '{"common": 1, "uncommon": 2, "epic": 10, "legend": 50, "secret": 100, "goat": 500}'),
   -- roue : nombre de boosters gagnés et poids de chaque case
   ('roue',              '[{"boosters":0,"poids":10},{"boosters":1,"poids":40},{"boosters":2,"poids":30},{"boosters":3,"poids":15},{"boosters":4,"poids":5}]')
@@ -320,13 +318,13 @@ end $$;
 -- Ouvrir un booster : tirage sur le serveur, score et pièces
 create or replace function public.ouvrir_booster() returns jsonb
 language plpgsql security definer set search_path = '' as $$
-declare u uuid := public._moi(); ch jsonb := public.reglage('chances'); chr jsonb := public.reglage('chances_rare'); pts jsonb := public.reglage('points');
+declare u uuid := public._moi(); ch jsonb := public.reglage('chances'); pts jsonb := public.reglage('points');
         tirees int[] := '{}'; nouvelles int[] := '{}'; rar text; c_id int; score int := 0; i int; meilleure boolean := false;
 begin
   update public.profils set boosters = boosters - 1, ouverts = ouverts + 1 where id = u and boosters >= 1;
   if not found then raise exception 'Tu n''as plus de booster à ouvrir.'; end if;
   for i in 1..5 loop
-    rar := public._tirer_rarete(case when i = 5 then chr else ch end);
+    rar := public._tirer_rarete(ch);
     select id into c_id from public.cartes where serie = 'ori' and rarete = rar order by public._alea(1000000) limit 1;
     tirees := tirees || c_id;
     score := score + (pts ->> rar)::int;

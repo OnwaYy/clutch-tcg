@@ -10,7 +10,7 @@
   const RAR = [
     { id: 'common', name: 'Commune', color: 'var(--c-common)', pts: 1, odds: '50 %', note: 'Clubs, ligues, maps, joueurs' },
     { id: 'uncommon', name: 'Peu commune', color: 'var(--c-uncommon)', pts: 2, odds: '30 %', note: 'Jeux, grands clubs, lieux' },
-    { id: 'epic', name: 'Épique', color: 'var(--c-epic)', pts: 10, odds: '15 %', note: 'Stars et grands rendez-vous · 1 par booster minimum' },
+    { id: 'epic', name: 'Épique', color: 'var(--c-epic)', pts: 10, odds: '15 %', note: 'Stars et grands rendez-vous' },
     { id: 'legend', name: 'Légendaire', color: 'var(--c-legend)', pts: 50, odds: '4,5 %', note: 'Moments historiques' },
     { id: 'secret', name: 'Secrète', color: 'var(--c-secret)', pts: 100, odds: '0,49 %', note: 'Hors numérotation, 151 à 175' },
     { id: 'goat', name: 'GOAT', color: 'var(--c-goat)', pts: 500, odds: '0,01 %', note: 'Les plus grands de l\'histoire' }
@@ -68,7 +68,7 @@
   const DEMO = (function () {
     const K = 'clutch-demo-v3';
     const W = [0, 1, 2, 3, 4], WP = [10, 40, 30, 15, 5];
-    const CH = { common: 50000, uncommon: 30000, epic: 15000, legend: 4500, secret: 490, goat: 10 }, CHR = { epic: 88000, legend: 10000, secret: 1900, goat: 100 };
+    const CH = { common: 50000, uncommon: 30000, epic: 15000, legend: 4500, secret: 490, goat: 10 };
     const QS = [['ouvrir3', 'Ouvrir 3 boosters', 3, 60, 0], ['gratuit2', 'Récupérer 2 boosters gratuits', 2, 0, 1], ['roue', 'Tourner la roue', 1, 30, 0], ['epique', 'Obtenir une carte épique ou mieux', 1, 80, 0], ['ouvrir10', 'Ouvrir 10 boosters', 10, 0, 2]];
     const RW = [['ori:common', 'Toutes les communes', 'common', 0, 2], ['ori:uncommon', 'Toutes les peu communes', 'uncommon', 0, 3], ['ori:epic', 'Toutes les épiques', 'epic', 500, 5], ['ori:legend', 'Toutes les légendaires', 'legend', 1000, 10], ['ori:secret', 'Toutes les secrètes', 'secret', 2000, 10], ['ori:all', 'Série Origines complète', null, 5000, 20]];
     function load() { try { return JSON.parse(localStorage.getItem(K) || 'null'); } catch (e) { return null; } }
@@ -99,7 +99,7 @@
         const d = me(); if (d.boosters < 1) throw new Error('Tu n\'as plus de booster à ouvrir.');
         d.boosters--; d.ouverts++; const cartes = [], nouvelles = []; let score = 0, best = false;
         for (let i = 1; i <= 5; i++) {
-          const rar = pick(i === 5 ? CHR : CH), pool = CATALOG.filter(function (c) { return c.rarity === rar; }), c = pool[Math.floor(Math.random() * pool.length)];
+          const rar = pick(CH), pool = CATALOG.filter(function (c) { return c.rarity === rar; }), c = pool[Math.floor(Math.random() * pool.length)];
           cartes.push(c.id); if (!d.col[c.id] && nouvelles.indexOf(c.id) < 0) nouvelles.push(c.id); d.col[c.id] = (d.col[c.id] || 0) + 1;
           score += RAR.find(function (r) { return r.id === rar; }).pts; if (RORDER[rar] >= 2) best = true;
         }
@@ -328,7 +328,7 @@
         '<button class="btn btn-ghost btn-sm" type="button" data-buy="5"' + (coins < prix.cinq ? ' disabled' : '') + '>Lot de 5 <small class="num" style="font-size:12px;opacity:.8"><i class="coin"></i> ' + fmt(prix.cinq) + '</small></button></div>';
     $('#shop').innerHTML = '<div class="panel offer">' + packHTML(s, true) + '<div class="offer-info"><div class="row"><span class="status ' + s.status + '">' + STATUS[s.status] + '</span>' +
       '<span class="stamp"><svg><use href="#sym-' + s.id + '"/></svg>' + s.code + '<span class="ed1">ÉDITION 1</span></span></div>' +
-      '<h3>' + s.name + '</h3><ul><li>' + s.desc + '</li><li>' + s.games + ' · ' + s.size + ' cartes + ' + s.secret + ' secrètes + GOAT</li><li>5 cartes par booster, 1 épique minimum</li></ul>' + buy + '</div></div>' +
+      '<h3>' + s.name + '</h3><ul><li>' + s.desc + '</li><li>' + s.games + ' · ' + s.size + ' cartes + ' + s.secret + ' secrètes + GOAT</li><li>5 cartes par booster, au hasard</li></ul>' + buy + '</div></div>' +
       '<div class="panel event-panel"><span class="status soon">Pendant les events</span><h3 style="font-size:19px;text-transform:uppercase;letter-spacing:.04em">Séries d\'événement</h3>' +
       '<p class="muted" style="margin:0">Des séries spéciales sortent uniquement pendant les grands events e-sport, avec leur propre symbole. Aucun event en cours.</p></div>';
     const rc = {}; RAR.forEach(function (r) { rc[r.id] = r; });
