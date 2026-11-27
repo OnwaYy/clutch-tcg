@@ -159,7 +159,10 @@ window.ORIGINES = {
     "Fatal1ty — Le premier pro gamer star": {"img": "assets/cartes/fatal1ty-le-premier-pro-gamer-star.jpg", "color": "#e0a43a", "photo": true},
     "Team Liquid — Le sacre de TI7": {"img": "assets/cartes/team-liquid-le-sacre-de-ti7.jpg", "color": "#1b2d5b", "photo": true},
     "Fnatic — Champions du monde Saison 1": {"img": "assets/cartes/fnatic-champions-du-monde-saison-1.jpg", "color": "#ff8a00", "photo": true},
-    "Na'Vi — Le premier The International": {"img": "assets/cartes/na-vi-le-premier-the-international.jpg", "color": "#f5d100", "photo": true}
+    "Na'Vi — Le premier The International": {"img": "assets/cartes/na-vi-le-premier-the-international.jpg", "color": "#f5d100", "photo": true},
+    "BoxeR — L'Empereur des Terrans": {"img": "assets/cartes/boxer-l-empereur-des-terrans.jpg", "color": "#2a6fd8", "photo": true},
+    "Flash — Le Dieu": {"img": "assets/cartes/flash-le-dieu.jpg", "color": "#e2012d", "photo": true},
+    "Grubby — La légende de Warcraft III": {"img": "assets/cartes/grubby-la-legende-de-warcraft-iii.jpg", "color": "#7a8aa8", "photo": true}
   },
   cards: [
     ["mTw", "C", "Logo de club", "Multi-jeux", null, "Légende allemande des années 2000"],
