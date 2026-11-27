@@ -224,7 +224,33 @@
       ';--foot:' + (lum > .5 ? mixc(rgb, K, .55) : mixc(rgb, W, .62)) + ';--foot-strong:' + (lum > .5 ? mixc(rgb, K, .78) : mixc(rgb, W, .88)) +
       ';--ghost:' + (c.dark ? 'rgba(255,255,255,.2)' : 'rgba(28,27,34,.24)') + ';--rr:' + r.color;
   }
+  // ---------- GOAT : carte en profondeur (fond du jeu, joueur détouré qui sort du cadre) ----------
+  const G3 = { Faker: ['6× champion du monde', '#e2012d'], ZywOo: ['3× champion du Major', '#f5c935'], Kaydop: ['3× champion du monde', '#5aa9ff'], Shotzzy: ['3× champion du monde', '#92c83e'], N0tail: ['2× champion de The International', '#e84a3a'] };
+  const CROWN = '<svg class="g3-crown" viewBox="0 0 40 28" aria-hidden="true"><path d="M3 24 L1 6 L11 14 L20 2 L29 14 L39 6 L37 24 Z"/><rect x="3" y="23" width="34" height="4" rx="1"/></svg>';
+  function goatInner(c) {
+    const g = G3[c.name] || ['', '#f2c25b'], slug = c.name.toLowerCase();
+    return '<span class="g3-holo"></span><span class="g3-clip" style="--c:' + g[1] + '"><span class="g3-bg" style="background-image:url(assets/goat/' + slug + '-1.webp?v=1)"></span><span class="g3-dust far"></span><span class="g3-light"></span>' +
+      '<span class="g3-beam a"></span><span class="g3-beam b"></span><span class="g3-word">GOAT</span><span class="g3-dust"></span></span>' +
+      '<img class="g3-cut" src="assets/goat/cut-' + slug + '.webp?v=1" alt="' + esc(c.name) + '" loading="lazy"><span class="g3-shade"></span>' + CROWN +
+      '<span class="g3-tag"><b>GOAT</b><small>HORS SÉRIE</small></span><span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span>' +
+      '<span class="g3-plate"><small>Greatest of all time</small><b>' + esc(c.name) + '</b><span class="g3-meta">' + esc(c.game) + (c.year ? ' · ' + esc(String(c.year)) : '') + '</span>' +
+      (g[0] ? '<span class="g3-hook">' + esc(g[0]) + '</span>' : '') + '</span>';
+  }
+  // ---------- Secrètes : encre invisible, révélée par la lumière ----------
+  const UV_MSG = ['tu m\'as trouvé ;)', 'chut…', 'bien vu.', 'rare parmi les rares', 'regarde mieux', 'garde-la bien', 'pas pour tout le monde', 'tu n\'étais pas censé voir ça'];
+  function uvLayer(c) {
+    let seed = c.id * 7919 % 2147483647 || 1; const r = function () { seed = seed * 16807 % 2147483647; return seed / 2147483647; };
+    let stars = '';
+    for (let i = 0; i < 12; i++) { const x = 15 + r() * 310, y = 15 + r() * 320, k = 5 + r() * 9; stars += '<path d="M' + x.toFixed(0) + ' ' + (y - k).toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + (x + k).toFixed(0) + ' ' + y.toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + x.toFixed(0) + ' ' + (y + k).toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + (x - k).toFixed(0) + ' ' + y.toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + x.toFixed(0) + ' ' + (y - k).toFixed(0) + 'Z"/>'; }
+    const a = 300 + r() * 40, b = 360 + r() * 30;
+    return '<span class="cc-uv" aria-hidden="true"><span class="uv-tint" style="background-image:url(' + c.img + ')"></span><svg viewBox="0 0 340 475" preserveAspectRatio="xMidYMid slice">' +
+      '<text x="170" y="250" text-anchor="middle" class="uv-num">' + c.num + '</text><g class="uv-stars">' + stars + '</g>' +
+      '<text x="170" y="58" text-anchor="middle" class="uv-head">CARTE SECRÈTE · Nº ' + c.num + '</text>' +
+      '<text x="44" y="' + a.toFixed(0) + '" class="uv-msg" transform="rotate(-7 44 ' + a.toFixed(0) + ')">' + esc(UV_MSG[c.id % UV_MSG.length]) + '</text>' +
+      '<path class="uv-line" d="M56 ' + b.toFixed(0) + ' C 110 ' + (b - 40).toFixed(0) + ', 150 ' + (b + 20).toFixed(0) + ', 200 ' + (b - 20).toFixed(0) + ' S 280 ' + (b - 30).toFixed(0) + ', 300 ' + b.toFixed(0) + '"/></svg></span><span class="cc-lamp"></span>';
+  }
   function cardInner(c) {
+    if (c.rarity === 'goat') return goatInner(c);
     const s = setById(c.set);
     const fr = /fran[cç]/i.test((c.note || '') + ' ' + c.name), goat = c.rarity === 'goat';
     // « Nom — Sous-titre » : le nom en gros, le sous-titre en dessous
@@ -235,14 +261,14 @@
     const story = (parts[1] || c.type === 'Moment' || c.type === 'Événement' || c.rarity === 'goat') && c.note ? c.note : '';
     const subLine = story && !parts[1] ? (c.year ? String(c.year) : c.type) : sub;
     return '<div class="cc-panel"><div class="cc-photo"><span class="cc-ghost">' + (goat ? 'GOAT' : n3(c.num)) + '</span>' +
-      (c.img ? '<img' + (c.map ? ' class="is-map' + (c.fade ? ' is-fade' : '') + '"' : c.player ? ' class="is-player"' : c.photo ? ' class="is-photo"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
+      (c.img ? '<img' + (c.map ? ' class="is-map' + (c.fade ? ' is-fade' : '') + '"' : c.player ? ' class="is-player"' : c.photo ? ' class="is-photo"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' + (c.rarity === 'secret' ? uvLayer(c) : '') : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
       (goat ? '<span class="cc-num"><b>GOAT</b><small>HORS SÉRIE</small></span>' : '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>') +
       '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-ed">PREMIÈRE ÉDITION</span>' + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
       '<div class="cc-band' + (fr ? ' fr' : '') + (story ? ' has-story' : '') + '">' + (c.rarity === 'legend' ? '<span class="cc-crest"><b>★</b> LÉGENDAIRE <b>★</b></span>' : c.rarity === 'secret' ? '<span class="cc-crest"><b>★</b> SECRÈTE <b>★</b></span>' : goat ? '<span class="cc-crest"><b>★★★</b> GREATEST OF ALL TIME <b>★★★</b></span>' : '') + (story ? '<h3>' + esc(title) + '</h3><p class="cc-story">' + esc(story) + '</p>' : '<h3>' + esc(title) + '</h3><p>' + esc(subLine) + '</p>') + '</div>' +
       '<div class="cc-foot"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + numText(c) + '<i></i></span></div></div>';
   }
   // Finition selon la rareté
-  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend l-glass', goat: 'l-legend g-goat', secret: 'l-legend s-secret' };
+  const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend l-glass', goat: 'g3d', secret: 'l-legend s-secret s-uv' };
   const finish = function (c) { return FINISH[c.rarity] || ''; };
   // Cadre HUD des légendaires : coins coupés, accents dorés sur les angles, losanges au centre
   const HUD = '<svg class="cc-hud" viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true">' +
@@ -251,7 +277,7 @@
     '<polyline class="bold" points="3.6,124 3.6,132.6 9,136.4 22,136.4"/><polyline class="bold" points="78,136.4 91,136.4 96.4,132.6 96.4,124"/>' +
     '<polygon class="gem" points="50,1.9 52.6,3.6 50,5.3 47.4,3.6"/><polygon class="gem" points="50,134.7 52.6,136.4 50,138.1 47.4,136.4"/>' +
     '</svg>';
-  const corners = function (c) { return c.rarity === 'legend' || c.rarity === 'goat' || c.rarity === 'secret' ? HUD : ''; };
+  const corners = function (c) { return c.rarity === 'legend' || c.rarity === 'secret' ? HUD : ''; };
   function ownedSlot(c, n) {
     return '<button class="cc mini ' + finish(c) + '" type="button" data-card="' + c.num + '" style="' + cardStyle(c) + '" aria-label="' + esc(c.name) + (n > 1 ? ' (×' + n + ')' : '') + '">' + cardInner(c) + corners(c) + (n > 1 ? '<span class="cc-count">×' + n + '</span>' : '') + '</button>';
   }
@@ -261,7 +287,7 @@
     el.className = 'cc big ' + finish(c);
     el.style.cssText = cardStyle(c);
     el.innerHTML = cardInner(c) + corners(c) + '<span class="cc-holo"></span><span class="cc-glare"></span>';
-    if (c.rarity === 'legend' || c.rarity === 'goat' || c.rarity === 'secret') el.querySelector('.cc-panel').insertAdjacentHTML('beforeend', '<span class="cc-glint"></span>');
+    if (c.rarity === 'legend' || c.rarity === 'secret') el.querySelector('.cc-panel').insertAdjacentHTML('beforeend', '<span class="cc-glint"></span>');
     $('#bigRarity').textContent = r.name;
     const mo = $('#cardModal'); mo.classList.add('open'); mo.setAttribute('aria-hidden', 'false');
     tiltReset();
