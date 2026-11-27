@@ -152,6 +152,7 @@ window.ORIGINES = {
     "Astralis — La dynastie des 4 Majors": {"img": "assets/cartes/astralis-la-dynastie-des-4-majors.jpg", "color": "#e21c30", "photo": true},
     "OG — Le doublé TI8 & TI9": {"img": "assets/cartes/og-le-double-ti8-ti9.jpg", "color": "#2fd08a", "photo": true},
     "Kaydop — Triple champion du monde": {"img": "assets/cartes/kaydop-triple-champion-du-monde.jpg", "color": "#f5c935", "photo": true},
+    "ZywOo — Numéro 1 mondial": {"img": "assets/cartes/zywoo-numero-1-mondial.jpg", "color": "#f5c935", "photo": true},
     "Faker": {"img": "assets/cartes/faker.png", "color": "#e2012d", "player": true},
     "Fortnite World Cup — Arthur Ashe Stadium": {"img": "assets/cartes/fortnite-world-cup-arthur-ashe-stadium.jpg", "color": "#5b3df5", "photo": true},
     "Evil Geniuses — Champions de TI5": {"img": "assets/cartes/evil-geniuses-champions-de-ti5.jpg", "color": "#1d3c6e", "photo": true},
