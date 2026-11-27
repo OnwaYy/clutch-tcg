@@ -711,36 +711,16 @@
     const p = centerOf(opPack.querySelector('.pack'), .07);
     burst(p[0], p[1], FXC[best], RORDER[best] >= 3 ? 80 : 36, RORDER[best] >= 3 ? 9 : 6);
     flash(RORDER[best] >= 2 ? RC[best] : 'rgba(255,255,255,.55)');
-    // La bande s'envole, les cartes montent par l'ouverture, puis le sachet se dissout dans la lumière
-    tween(700, easeOut, function (k) { renderTear(1, k); });
+    // La bande s'envole, le sachet disparaît aussitôt et les cartes sont là
+    tween(500, easeOut, function (k) { renderTear(1, k); });
     OP.busy = true;
-    buildReveal(res);
-    await sleep(180);
-    const up = opReveal.animate([
-      { transform: 'translateY(16%) scale(.8)', opacity: 0 },
-      { transform: 'translateY(12%) scale(.8)', opacity: 1, offset: .12 },
-      { transform: 'translateY(-46%) scale(.84)', opacity: 1 }
-    ], { duration: 900, easing: 'cubic-bezier(.22,.9,.3,1)', fill: 'forwards' });
-    await up.finished;
-    await sleep(220);
-    // 2. le sachet disparaît pendant que les cartes restent immobiles au-dessus
-    const packEl = opPack.querySelector('.pack');
-    packEl.style.animation = 'none';
-    const fade = opPack.animate([
-      { opacity: 1, transform: 'scale(1)', filter: 'blur(0px) brightness(1)' },
-      { opacity: 0, transform: 'scale(.94)', filter: 'blur(6px) brightness(1.5)' }
-    ], { duration: 480, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
-    await fade.finished;
-    opPack.hidden = true;
     await sleep(120);
-    // 3. puis les cartes descendent se placer au centre
-    const settle = opReveal.animate([
-      { transform: 'translateY(-46%) scale(.84)' },
-      { transform: 'translateY(0) scale(1)' }
-    ], { duration: 700, easing: 'cubic-bezier(.3,1.2,.45,1)', fill: 'forwards' });
-    up.cancel();
-    await settle.finished;
-    settle.cancel(); fade.cancel(); OP.busy = false;
+    const packEl = opPack.querySelector('.pack'); packEl.style.animation = 'none';
+    opPack.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(1.06)' }], { duration: 260, easing: 'ease-out', fill: 'forwards' });
+    buildReveal(res);
+    const show = opReveal.animate([{ opacity: 0, transform: 'scale(.92)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 300, easing: 'cubic-bezier(.2,.9,.3,1.1)' });
+    await show.finished;
+    opPack.hidden = true; OP.busy = false;
   }
   // Glisser le doigt / la souris le long du booster pour le déchirer, sinon un simple clic l'ouvre
   let tearDrag = null;
