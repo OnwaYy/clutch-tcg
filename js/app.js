@@ -96,10 +96,11 @@
         const d = me(); if (d.boosters < 1) throw new Error('Tu n\'as plus de booster à ouvrir.');
         d.boosters--; d.ouverts++; const cartes = [], nouvelles = []; let score = 0, best = false;
         for (let i = 1; i <= 5; i++) {
-          const rar = pick(CH), pool = CATALOG.filter(function (c) { return c.rarity === rar; }), c = pool[Math.floor(Math.random() * pool.length)];
+          const rar = (i === 5 && d.forced) ? d.forced : pick(CH), pool = CATALOG.filter(function (c) { return c.rarity === rar; }), c = pool[Math.floor(Math.random() * pool.length)];
           cartes.push(c.id); if (!d.col[c.id] && nouvelles.indexOf(c.id) < 0) nouvelles.push(c.id); d.col[c.id] = (d.col[c.id] || 0) + 1;
           score += RAR.find(function (r) { return r.id === rar; }).pts; if (RORDER[rar] >= 2) best = true;
         }
+        d.forced = null;
         d.pieces += score; quest(d, 'ouvrir3', 1); quest(d, 'ouvrir10', 1); if (best) quest(d, 'epique', 1); save(d);
         return { cartes: cartes, nouvelles: nouvelles, score: score };
       },
@@ -109,6 +110,7 @@
       pseudo_libre: function (a) { return NAME_OK.test(a.p); },
       suis_testeur: function () { return !!load(); },
       test_boosters: function (a) { const d = me(); d.boosters += a.n; save(d); return d.boosters; },
+      test_truquer: function (a) { const d = me(); d.forced = a.r || null; save(d); return a.r; },
       test_toutes_cartes: function () { const d = me(); let n = 0; CATALOG.forEach(function (c) { if (!d.col[c.id]) { d.col[c.id] = 1; n++; } }); save(d); return n; }
     };
     return api;
@@ -684,7 +686,7 @@
   // Le tirage part dès qu'on touche le booster : la lueur de la déchirure prend la couleur de la meilleure carte
   function ensureReq() {
     if (OP.req) return OP.req;
-    OP.req = rpc('ouvrir_booster').then(function (res) { OP.res = res; setRc(RC[bestRarity(res)]); refresh(); return res; }, function (e) { OP.err = e; throw e; });
+    OP.req = rpc('ouvrir_booster').then(function (res) { OP.res = res; $$('#rigSeg button').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); setRc(RC[bestRarity(res)]); refresh(); return res; }, function (e) { OP.err = e; throw e; });
     OP.req.catch(function () {});
     return OP.req;
   }
@@ -1030,6 +1032,14 @@
     if (t.dataset.closeModal !== undefined) { closeModal(t.closest('.modal')); return; }
     if (t.id === 'wheelSpin') { spinWheel(); return; }
     if (t.dataset.op === 'skip') { showSummary(); return; }
+    if (t.dataset.rig !== undefined) {
+      try {
+        await rpc('test_truquer', { r: t.dataset.rig || null });
+        $$('#rigSeg button').forEach(function (b) { b.setAttribute('aria-pressed', b === t ? 'true' : 'false'); });
+        toast(t.dataset.rig ? 'Ton prochain booster finira par ' + (t.dataset.rig === 'goat' ? 'une GOAT' : 'une carte ' + t.textContent.toLowerCase()) + '.' : 'Prochain booster normal.');
+      } catch (err) { toast(err.message, true); }
+      return;
+    }
     if (t.dataset.testCartes !== undefined) {
       t.disabled = true;
       try { const n = await rpc('test_toutes_cartes'); toast(n ? n + ' cartes ajoutées : ta collection est complète.' : 'Tu as déjà toutes les cartes.'); await refresh(); } catch (err) { toast(err.message, true); }

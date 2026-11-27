@@ -319,12 +319,13 @@ end $$;
 create or replace function public.ouvrir_booster() returns jsonb
 language plpgsql security definer set search_path = '' as $$
 declare u uuid := public._moi(); ch jsonb := public.reglage('chances'); pts jsonb := public.reglage('points');
-        tirees int[] := '{}'; nouvelles int[] := '{}'; rar text; c_id int; score int := 0; i int; meilleure boolean := false;
+        tirees int[] := '{}'; nouvelles int[] := '{}'; rar text; c_id int; score int := 0; i int; meilleure boolean := false force text;
 begin
   update public.profils set boosters = boosters - 1, ouverts = ouverts + 1 where id = u and boosters >= 1;
   if not found then raise exception 'Tu n''as plus de booster à ouvrir.'; end if;
+  select prochain into force from public.testeurs where joueur = u;
   for i in 1..5 loop
-    rar := public._tirer_rarete(ch);
+    rar := case when i = 5 and force is not null then force else public._tirer_rarete(ch) end;
     select id into c_id from public.cartes where serie = 'ori' and rarete = rar order by public._alea(1000000) limit 1;
     tirees := tirees || c_id;
     score := score + (pts ->> rar)::int;
@@ -336,6 +337,7 @@ begin
       on conflict (joueur, carte) do update set nombre = co.nombre + 1;
   end loop;
   -- Le score du booster rapporte autant de pièces
+  if force is not null then update public.testeurs set prochain = null where joueur = u; end if;
   update public.profils set pieces = pieces + score where id = u;
   insert into public.tirages (joueur, cartes, score) values (u, tirees, score);
   perform public._quete(u, 'ouvrir3', 1);
@@ -441,3 +443,19 @@ begin
 end $$;
 revoke all on function public.test_toutes_cartes() from public, anon;
 grant execute on function public.test_toutes_cartes() to authenticated;
+
+-- Outil de test TEMPORAIRE : truquer la dernière carte du prochain booster (testeurs uniquement).
+-- La fonction ouvrir_booster lit testeurs.prochain puis le remet à null.
+-- À supprimer avant la sortie : drop function public.test_truquer(text); remettre ouvrir_booster sans la variable « force ».
+alter table public.testeurs add column if not exists prochain text check (prochain in ('epic','legend','secret','goat'));
+create or replace function public.test_truquer(r text) returns text
+language plpgsql security definer set search_path = '' as $$
+declare u uuid := public._moi();
+begin
+  if r is not null and r not in ('epic','legend','secret','goat') then raise exception 'Rareté inconnue.'; end if;
+  update public.testeurs set prochain = r where joueur = u;
+  if not found then raise exception 'Réservé aux testeurs.'; end if;
+  return r;
+end $$;
+revoke all on function public.test_truquer(text) from public, anon;
+grant execute on function public.test_truquer(text) to authenticated;
