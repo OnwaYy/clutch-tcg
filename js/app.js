@@ -239,21 +239,22 @@
   // ---------- Secrètes : encre invisible, révélée par la lumière ----------
   // Ce que révèle la lumière sur chaque secrète : un détail lié à la carte
   const UV_TXT = {
-    151: 'DreamHack · Jönköping 2011', 152: 'Gamescom · Cologne 2011', 153: 'Düsseldorf · août 2023', 154: 'Shanghai 2024 · MVP à 17 ans',
-    155: 'SlayerS_`BoxeR`', 156: '« God » · KT Rolster', 157: 'pour la Horde', 158: '87 maps · 0 défaite',
-    159: 'Londres · Katowice · Berlin', 160: 'TI8 Vancouver · TI9 Shanghai', 161: 'BlizzCon 2018 · Finlande', 162: 'Arthur Ashe · 3 000 000 $',
-    163: 'Gale Force · Dignitas · Vitality', 164: 'Paris · Austin · Budapest', 165: 'Cluj 2015 → Budapest 2025', 166: 'PGL Stockholm 2021',
-    167: 'Accor Arena · Paris 2023', 168: 'les Worlds depuis 2011', 169: 'les noms gravés pour toujours', 170: 'le graal de Counter-Strike',
-    171: '30 séries d\'affilée', 172: '2013 · 15 · 16 · 23 · 24 · 25', 173: 'sortis des play-ins', 174: '« Ceb Face »', 175: '« The French Monster »'
+    151: 'Jönköping · 2011', 152: '1 000 000 $ · 2011', 153: 'Düsseldorf · 2023', 154: 'MVP à 17 ans',
+    155: 'SlayerS_BoxeR', 156: '« God » · KT Rolster', 157: 'Orc · 4Kings', 158: '87 – 0',
+    159: '4 Majors · 2017-2019', 160: 'Vancouver · Shanghai', 161: 'BlizzCon 2018', 162: '3 000 000 $ · 16 ans',
+    163: 'RLCS S5 · S6 · S7', 164: 'Paris · Austin · Budapest', 165: 'Cluj 2015 → Budapest 2025', 166: 'Stockholm 2021',
+    167: 'Accor Arena · 2023', 168: 'Faker l\'a soulevée 6 fois', 169: 'Gagnée 2 fois par OG', 170: 'Astralis l\'a soulevé 4 fois',
+    171: '30 séries d\'affilée', 172: '2013 → 2025', 173: 'San Francisco · 2022', 174: 'Coach devenu champion', 175: 'The French Monster'
   };
   function uvLayer(c) {
     let seed = c.id * 7919 % 2147483647 || 1; const r = function () { seed = seed * 16807 % 2147483647; return seed / 2147483647; };
     let stars = '';
     for (let i = 0; i < 12; i++) { const x = 15 + r() * 310, y = 15 + r() * 320, k = 5 + r() * 9; stars += '<path d="M' + x.toFixed(0) + ' ' + (y - k).toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + (x + k).toFixed(0) + ' ' + y.toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + x.toFixed(0) + ' ' + (y + k).toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + (x - k).toFixed(0) + ' ' + y.toFixed(0) + 'Q' + x.toFixed(0) + ' ' + y.toFixed(0) + ' ' + x.toFixed(0) + ' ' + (y - k).toFixed(0) + 'Z"/>'; }
     const a = 285 + r() * 20, b = 320 + r() * 20;
+    const msg = UV_TXT[c.id] || c.game;
     return '<span class="cc-uv" aria-hidden="true"><span class="uv-tint" style="background-image:url(' + c.img + ')"></span><svg viewBox="0 0 340 475" preserveAspectRatio="xMidYMid slice">' +
       '<text x="170" y="250" text-anchor="middle" class="uv-num">' + c.num + '</text><g class="uv-stars">' + stars + '</g>' +
-      '<text x="170" y="' + a.toFixed(0) + '" text-anchor="middle" class="uv-msg" transform="rotate(-6 170 ' + a.toFixed(0) + ')">' + esc(UV_TXT[c.id] || c.game) + '</text>' +
+      '<text x="170" y="' + a.toFixed(0) + '" text-anchor="middle" class="uv-msg" style="font-size:' + Math.min(18, 250 / (msg.length * .62)).toFixed(1) + 'px" transform="rotate(-5 170 ' + a.toFixed(0) + ')">' + esc(msg) + '</text>' +
       '<path class="uv-line" d="M56 ' + b.toFixed(0) + ' C 110 ' + (b - 40).toFixed(0) + ', 150 ' + (b + 20).toFixed(0) + ', 200 ' + (b - 20).toFixed(0) + ' S 280 ' + (b - 30).toFixed(0) + ', 300 ' + b.toFixed(0) + '"/></svg></span><span class="cc-lamp"></span>';
   }
   const footFit = function (t) { t = String(t); return t.length > 30 ? ' f-xs' : t.length > 22 ? ' f-s' : ''; };
