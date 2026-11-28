@@ -7,8 +7,8 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.45.4';
 
 const RULES: [string, string][] = [
-  ['pvp-data.js', 'ff77aae27f8d14c3318ae9c37cd2b7155e7520594625155198bc1cfe0d212db4'],
-  ['pvp-engine.js', 'd73cd89210e8467c9fccf889ac6bb2f13a0f4fe153d9959287ddfccdb3631118'],
+  ['pvp-data.js', '7e06b7c0d76cd3c172001c4800d2c53f03c1017073f58b8d9f63c202c27885f0'],
+  ['pvp-engine.js', 'ee70346b5a9c26eb93ab85a37eb55fb33d1209146f96bb4db920d5b9d9d08d91'],
 ];
 for (const [name, sha] of RULES) {
   const code = await (await fetch('https://onwayy.github.io/clutch-tcg/js/' + name + '?v=' + sha.slice(0, 8))).text();
@@ -27,23 +27,28 @@ const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...CORS, 'Content-Type': 'application/json' } });
 const fail = (m: string, s = 400) => json({ error: m }, s);
 
-// Decks des adversaires « académie » quand aucun vrai joueur n'a de deck
+// Decks des adversaires « académie » quand aucun vrai joueur n'a de deck : 14 serviteurs + 6 sorts
 const BOTS: [string, (d: any) => boolean][] = [
-  ['Académie Counter-Strike', (d) => d.g === 'CS' || (d.fam === 'FPS' && d.t !== 'J')],
-  ['Académie League of Legends', (d) => d.g === 'LoL' || (d.fam === 'MOBA' && d.t !== 'J')],
+  ['Académie Counter-Strike', (d) => d.g === 'CS' || (d.fam === 'FPS' && d.k === 's')],
+  ['Académie League of Legends', (d) => d.g === 'LoL' || (d.fam === 'MOBA' && d.k === 's')],
   ['Académie Dota 2', (d) => d.g === 'Dota' || d.fam === 'MOBA'],
-  ['Académie des solistes', (d) => ['RTS', 'COMBAT'].includes(d.fam) || [41, 34, 90, 92, 106, 123, 162, 30, 149].includes(d.id)],
+  ['Académie des solistes', (d) => ['RTS', 'COMBAT'].includes(d.fam) || d.k === 's'],
   ['Académie FPS', (d) => d.fam === 'FPS'],
 ];
+const val = (d: any) => (d.k === 'u' ? d.a + d.h : 4) + d.fx.length * 2 + d.kw.length;
 function botDeck(f: (d: any) => boolean, rarOk: string) {
-  const pool = CARDS.filter((d) => f(d) && rarOk.includes(d.r)).sort((a, b) => (b.p + b.fx.length * 2) - (a.p + a.fx.length * 2));
-  const deck: number[] = [], curve: Record<number, number> = {};
-  for (const d of pool) {
-    const max = 'LSG'.includes(d.r) ? 1 : 2;
-    for (let k = 0; k < max && deck.length < 20; k++) { if ((curve[d.c] || 0) >= (d.c >= 5 ? 3 : d.c === 4 ? 4 : 6)) break; deck.push(d.id); curve[d.c] = (curve[d.c] || 0) + 1; }
-    if (deck.length >= 20) break;
-  }
-  for (const d of CARDS) { if (deck.length >= 20) break; if (d.c <= 3 && rarOk.includes(d.r) && deck.filter((x) => x === d.id).length < 1) deck.push(d.id); }
+  const ok = CARDS.filter((d) => d.t !== 'Tok' && f(d) && rarOk.includes(d.r)), deck: number[] = [], curve: Record<number, number> = {};
+  const add = (list: any[], cap: number) => {
+    for (const d of list) {
+      const max = 'LSG'.includes(d.r) ? 1 : 2;
+      for (let k = 0; k < max && deck.length < cap; k++) { if ((curve[d.c] || 0) >= (d.c >= 6 ? 2 : d.c >= 4 ? 4 : 5)) break; deck.push(d.id); curve[d.c] = (curve[d.c] || 0) + 1; }
+      if (deck.length >= cap) break;
+    }
+  };
+  const byVal = (a: any, b: any) => val(b) / (b.c + 1) - val(a) / (a.c + 1);
+  add(ok.filter((d) => d.k === 'u').sort(byVal), 14);
+  add(ok.filter((d) => d.k === 's').sort(byVal), 20);
+  for (const d of CARDS) { if (deck.length >= 20) break; if (d.t !== 'Tok' && d.k === 'u' && 'CP'.includes(d.r) && !deck.includes(d.id)) deck.push(d.id); }
   return deck;
 }
 
@@ -65,21 +70,23 @@ Deno.serve(async (req) => {
 
     const current = async () => (await admin.from('pvp_matchs').select('*').eq('joueur', u).eq('fini', false).order('cree_le', { ascending: false }).limit(1)).data?.[0];
 
+    const pack = (m: any) => ({ id: m.id, seq: m.tour, view: PVP.view(m.etat, 0), adv: m.adversaire, bot: !m.adv_id });
+
     if (act === 'state') {
       const m = body.id ? (await admin.from('pvp_matchs').select('*').eq('id', body.id).eq('joueur', u).single()).data : await current();
       if (!m) return json({ match: null });
-      return json({ match: { id: m.id, view: PVP.view(m.etat, 0), adv: m.adversaire, bot: !m.adv_id } });
+      return json({ match: pack(m) });
     }
 
     if (act === 'start') {
       const open = await current();
-      if (open) return json({ match: { id: open.id, view: PVP.view(open.etat, 0), adv: open.adversaire, bot: !open.adv_id }, resumed: true });
+      if (open) return json({ match: pack(open), resumed: true });
       const { data: deck } = await admin.from('decks').select('cartes').eq('id', body.deck).eq('joueur', u).single();
       if (!deck) return fail('Deck introuvable.');
       const { data: err } = await admin.rpc('_deck_erreur', { u, cartes: deck.cartes });
       if (err) return fail(err);
       const { data: me } = await admin.from('profils').select('pseudo').eq('id', u).single();
-      // adversaire : le deck d'un vrai joueur, choisi parmi les plus récents ; sinon une académie
+      // adversaire : le deck d'un vrai joueur (joué par l'ordinateur), sinon une académie
       let adv = '', advId: string | null = null, advDeck: number[] | null = null;
       const { data: pool } = await admin.from('decks').select('cartes, joueur, profils(pseudo)').neq('joueur', u).order('maj_le', { ascending: false }).limit(40);
       const cand = (pool || []).filter((d: any) => d.profils?.pseudo && !PVP.deckError(d.cartes)).sort(() => Math.random() - .5);
@@ -87,37 +94,39 @@ Deno.serve(async (req) => {
         const { data: e2 } = await admin.rpc('_deck_erreur', { u: d.joueur, cartes: d.cartes });
         if (!e2) { adv = d.profils.pseudo; advId = d.joueur; advDeck = d.cartes; break; }
       }
-      if (!advDeck) {
-        const b = BOTS[Math.floor(Math.random() * BOTS.length)];
-        adv = b[0]; advDeck = botDeck(b[1], Math.random() < .5 ? 'CPE' : 'CPEL');
-      }
+      if (!advDeck) { const b = BOTS[Math.floor(Math.random() * BOTS.length)]; adv = b[0]; advDeck = botDeck(b[1], Math.random() < .5 ? 'CPE' : 'CPEL'); }
       const seed = crypto.getRandomValues(new Uint32Array(1))[0];
       const st = PVP.newMatch(deck.cartes, advDeck, { seed, names: [me?.pseudo || 'Toi', adv] });
+      const steps = st.cur === 1 ? PVP.aiTurn(st, 1, 0) : [];          // l'ordinateur commence
       const { data: saison } = await admin.rpc('pvp_saison');
-      const { data: row, error } = await admin.from('pvp_matchs').insert({ joueur: u, deck: deck.cartes, adversaire: adv, adv_id: advId, adv_deck: advDeck, etat: st, tour: st.turn, saison }).select('id').single();
+      const { data: row, error } = await admin.from('pvp_matchs').insert({ joueur: u, deck: deck.cartes, adversaire: adv, adv_id: advId, adv_deck: advDeck, etat: st, tour: 1, saison }).select('*').single();
       if (error) throw error;
-      return json({ match: { id: row.id, view: PVP.view(st, 0), adv, bot: !advId } });
+      return json({ match: pack(row), steps });
     }
 
-    if (act === 'play' || act === 'forfeit') {
+    if (act === 'act' || act === 'forfeit') {
       const { data: m } = await admin.from('pvp_matchs').select('*').eq('id', body.id).eq('joueur', u).single();
       if (!m || m.fini) return fail('Ce match est terminé.');
+      if (body.seq !== m.tour) return fail('Le match a changé, on recharge.', 409);
+      const next = m.tour + 1;
       if (act === 'forfeit') {
-        const { data: ok } = await admin.from('pvp_matchs').update({ maj_le: new Date().toISOString() }).eq('id', m.id).eq('tour', m.tour).eq('fini', false).select('id');
+        const { data: ok } = await admin.from('pvp_matchs').update({ tour: next, maj_le: new Date().toISOString() }).eq('id', m.id).eq('tour', m.tour).eq('fini', false).select('id');
         if (!ok?.length) return fail('Réessaie.', 409);
         return json({ fin: await finish(m.id, -1), res: -1 });
       }
-      const st = m.etat, plays = Array.isArray(body.plays) ? body.plays.slice(0, 7).map((p: any) => ({ h: p.h | 0, m: p.m | 0 })) : [];
-      const err = PVP.check(st, 0, plays);
+      const st = m.etat, x = body.a || {};
+      const a = x.t === 'play' ? { t: 'play', h: x.h | 0, tgt: x.tgt == null ? undefined : (typeof x.tgt === 'number' ? x.tgt : String(x.tgt)) }
+        : x.t === 'atk' ? { t: 'atk', from: x.from | 0, to: typeof x.to === 'number' ? x.to : String(x.to) } : { t: 'end' };
+      const err = PVP.check(st, 0, a);
       if (err) return fail(err);
-      const ai = PVP.aiPlays(st, 1);
-      const ev = PVP.playTurn(st, plays, ai);
-      // verrou optimiste : si deux requêtes arrivent en même temps, une seule passe
-      const { data: ok } = await admin.from('pvp_matchs').update({ etat: st, tour: st.turn, maj_le: new Date().toISOString() }).eq('id', m.id).eq('tour', m.tour).select('id');
-      if (!ok?.length) return fail('Ce tour a déjà été joué.', 409);
+      const steps = [{ a, ev: PVP.act(st, 0, a), view: PVP.view(st, 0) }];
+      if (a.t === 'end' && !st.over && st.cur === 1) steps.push(...PVP.aiTurn(st, 1, 0));
+      // verrou optimiste : une action à la fois
+      const { data: ok } = await admin.from('pvp_matchs').update({ etat: st, tour: next, maj_le: new Date().toISOString() }).eq('id', m.id).eq('tour', m.tour).select('id');
+      if (!ok?.length) return fail('Le match a changé, on recharge.', 409);
       let fin = null, res = null;
       if (st.over) { res = st.res.w === 0 ? 1 : st.res.w === 1 ? -1 : 0; fin = await finish(m.id, res); }
-      return json({ view: PVP.view(st, 0), ev, fin, res });
+      return json({ steps, view: PVP.view(st, 0), seq: next, fin, res });
     }
     return fail('Action inconnue.');
   } catch (e) {

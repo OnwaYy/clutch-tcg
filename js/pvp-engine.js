@@ -1,344 +1,399 @@
-// Moteur de match PvP de Clutch TCG — partagé entre le site et le serveur (même code, mêmes règles).
-// Un match : 3 maps, 6 tours, les deux joueurs posent leurs cartes en même temps puis on révèle.
-// On gagne une map en y ayant plus de puissance ; on gagne le match avec le plus de points de map.
+// Moteur de match 1v1 de Clutch TCG (style Hearthstone) — partagé entre le site et le serveur.
+// Chacun son tour : on pose des joueurs sur le plateau, ils attaquent les cartes ou le héros adverse.
+// On gagne quand le héros adverse tombe à 0 PV.
 (function (root) {
   'use strict';
   const DEFS = {}; (root.PVP_CARDS || []).forEach(function (d) { DEFS[d.id] = d; });
   const CLUBS = root.PVP_CLUBS || {};
-  const TURNS = 6, SLOTS = 4, HAND_MAX = 7, DECK_SIZE = 20;
+  const HERO_HP = 25, BOARD_MAX = 6, HAND_MAX = 10, MANA_MAX = 10, DECK_SIZE = 20, TURN_CAP = 50, HURT_AT = 12;
+  const CHOICE = { any: 1, enemy: 1, enemyMin: 1, min: 1, friendMin: 1 };
 
-  // ---------- Arènes : la règle de chaque map, révélée au fil des tours ----------
-  const ARENAS = [
-    { id: 'lan', nom: 'LAN de quartier', txt: 'Aucun effet.' },
-    { id: 'spodek', nom: 'Spodek — Katowice', txt: 'Les cartes FPS ont +1 ici.', fx: { o: 'all', v: 1, f: 'FPS' } },
-    { id: 'lck', nom: 'Studio de la LCK — Séoul', txt: 'Les cartes MOBA ont +1 ici.', fx: { o: 'all', v: 1, f: 'MOBA' } },
-    { id: 'scene', nom: 'Scène principale', txt: '3 cartes maximum par joueur ici.', fx: { o: 'cap', n: 3 } },
-    { id: 'bootcamp', nom: 'Bootcamp', txt: 'Les cartes jouées ici coûtent 1 de moins.' },
-    { id: 'plateau', nom: 'Plateau télé', txt: 'Plus aucune carte ne peut être jouée ici après le tour 4.' },
-    { id: 'stade', nom: 'Stade plein', txt: 'Les cartes qui coûtent 4 ou plus ont +2 ici.', fx: { o: 'all', v: 2, f: 'c>=4' } },
-    { id: 'presse', nom: 'Salle de presse', txt: 'Quand tu joues une carte ici, pioche une carte.' },
-    { id: 'echauffement', nom: 'Zone d\'échauffement', txt: 'Les cartes qui coûtent 1 ou 2 ont +2 ici.', fx: { o: 'all', v: 2, f: 'c<=2' } },
-    { id: 'casters', nom: 'Cabine des casters', txt: 'Les effets Révélation se déclenchent deux fois ici.' },
-    { id: 'finale', nom: 'Finale à guichets fermés', txt: 'Cette map compte double.' },
-    { id: 'solo', nom: 'Coin des solistes', txt: 'Les cartes seules de leur côté ont +3 ici.', fx: { o: 'all', v: 3, f: 'alone' } }
-  ];
-  const AR = {}; ARENAS.forEach(function (a) { AR[a.id] = a; });
-
-  // ---------- Hasard reproductible (le serveur et le site tirent la même chose) ----------
+  // ---------- Hasard reproductible ----------
   function rnd(st) { let t = (st.rng = (st.rng + 0x6D2B79F5) | 0); t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
   function shuffle(st, a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd(st) * (i + 1)); const x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
 
-  // ---------- Filtres : « CS », « J&CS », « club:Vitality », « c<=2 », « * »… ----------
+  // ---------- Filtres de cartes ----------
   const GAMES = ['CS', 'LoL', 'Dota', 'Val', 'CoD', 'RL', 'SC2', 'BW', 'WC3', 'OW', 'FN', 'Quake', 'Halo', 'R6', 'Smash', 'SF', 'FGC'];
   const FAMS = ['FPS', 'MOBA', 'RTS', 'COMBAT', 'SPORT', 'MULTI'];
-  const TYPES = ['J', 'Club', 'Mom', 'Jeu', 'Lig', 'Map', 'Evt', 'Lieu', 'Tro', 'Med', 'Cast'];
-  function test1(tok, d, card, st) {
-    if (tok === '*') return true;
-    if (tok === 'alone') return !!(card && st && st.board[card.m][card.o].length === 1);
-    if (tok.indexOf('club:') === 0 || tok === 'stream') return d.tags.indexOf(tok) >= 0;
-    if (tok.indexOf('c<=') === 0) return d.c <= +tok.slice(3);
-    if (tok.indexOf('c>=') === 0) return d.c >= +tok.slice(3);
-    if (FAMS.indexOf(tok) >= 0) return d.fam === tok;
-    if (GAMES.indexOf(tok) >= 0) return d.g === tok;
-    if (TYPES.indexOf(tok) >= 0) return d.t === tok;
+  const TYPES = ['J', 'Club', 'Mom', 'Jeu', 'Lig', 'Map', 'Evt', 'Lieu', 'Tro', 'Med', 'Cast', 'Tok'];
+  function test1(t, d) {
+    if (t === '*') return true;
+    if (t.indexOf('club:') === 0 || t === 'stream') return d.tags.indexOf(t) >= 0;
+    if (t.indexOf('id:') === 0) return d.id === +t.slice(3);
+    if (FAMS.indexOf(t) >= 0) return d.fam === t;
+    if (GAMES.indexOf(t) >= 0) return d.g === t;
+    if (TYPES.indexOf(t) >= 0) return d.t === t;
     return false;
   }
-  function match(f, cid, card, st) { const d = DEFS[cid]; return !!d && String(f).split('&').every(function (t) { return test1(t, d, card, st); }); }
+  function match(f, cid) { const d = DEFS[cid]; return !!d && String(f || '*').split('&').every(function (t) { return test1(t, d); }); }
 
-  // ---------- Textes des effets (générés depuis les données : toujours fidèles aux règles) ----------
+  // ---------- Textes ----------
   const GNAME = { CS: 'Counter-Strike', LoL: 'LoL', Dota: 'Dota 2', Val: 'Valorant', CoD: 'Call of Duty', RL: 'Rocket League', SC2: 'StarCraft II', BW: 'Brood War', WC3: 'Warcraft III', OW: 'Overwatch', FN: 'Fortnite', Quake: 'Quake', Halo: 'Halo', R6: 'Rainbow Six', Smash: 'Smash', SF: 'Street Fighter', FGC: 'jeux de combat' };
   const FNAME = { FPS: 'FPS', MOBA: 'MOBA', RTS: 'de stratégie', COMBAT: 'de jeux de combat', SPORT: 'Rocket League', MULTI: 'multi-jeux' };
+  const KWN = { taunt: 'Provocation', charge: 'Charge', shield: 'Armure', stealth: 'Camouflage', wind: 'Double attaque' };
+  const KWD = { taunt: 'les ennemis doivent l\'attaquer en premier', charge: 'peut attaquer dès qu\'il arrive', shield: 'ignore les premiers dégâts subis', stealth: 'ne peut pas être ciblé tant qu\'il n\'a pas attaqué', wind: 'peut attaquer deux fois par tour' };
   function fLabel(f, one) {
-    const toks = String(f).split('&'); let noun = one ? 'carte' : 'cartes'; const q = [];
+    const toks = String(f || '*').split('&'); let noun = one ? 'carte' : 'cartes'; const q = [];
     toks.forEach(function (t) {
       if (t === 'J') noun = one ? 'joueur' : 'joueurs';
-      else if (t === 'stream') noun = one ? 'streamer' : 'streamers';
       else if (t === '*') {}
       else if (t.indexOf('club:') === 0) q.push(CLUBS[t.slice(5)] || t.slice(5));
-      else if (GNAME[t]) q.push(noun === 'cartes' || noun === 'carte' ? GNAME[t] : 'de ' + GNAME[t]);
+      else if (t.indexOf('id:') === 0) { noun = ''; q.push(root.PVP_NAMES ? root.PVP_NAMES[+t.slice(3)] : '#' + t.slice(3)); }
+      else if (GNAME[t]) q.push(noun.indexOf('joueur') === 0 ? 'de ' + GNAME[t] : GNAME[t]);
       else if (FNAME[t]) q.push(FNAME[t]);
-      else if (t.indexOf('c<=') === 0) q.push('qui ' + (one ? 'coûte ' : 'coûtent ') + t.slice(3) + ' ou moins');
-      else if (t.indexOf('c>=') === 0) q.push('qui ' + (one ? 'coûte ' : 'coûtent ') + t.slice(3) + ' ou plus');
-      else if (t === 'alone') q.push(one ? 'seule de son côté' : 'seules de leur côté');
     });
     return (noun + ' ' + q.join(' ')).trim();
   }
-  const sg = function (v) { return (v > 0 ? '+' : '−') + Math.abs(v); };
-  const AT = function (at) { return at === 'all' ? 'en jeu' : 'ici'; };
+  const TGT = { any: 'un personnage', enemy: 'un ennemi', enemyMin: 'un serviteur adverse', min: 'un serviteur', friendMin: 'un serviteur allié', self: 'ce serviteur',
+    myHero: 'ton héros', foeHero: 'le héros adverse', allEnemyMin: 'tous les serviteurs adverses', allFriendMin: 'tes autres serviteurs', allMin: 'tous les autres serviteurs', allEnemy: 'tous les ennemis', randEnemy: 'un ennemi au hasard' };
+  function tgtText(e) {
+    if (e.f && e.f !== '*' && (e.t === 'allFriendMin' || e.t === 'friendMin')) return (e.t === 'friendMin' ? 'un(e) ' + fLabel(e.f, true) + ' allié(e)' : 'tes ' + fLabel(e.f));
+    return TGT[e.t] || '';
+  }
   function condText(c) {
     if (!c) return '';
-    if (c.alone) return 'tu n\'as aucune autre carte ici';
-    if (c.duel) return 'il n\'y a qu\'une seule carte adverse ici';
-    if (c.losing) return 'tu perds cette map';
-    if (c.late) return 'elle est jouée au tour 5 ou 6';
-    if (c.min) return 'tu as ' + (c.min[1] > 1 ? c.min[1] + ' autres ' + fLabel(c.min[0]) : 'un(e) autre ' + fLabel(c.min[0], true)) + ' ' + AT(c.min[2]);
-    if (c.duo) return 'tu as aussi ' + (root.PVP_NAMES ? root.PVP_NAMES[c.duo] : '#' + c.duo) + ' en jeu';
+    if (c.alone) return 'tu n\'as aucun autre serviteur';
+    if (c.hurt) return 'ton héros a ' + HURT_AT + ' PV ou moins';
+    if (c.nothurt) return 'ton héros a plus de ' + HURT_AT + ' PV';
+    if (c.has) return 'tu contrôles ' + (c.has.indexOf('id:') === 0 ? fLabel(c.has) : 'un(e) autre ' + fLabel(c.has, true));
     return '';
   }
-  function fxText(e) {
-    const k = { rev: 'Révélation', cont: 'Continu', ter: 'Terrain', turn: 'Fin de tour' }[e.k];
-    let t;
+  function opText(e) {
+    const tg = tgtText(e);
     switch (e.o) {
-      case 'pow': t = e.k === 'cont' ? sg(e.v) + ' tant que ' + condText(e.if) + '.' : sg(e.v) + (e.if ? ' si ' + condText(e.if) : '') + '.'; break;
-      case 'per': t = sg(e.v) + ' pour chaque autre ' + fLabel(e.f, true) + ' que tu as ' + AT(e.at) + '.'; break;
-      case 'perEnemy': t = sg(e.v) + ' pour chaque carte adverse ici.'; break;
-      case 'aura': t = e.k === 'cont' ? 'tes autres ' + fLabel(e.f) + ' ont ' + sg(e.v) + ' ' + (e.at === 'all' ? 'partout' : 'ici') + '.' : 'tes autres ' + fLabel(e.f) + ' ' + AT(e.at) + ' gagnent ' + sg(e.v) + '.'; break;
-      case 'all': t = 'les ' + fLabel(e.f) + ' ont ' + sg(e.v) + ' ici, pour les deux joueurs.'; break;
-      case 'cap': t = e.n + ' cartes maximum par joueur ici.'; break;
-      case 'draw': t = 'pioche ' + (e.n > 1 ? e.n + ' ' + fLabel(e.f) : (e.f === '*' ? 'une carte' : 'un(e) ' + fLabel(e.f, true))) + ' de ton deck.'; break;
-      case 'cost': t = 'tes ' + fLabel(e.f) + ' en main coûtent ' + e.v + ' de moins.'; break;
-      case 'nrg': t = '+' + e.n + ' énergie au prochain tour.'; break;
-      case 'lock': t = 'plus aucune carte ne peut être jouée ici.'; break;
-      case 'mute': t = 'annule les effets Continu et Terrain des cartes adverses ici.'; break;
-      case 'swing': t = 'si tu perds cette map, tes autres cartes ici gagnent ' + sg(e.v) + '.'; break;
-      case 'rerev': t = 'relance les effets Révélation de tes autres cartes ici.'; break;
-      case 'hit': t = 'les cartes adverses ' + AT(e.at) + ' perdent ' + e.v + '.'; break;
-      case 'hitTop': t = 'la carte adverse la plus forte ici perd ' + e.v + '.'; break;
-      case 'hitLow': t = 'la carte adverse la plus faible ici perd ' + e.v + '.'; break;
-      case 'auraWin': t = 'tes cartes gagnent ' + sg(e.v) + ' sur chaque map que tu remportes.'; break;
-      case 'dbl': t = 'cette map compte double.'; break;
-      case 'shield': t = 'ne peut pas perdre de puissance.'; break;
-      case 'grow': t = sg(e.v) + ' à cette carte.'; break;
-      default: t = '';
+      case 'dmg': return 'inflige ' + e.n + ' dégât' + (e.n > 1 ? 's' : '') + ' à ' + tg + (e.times ? ', ' + e.times + ' fois' : '');
+      case 'heal': return 'rend ' + e.n + ' PV à ' + tg;
+      case 'buff': return (e.t === 'self' ? 'gagne ' : 'donne ') + '+' + e.a + '/+' + e.h + (e.t === 'self' ? '' : ' à ' + tg);
+      case 'buffPer': return 'gagne +' + e.a + '/+' + e.h + ' pour chaque autre ' + fLabel(e.f, true) + ' que tu contrôles';
+      case 'kw': return (e.t === 'self' ? 'gagne ' : 'donne ') + KWN[e.k] + (e.t === 'self' ? '' : ' à ' + tg);
+      case 'draw': return 'pioche ' + (e.n > 1 ? e.n + ' ' + fLabel(e.f) : (e.f === '*' ? 'une carte' : 'un(e) ' + fLabel(e.f, true)));
+      case 'cost': return 'tes ' + fLabel(e.f) + ' en main coûtent ' + e.v + ' de moins';
+      case 'ramp': return 'gagne ' + e.n + ' cristal d\'énergie';
+      case 'mana': return 'gagne ' + e.n + ' énergie pour ce tour';
+      case 'silence': return 'réduit au silence ' + tg + ' (il perd ses effets)';
+      case 'destroy': return 'détruit ' + tg + (e.min ? ' qui a ' + e.min + ' ATQ ou plus' : '');
+      case 'summon': return 'invoque ' + (e.n > 1 ? e.n + ' ' : 'un ') + (DEFS[e.tok] ? DEFS[e.tok].nom + (e.n > 1 ? 's' : '') + ' ' + DEFS[e.tok].a + '/' + DEFS[e.tok].h : '');
+      case 'revive': return 'ramène en jeu tes ' + e.n + ' derniers serviteurs morts';
+      case 'duel': return 'affronte ' + tg + ' : ils s\'infligent leurs dégâts';
     }
-    return { kw: k, txt: t.charAt(0).toUpperCase() + t.slice(1) };
+    return '';
   }
-  function cardText(cid) { const d = DEFS[cid]; return d ? d.fx.map(fxText) : []; }
+  function cardText(cid) {
+    const d = DEFS[cid]; if (!d) return [];
+    const out = [];
+    d.kw.forEach(function (k) { out.push({ kw: KWN[k], txt: KWD[k].charAt(0).toUpperCase() + KWD[k].slice(1) + '.' }); });
+    const groups = {};
+    d.fx.forEach(function (e) {
+      let t;
+      if (e.w === 'aura') t = e.o === 'self' ? 'a +' + e.a + '/+' + e.h + ' tant que ' + condText(e.if) : 'tes autres ' + fLabel(e.f) + ' ont +' + e.a + '/+' + e.h;
+      else t = opText(e) + (e.if ? ' si ' + condText(e.if) : '');
+      const kw = d.k === 's' ? 'Sort' : { play: 'Entrée', aura: 'Aura', end: 'Fin de tour', death: 'Dernier mot' }[e.w];
+      (groups[kw] = groups[kw] || []).push(t);
+    });
+    Object.keys(groups).forEach(function (k) { const s = groups[k].join(', puis '); out.push({ kw: k, txt: s.charAt(0).toUpperCase() + s.slice(1) + '.' }); });
+    return out;
+  }
 
-  // ---------- Création d'un match ----------
+  // ---------- Création ----------
   function newMatch(deckA, deckB, opts) {
     opts = opts || {};
-    const st = { v: 1, turn: 1, rng: (opts.seed >>> 0) || 1, n: 0, over: false, res: null, locked: [0, 0, 0], log: [],
-      names: opts.names || ['Toi', 'Adversaire'], board: [[[], []], [[], []], [[], []]], arenas: [], pl: [] };
-    const pool = ARENAS.slice(); shuffle(st, pool);
-    st.arenas = pool.slice(0, 3).map(function (a) { return a.id; });
-    [deckA, deckB].forEach(function (deck, p) {
-      const pl = { deck: shuffle(st, deck.slice()), hand: [], nrg: 0 };
-      st.pl[p] = pl;
-      for (let i = 0; i < 3; i++) draw(st, p, '*');
-    });
-    startTurn(st);
+    const st = { v: 2, rng: (opts.seed >>> 0) || 1, n: 0, turn: 0, cur: 0, over: false, res: null, names: opts.names || ['Toi', 'Adversaire'], pl: [] };
+    [deckA, deckB].forEach(function (deck, p) { st.pl[p] = { hp: HERO_HP, max: 0, mana: 0, deck: shuffle(st, deck.slice()), hand: [], board: [], grave: [], fat: 0 }; });
+    const first = rnd(st) < .5 ? 0 : 1;
+    const ev = [];
+    for (let i = 0; i < 3; i++) { draw(st, first, '*', ev); draw(st, 1 - first, '*', ev); }
+    draw(st, 1 - first, '*', ev);                         // le second joueur commence avec une carte de plus
+    st.pl[1 - first].hand.push({ c: 903, m: 0 });          // … et une « Pause technique » (+1 énergie une fois)
+    st.first = first;
+    startTurn(st, first, ev);
     return st;
   }
-  function draw(st, p, f) {
-    const pl = st.pl[p]; if (pl.hand.length >= HAND_MAX) return false;
+  function draw(st, p, f, ev) {
+    const pl = st.pl[p];
     const i = pl.deck.findIndex(function (c) { return match(f, c); });
-    if (i < 0) return false;
-    pl.hand.push({ c: pl.deck.splice(i, 1)[0], m: 0 }); return true;
-  }
-  function startTurn(st) { for (let p = 0; p < 2; p++) draw(st, p, '*'); }
-  const revealed = function (st, m) { return m < Math.min(st.turn, 3) || st.over; };
-  const arenaAt = function (st, m) { return revealed(st, m) ? st.arenas[m] : null; };
-  function energy(st, p) { return Math.min(st.turn, TURNS) + (st.pl[p].nrgNow || 0); }
-
-  // ---------- Puissance ----------
-  function capOf(st, m) {
-    let cap = SLOTS; if (arenaAt(st, m) === 'scene') cap = 3;
-    for (let p = 0; p < 2; p++) st.board[m][p].forEach(function (c) { if (!c.mute) DEFS[c.c].fx.forEach(function (e) { if (e.k === 'ter' && e.o === 'cap') cap = Math.min(cap, e.n); }); });
-    return cap;
-  }
-  function others(st, card, f, at) {
-    let n = 0;
-    for (let m = 0; m < 3; m++) { if (at !== 'all' && m !== card.m) continue; st.board[m][card.o].forEach(function (x) { if (x !== card && match(f, x.c, x, st)) n++; }); }
-    return n;
-  }
-  function cond(st, card, c, depth) {
-    if (!c) return true;
-    if (c.alone) return st.board[card.m][card.o].length === 1;
-    if (c.duel) return st.board[card.m][1 - card.o].length === 1;
-    if (c.late) return card.t >= 5;
-    if (c.losing) return depth > 1 ? false : mapPower(st, card.m, card.o, depth + 1) < mapPower(st, card.m, 1 - card.o, depth + 1);
-    if (c.min) return others(st, card, c.min[0], c.min[2]) >= c.min[1];
-    if (c.duo) { for (let m = 0; m < 3; m++) if (st.board[m][card.o].some(function (x) { return x.c === c.duo; })) return true; return false; }
-    return true;
-  }
-  function hasShield(card) { return !card.mute && DEFS[card.c].fx.some(function (e) { return e.o === 'shield'; }); }
-  function cardPower(st, card, depth) {
-    depth = depth || 0;
-    const d = DEFS[card.c]; let pos = d.p + card.perm, neg = card.neg;
-    if (!card.mute) d.fx.forEach(function (e) {
-      if (e.k !== 'cont') return;
-      if (e.o === 'pow' && cond(st, card, e.if, depth)) pos += e.v;
-      else if (e.o === 'per') pos += e.v * others(st, card, e.f, e.at);
-      else if (e.o === 'perEnemy') pos += e.v * st.board[card.m][1 - card.o].length;
-    });
-    // auras de mes autres cartes
-    for (let m = 0; m < 3; m++) st.board[m][card.o].forEach(function (x) {
-      if (x === card || x.mute) return;
-      DEFS[x.c].fx.forEach(function (e) { if (e.k === 'cont' && e.o === 'aura' && (e.at === 'all' || m === card.m) && match(e.f, card.c, card, st)) pos += e.v; });
-    });
-    // terrains de cette map (des deux joueurs) et arène
-    for (let p = 0; p < 2; p++) st.board[card.m][p].forEach(function (x) {
-      if (x.mute) return;
-      DEFS[x.c].fx.forEach(function (e) { if (e.k === 'ter' && e.o === 'all' && match(e.f, card.c, card, st)) { if (e.v > 0) pos += e.v; else neg -= e.v; } });
-    });
-    const a = AR[arenaAt(st, card.m)];
-    if (a && a.fx && a.fx.o === 'all' && match(a.fx.f, card.c, card, st)) pos += a.fx.v;
-    return Math.max(0, pos - (hasShield(card) ? 0 : neg));
-  }
-  function mapPower(st, m, p, depth) { return st.board[m][p].reduce(function (s, c) { return s + cardPower(st, c, depth); }, 0); }
-  function mapWorth(st, m) {
-    if (arenaAt(st, m) === 'finale') return 2;
-    for (let p = 0; p < 2; p++) if (st.board[m][p].some(function (c) { return !c.mute && DEFS[c.c].fx.some(function (e) { return e.o === 'dbl'; }); })) return 2;
-    return 1;
-  }
-  function score(st) {
-    const maps = [0, 1, 2].map(function (m) { const a = mapPower(st, m, 0), b = mapPower(st, m, 1); return { a: a, b: b, w: a > b ? 0 : b > a ? 1 : -1, pts: mapWorth(st, m) }; });
-    const pts = [0, 0]; maps.forEach(function (x) { if (x.w >= 0) pts[x.w] += x.pts; });
-    return { maps: maps, pts: pts, tot: [maps.reduce(function (s, x) { return s + x.a; }, 0), maps.reduce(function (s, x) { return s + x.b; }, 0)] };
-  }
-
-  // ---------- Coûts et validité d'un coup ----------
-  function costOf(st, p, h, m) { return Math.max(0, DEFS[h.c].c - h.m - (arenaAt(st, m) === 'bootcamp' ? 1 : 0)); }
-  // plays : [{ h: index dans la main, m: map }]
-  function check(st, p, plays) {
-    if (st.over) return 'Le match est terminé.';
-    if (!Array.isArray(plays)) return 'Coup invalide.';
-    const used = {}, per = [0, 0, 0]; let spent = 0;
-    for (const pl of plays) {
-      const h = st.pl[p].hand[pl.h];
-      if (!h || used[pl.h] || !(pl.m >= 0 && pl.m <= 2)) return 'Coup invalide.';
-      used[pl.h] = 1;
-      if (st.locked[pl.m]) return 'Cette map est verrouillée.';
-      if (arenaAt(st, pl.m) === 'plateau' && st.turn > 4) return 'Plus aucune carte ne peut être jouée sur le plateau télé.';
-      per[pl.m]++;
-      if (st.board[pl.m][p].length + per[pl.m] > capOf(st, pl.m)) return 'Plus de place sur cette map.';
-      spent += costOf(st, p, h, pl.m);
+    if (i < 0) {
+      if (f !== '*') return;
+      pl.fat++; damageHero(st, p, pl.fat, ev); ev.push({ t: 'fatigue', p: p, n: pl.fat }); return;
     }
-    if (spent > energy(st, p)) return 'Pas assez d\'énergie.';
-    return null;
+    const c = pl.deck.splice(i, 1)[0];
+    if (pl.hand.length >= HAND_MAX) { ev.push({ t: 'burn', p: p, c: c }); return; }
+    pl.hand.push({ c: c, m: 0 }); ev.push({ t: 'draw', p: p, c: c });
+  }
+  function startTurn(st, p, ev) {
+    st.cur = p; st.turn++;
+    const pl = st.pl[p];
+    pl.max = Math.min(MANA_MAX, pl.max + 1); pl.mana = pl.max;
+    pl.board.forEach(function (m) { m.sick = 0; m.atks = 0; });
+    ev.push({ t: 'turn', p: p, n: st.turn });
+    draw(st, p, '*', ev);
+    checkEnd(st, ev);
   }
 
-  // ---------- Effets à la révélation ----------
-  function runRev(st, card, ev, skipRerev) {
-    const d = DEFS[card.c], times = arenaAt(st, card.m) === 'casters' ? 2 : 1;
-    for (let k = 0; k < times; k++) d.fx.forEach(function (e) {
-      if (e.k !== 'rev') return;
-      const me = card.o, foe = 1 - me, here = st.board[card.m];
-      const mine = function (at) { const r = []; for (let m = 0; m < 3; m++) if (at === 'all' || m === card.m) st.board[m][me].forEach(function (x) { if (x !== card) r.push(x); }); return r; };
-      const hurt = function (x, v) { if (!hasShield(x)) { x.neg += v; ev.push({ t: 'hit', u: x.u, v: v }); } };
-      switch (e.o) {
-        case 'pow': if (cond(st, card, e.if, 0)) { card.perm += e.v; ev.push({ t: 'buff', u: card.u, v: e.v }); } break;
-        case 'per': { const v = e.v * others(st, card, e.f, e.at); if (v) { card.perm += v; ev.push({ t: 'buff', u: card.u, v: v }); } break; }
-        case 'perEnemy': { const v = e.v * here[foe].length; if (v) { card.perm += v; ev.push({ t: 'buff', u: card.u, v: v }); } break; }
-        case 'aura': mine(e.at).forEach(function (x) { if (match(e.f, x.c, x, st)) { x.perm += e.v; ev.push({ t: 'buff', u: x.u, v: e.v }); } }); break;
-        case 'auraWin': for (let m = 0; m < 3; m++) if (mapPower(st, m, me) > mapPower(st, m, foe)) st.board[m][me].forEach(function (x) { x.perm += e.v; ev.push({ t: 'buff', u: x.u, v: e.v }); }); break;
-        case 'swing': if (mapPower(st, card.m, me) < mapPower(st, card.m, foe)) here[me].forEach(function (x) { if (x !== card) { x.perm += e.v; ev.push({ t: 'buff', u: x.u, v: e.v }); } }); break;
-        case 'hit': for (let m = 0; m < 3; m++) if (e.at === 'all' || m === card.m) st.board[m][foe].forEach(function (x) { if (match(e.f, x.c, x, st)) hurt(x, e.v); }); break;
-        case 'hitTop': case 'hitLow': {
-          let best = null, bp = 0;
-          here[foe].forEach(function (x) { const pw = cardPower(st, x); if (!best || (e.o === 'hitTop' ? pw >= bp : pw < bp)) { best = x; bp = pw; } });
-          if (best) hurt(best, e.v); break;
-        }
-        case 'draw': { let n = 0; for (let i = 0; i < e.n; i++) if (draw(st, me, e.f)) n++; if (n) ev.push({ t: 'draw', p: me, n: n }); break; }
-        case 'cost': st.pl[me].hand.forEach(function (h) { if (match(e.f, h.c)) h.m += e.v; }); ev.push({ t: 'cost', p: me }); break;
-        case 'nrg': st.pl[me].nrg += e.n; ev.push({ t: 'nrg', p: me, n: e.n }); break;
-        case 'lock': st.locked[card.m] = 1; ev.push({ t: 'lock', m: card.m }); break;
-        case 'mute': here[foe].forEach(function (x) { x.mute = 1; ev.push({ t: 'mute', u: x.u }); }); break;
-        case 'rerev': if (!skipRerev) here[me].forEach(function (x) { if (x !== card) runRev(st, x, ev, true); }); break;
-      }
-    });
-  }
-
-  // ---------- Résolution d'un tour ----------
-  function playTurn(st, plays0, plays1) {
-    const P = [plays0 || [], plays1 || []];
-    for (let p = 0; p < 2; p++) { const err = check(st, p, P[p]); if (err) throw new Error(err); }
-    const ev = [], sc = score(st);
-    const first = sc.pts[0] > sc.pts[1] ? 0 : sc.pts[1] > sc.pts[0] ? 1 : (rnd(st) < .5 ? 0 : 1);
-    // on retire les cartes jouées des mains (indices décroissants)
-    const out = [[], []];
-    for (let p = 0; p < 2; p++) {
-      const hand = st.pl[p].hand;
-      out[p] = P[p].map(function (x) { return { h: hand[x.h], m: x.m }; });
-      P[p].map(function (x) { return x.h; }).sort(function (a, b) { return b - a; }).forEach(function (i) { hand.splice(i, 1); });
-    }
-    ev.push({ t: 'order', first: first });
-    [first, 1 - first].forEach(function (p) {
-      out[p].forEach(function (x) {
-        const m = x.m;
-        if (st.locked[m] || st.board[m][p].length >= capOf(st, m)) {    // la map s'est fermée entre-temps : la carte revient en main
-          if (st.pl[p].hand.length < HAND_MAX) st.pl[p].hand.push({ c: x.h.c, m: 0 });
-          ev.push({ t: 'bounce', p: p, c: x.h.c, m: m }); return;
-        }
-        const card = { u: ++st.n, c: x.h.c, o: p, m: m, perm: 0, neg: 0, t: st.turn, mute: 0 };
-        st.board[m][p].push(card);
-        const e2 = [];
-        runRev(st, card, e2);
-        if (arenaAt(st, m) === 'presse' && draw(st, p, '*')) e2.push({ t: 'draw', p: p, n: 1 });
-        ev.push({ t: 'rev', p: p, u: card.u, c: card.c, m: m, fx: e2, pw: [0, 1, 2].map(function (k) { return [mapPower(st, k, 0), mapPower(st, k, 1)]; }) });
+  // ---------- Serviteurs ----------
+  const D = function (m) { return DEFS[m.c]; };
+  function auraOf(st, m) {
+    let a = 0, h = 0;
+    if (m.sil) return [0, 0];
+    st.pl[m.o].board.forEach(function (x) {
+      if (x.sil) return;
+      D(x).fx.forEach(function (e) {
+        if (e.w !== 'aura') return;
+        if (x === m && e.o === 'self' && st.pl[m.o].board.length === 1) { a += e.a; h += e.h; }
+        else if (x !== m && e.o === 'buff' && match(e.f, m.c)) { a += e.a; h += e.h; }
       });
     });
-    // fin du tour : cartes qui grandissent
-    for (let m = 0; m < 3; m++) for (let p = 0; p < 2; p++) st.board[m][p].forEach(function (c) {
-      if (!c.mute) DEFS[c.c].fx.forEach(function (e) { if (e.k === 'turn' && e.o === 'grow') { c.perm += e.v; ev.push({ t: 'grow', u: c.u, v: e.v }); } });
-    });
-    for (let p = 0; p < 2; p++) { st.pl[p].nrgNow = st.pl[p].nrg; st.pl[p].nrg = 0; }
-    st.turn++;
-    if (st.turn > TURNS) {
-      st.over = true; const s = score(st);
-      st.res = { pts: s.pts, tot: s.tot, maps: s.maps, w: s.pts[0] > s.pts[1] ? 0 : s.pts[1] > s.pts[0] ? 1 : s.tot[0] > s.tot[1] ? 0 : s.tot[1] > s.tot[0] ? 1 : -1 };
-      ev.push({ t: 'end', res: st.res });
-    } else {
-      if (st.turn <= 3) ev.push({ t: 'arena', m: st.turn - 1, a: st.arenas[st.turn - 1] });
-      startTurn(st);
+    return [a, h];
+  }
+  function atkOf(st, m) { return Math.max(0, D(m).a + m.da + auraOf(st, m)[0]); }
+  function maxHpOf(st, m) { return D(m).h + m.dh + auraOf(st, m)[1]; }
+  function hpOf(st, m) { return maxHpOf(st, m) - m.dmg; }
+  function kw(m, k) { return !!m.kw[k]; }
+  function findMin(st, u) { for (let p = 0; p < 2; p++) { const m = st.pl[p].board.find(function (x) { return x.u === u; }); if (m) return m; } return null; }
+  function summon(st, p, cid, ev) {
+    const pl = st.pl[p]; if (pl.board.length >= BOARD_MAX) return null;
+    const d = DEFS[cid], m = { u: ++st.n, c: cid, o: p, da: 0, dh: 0, dmg: 0, kw: {}, sil: 0, sick: 1, atks: 0 };
+    d.kw.forEach(function (k) { m.kw[k] = 1; });
+    pl.board.push(m); ev.push({ t: 'summon', p: p, u: m.u, c: cid });
+    return m;
+  }
+
+  // ---------- Dégâts, soins, morts ----------
+  function damageHero(st, p, n, ev) { if (n <= 0) return; st.pl[p].hp -= n; ev.push({ t: 'dmg', id: 'h' + p, n: n }); }
+  function damage(st, id, n, ev) {
+    if (n <= 0) return;
+    if (id === 'h0' || id === 'h1') return damageHero(st, +id[1], n, ev);
+    const m = findMin(st, id); if (!m) return;
+    if (m.kw.shield) { m.kw.shield = 0; ev.push({ t: 'shield', id: id }); return; }
+    m.dmg += n; ev.push({ t: 'dmg', id: id, n: n });
+  }
+  function heal(st, id, n, ev) {
+    if (id === 'h0' || id === 'h1') { const pl = st.pl[+id[1]], v = Math.min(n, HERO_HP - pl.hp); if (v > 0) { pl.hp += v; ev.push({ t: 'heal', id: id, n: v }); } return; }
+    const m = findMin(st, id); if (!m) return; const v = Math.min(n, m.dmg); if (v > 0) { m.dmg -= v; ev.push({ t: 'heal', id: id, n: v }); }
+  }
+  function resolveDeaths(st, ev) {
+    for (let loop = 0; loop < 20; loop++) {
+      const dead = [];
+      for (let p = 0; p < 2; p++) st.pl[p].board.forEach(function (m) { if (hpOf(st, m) <= 0) dead.push(m); });
+      if (!dead.length) break;
+      dead.sort(function (a, b) { return a.u - b.u; });
+      dead.forEach(function (m) {
+        const pl = st.pl[m.o]; pl.board.splice(pl.board.indexOf(m), 1);
+        if (D(m).t !== 'Tok') pl.grave.push(m.c);
+        ev.push({ t: 'die', u: m.u });
+      });
+      dead.forEach(function (m) { if (!m.sil) D(m).fx.forEach(function (e) { if (e.w === 'death') runOp(st, m.o, e, null, m, ev); }); });
     }
-    st.log.push(ev);
+    checkEnd(st, ev);
+  }
+  function checkEnd(st, ev) {
+    if (st.over) return;
+    const a = st.pl[0].hp <= 0, b = st.pl[1].hp <= 0;
+    if (a || b || st.turn > TURN_CAP) {
+      st.over = true;
+      st.res = { w: a && b ? -1 : a ? 1 : b ? 0 : st.pl[0].hp > st.pl[1].hp ? 0 : st.pl[1].hp > st.pl[0].hp ? 1 : -1 };
+      ev.push({ t: 'end', res: st.res });
+    }
+  }
+
+  // ---------- Cibles ----------
+  function targetable(st, p, id) {                            // un ennemi camouflé ne peut pas être ciblé
+    if (id === 'h0' || id === 'h1') return true;
+    const m = findMin(st, id); return !!m && (m.o === p || !m.kw.stealth);
+  }
+  function choiceOp(cid) { return DEFS[cid].fx.find(function (e) { return e.w === 'play' && CHOICE[e.t]; }); }
+  function legalTargets(st, p, cid) {
+    const e = choiceOp(cid); if (!e) return null;
+    const foe = 1 - p, out = [];
+    const addMins = function (q) { st.pl[q].board.forEach(function (m) {
+      if (!targetable(st, p, m.u)) return;
+      if (e.f && e.f !== '*' && e.t === 'friendMin' && !match(e.f, m.c)) return;
+      if (e.o === 'destroy' && e.min && atkOf(st, m) < e.min) return;
+      out.push(m.u);
+    }); };
+    if (e.t === 'any') { addMins(p); addMins(foe); out.push('h' + p, 'h' + foe); }
+    else if (e.t === 'enemy') { addMins(foe); out.push('h' + foe); }
+    else if (e.t === 'enemyMin') addMins(foe);
+    else if (e.t === 'min') { addMins(p); addMins(foe); }
+    else if (e.t === 'friendMin') addMins(p);
+    return out;
+  }
+  function autoTargets(st, p, e, self) {
+    const foe = 1 - p, mins = function (q) { return st.pl[q].board.filter(function (m) { return m !== self && (!e.f || e.f === '*' || match(e.f, m.c)); }).map(function (m) { return m.u; }); };
+    switch (e.t) {
+      case 'self': return self ? [self.u] : [];
+      case 'myHero': return ['h' + p];
+      case 'foeHero': return ['h' + foe];
+      case 'allEnemyMin': return mins(foe);
+      case 'allFriendMin': return mins(p);
+      case 'allMin': return mins(p).concat(mins(foe));
+      case 'allEnemy': return mins(foe).concat(['h' + foe]);
+    }
+    return [];
+  }
+  function cond(st, p, c, self) {
+    if (!c) return true;
+    const others = st.pl[p].board.filter(function (m) { return m !== self; });
+    if (c.alone) return others.length === 0;
+    if (c.hurt) return st.pl[p].hp <= HURT_AT;
+    if (c.nothurt) return st.pl[p].hp > HURT_AT;
+    if (c.has) return others.some(function (m) { return match(c.has, m.c); });
+    return true;
+  }
+
+  // ---------- Effets ----------
+  function runOp(st, p, e, tgt, self, ev) {
+    if (!cond(st, p, e.if, self)) return;
+    let ids = CHOICE[e.t] ? (tgt != null ? [tgt] : []) : autoTargets(st, p, e, self);
+    switch (e.o) {
+      case 'dmg':
+        if (e.t === 'randEnemy') {
+          for (let k = 0; k < (e.times || 1); k++) {
+            const pool = st.pl[1 - p].board.filter(function (m) { return hpOf(st, m) > 0; }).map(function (m) { return m.u; }).concat(['h' + (1 - p)]);
+            damage(st, pool[Math.floor(rnd(st) * pool.length)], e.n, ev);
+          }
+        } else for (let k = 0; k < (e.times || 1); k++) ids.forEach(function (id) { damage(st, id, e.n, ev); });
+        break;
+      case 'heal': ids.forEach(function (id) { heal(st, id, e.n, ev); }); break;
+      case 'buff': ids.forEach(function (id) { const m = findMin(st, id); if (m) { m.da += e.a; m.dh += e.h; ev.push({ t: 'buff', id: id, a: e.a, h: e.h }); } }); break;
+      case 'buffPer': if (self) { const n = st.pl[p].board.filter(function (m) { return m !== self && match(e.f, m.c); }).length; if (n) { self.da += e.a * n; self.dh += e.h * n; ev.push({ t: 'buff', id: self.u, a: e.a * n, h: e.h * n }); } } break;
+      case 'kw': ids.forEach(function (id) { const m = findMin(st, id); if (m) { m.kw[e.k] = 1; ev.push({ t: 'kw', id: id, k: e.k }); } }); break;
+      case 'draw': for (let k = 0; k < e.n; k++) draw(st, p, e.f, ev); break;
+      case 'cost': st.pl[p].hand.forEach(function (h) { if (match(e.f, h.c)) h.m += e.v; }); ev.push({ t: 'cost', p: p }); break;
+      case 'ramp': st.pl[p].max = Math.min(MANA_MAX, st.pl[p].max + e.n); ev.push({ t: 'ramp', p: p }); break;
+      case 'mana': st.pl[p].mana += e.n; ev.push({ t: 'ramp', p: p }); break;
+      case 'silence': ids.forEach(function (id) { const m = findMin(st, id); if (m) { m.sil = 1; m.kw = {}; m.da = 0; m.dh = 0; ev.push({ t: 'silence', id: id }); } }); break;
+      case 'destroy': ids.forEach(function (id) { const m = findMin(st, id); if (m) { m.dmg = 999; m.kw.shield = 0; ev.push({ t: 'destroy', id: id }); } }); break;
+      case 'summon': for (let k = 0; k < e.n; k++) summon(st, p, e.tok, ev); break;
+      case 'revive': st.pl[p].grave.slice(-e.n).forEach(function (c) { summon(st, p, c, ev); }); break;
+      case 'duel': ids.forEach(function (id) { const m = findMin(st, id); if (m && self) { const a1 = atkOf(st, self), a2 = atkOf(st, m); ev.push({ t: 'atk', from: self.u, to: id }); damage(st, id, a1, ev); damage(st, self.u, a2, ev); } }); break;
+    }
+  }
+
+  // ---------- Coups ----------
+  function costOf(st, p, h) { return Math.max(0, DEFS[h.c].c - h.m); }
+  function canAttack(st, m) { return st.cur === m.o && !st.over && atkOf(st, m) > 0 && (!m.sick || m.kw.charge) && m.atks < (m.kw.wind ? 2 : 1); }
+  function attackTargets(st, m) {
+    const foe = 1 - m.o, enemies = st.pl[foe].board.filter(function (x) { return !x.kw.stealth; });
+    const taunts = enemies.filter(function (x) { return x.kw.taunt; });
+    return taunts.length ? taunts.map(function (x) { return x.u; }) : enemies.map(function (x) { return x.u; }).concat(['h' + foe]);
+  }
+  // a : { t: 'play', h, tgt } | { t: 'atk', from, to } | { t: 'end' }
+  function check(st, p, a) {
+    if (st.over) return 'Le match est terminé.';
+    if (st.cur !== p) return 'Ce n\'est pas ton tour.';
+    if (!a || typeof a !== 'object') return 'Action invalide.';
+    const pl = st.pl[p];
+    if (a.t === 'end') return null;
+    if (a.t === 'play') {
+      const h = pl.hand[a.h]; if (!h) return 'Carte introuvable.';
+      const d = DEFS[h.c];
+      if (costOf(st, p, h) > pl.mana) return 'Pas assez d\'énergie.';
+      if (d.k === 'u' && pl.board.length >= BOARD_MAX) return 'Ton plateau est plein.';
+      const lt = legalTargets(st, p, h.c);
+      if (lt) {
+        if (a.tgt != null && lt.indexOf(a.tgt) < 0) return 'Cible invalide.';
+        if (a.tgt == null && lt.length && d.k === 's') return 'Choisis une cible.';
+        if (!lt.length && d.k === 's') return 'Aucune cible possible.';
+      }
+      return null;
+    }
+    if (a.t === 'atk') {
+      const m = pl.board.find(function (x) { return x.u === a.from; });
+      if (!m) return 'Attaquant introuvable.';
+      if (!canAttack(st, m)) return m.sick ? 'Ce joueur vient d\'arriver : il attaquera au prochain tour.' : 'Ce joueur a déjà attaqué.';
+      if (attackTargets(st, m).indexOf(a.to) < 0) return 'Cible invalide (une Provocation protège peut-être l\'adversaire).';
+      return null;
+    }
+    return 'Action invalide.';
+  }
+  function act(st, p, a) {
+    const err = check(st, p, a); if (err) throw new Error(err);
+    const ev = [], pl = st.pl[p];
+    if (a.t === 'play') {
+      const h = pl.hand.splice(a.h, 1)[0], d = DEFS[h.c];
+      pl.mana -= costOf(st, p, h);
+      ev.push({ t: 'play', p: p, c: h.c, tgt: a.tgt != null ? a.tgt : null });
+      let self = null;
+      if (d.k === 'u') self = summon(st, p, h.c, ev);
+      d.fx.forEach(function (e) { if (e.w === 'play') runOp(st, p, e, a.tgt != null ? a.tgt : null, self, ev); });
+      if (d.k === 's') pl.grave.length = pl.grave.length;      // les sorts ne vont pas au cimetière des serviteurs
+      resolveDeaths(st, ev);
+    } else if (a.t === 'atk') {
+      const m = pl.board.find(function (x) { return x.u === a.from; });
+      m.atks++; if (m.kw.stealth) m.kw.stealth = 0;
+      ev.push({ t: 'atk', from: m.u, to: a.to });
+      const atk = atkOf(st, m);
+      if (a.to === 'h0' || a.to === 'h1') damage(st, a.to, atk, ev);
+      else { const t = findMin(st, a.to), back = atkOf(st, t); damage(st, a.to, atk, ev); damage(st, m.u, back, ev); }
+      resolveDeaths(st, ev);
+    } else {
+      pl.board.slice().forEach(function (m) { if (!m.sil && findMin(st, m.u)) D(m).fx.forEach(function (e) { if (e.w === 'end') runOp(st, p, e, null, m, ev); }); });
+      resolveDeaths(st, ev);
+      if (!st.over) startTurn(st, 1 - p, ev);
+    }
     return ev;
   }
 
   // ---------- Adversaire joué par l'ordinateur ----------
-  function clone(st) { const l = st.log; st.log = []; const c = JSON.parse(JSON.stringify(st)); st.log = l; return c; }
+  function clone(st) { return JSON.parse(JSON.stringify(st)); }
+  function minVal(st, m) { const d = D(m); return atkOf(st, m) * 1.1 + hpOf(st, m) * .9 + (m.kw.taunt ? 1 : 0) + (m.kw.shield ? atkOf(st, m) * .5 + 1 : 0) + (m.kw.wind ? atkOf(st, m) * .6 : 0) + (m.kw.stealth ? .5 : 0) + (m.sil ? 0 : d.fx.filter(function (e) { return e.w === 'aura' || e.w === 'end'; }).length * 2) + .5; }
   function evalFor(st, p) {
+    if (st.over) return st.res.w === p ? 1e4 : st.res.w === -1 ? 0 : -1e4;
+    const me = st.pl[p], fo = st.pl[1 - p];
     let s = 0;
-    for (let m = 0; m < 3; m++) {
-      const diff = mapPower(st, m, p) - mapPower(st, m, 1 - p);
-      s += mapWorth(st, m) * Math.tanh(diff / 6);
-    }
+    me.board.forEach(function (m) { s += minVal(st, m); }); fo.board.forEach(function (m) { s -= minVal(st, m) * 1.05; });
+    s += Math.sqrt(Math.max(0, me.hp)) * 4 - Math.sqrt(Math.max(0, fo.hp)) * 4.5 + me.hand.length * .8 - fo.hand.length * .4;
+    if (fo.hp <= 10) s += (10 - fo.hp) * .6;                        // presser quand l'adversaire est bas
     return s;
   }
-  function aiPlays(st, p, level) {
-    const plan = [], usedH = {}, per = [0, 0, 0];
-    let nrg = energy(st, p);
-    const sim = clone(st);
-    for (let iter = 0; iter < 6; iter++) {
-      const base = evalFor(sim, p);
-      let best = null;
-      st.pl[p].hand.forEach(function (h, i) {
-        if (usedH[i]) return;
-        for (let m = 0; m < 3; m++) {
-          if (st.locked[m] || sim.locked[m] || (arenaAt(st, m) === 'plateau' && st.turn > 4)) continue;
-          if (sim.board[m][p].length + 1 > capOf(sim, m)) continue;
-          const cost = costOf(st, p, h, m); if (cost > nrg) continue;
-          const s2 = clone(sim);
-          const card = { u: ++s2.n, c: h.c, o: p, m: m, perm: 0, neg: 0, t: s2.turn, mute: 0 };
-          s2.board[m][p].push(card); runRev(s2, card, []);
-          // on anticipe la croissance et on valorise l'énergie bien dépensée
-          let val = evalFor(s2, p) - base + cost * .015 + (DEFS[h.c].fx.some(function (e) { return e.o === 'grow'; }) ? (TURNS - st.turn) * .05 : 0);
-          if (level !== 'dur') val += (rnd(st) - .5) * .04;
-          if (!best || val > best.val) best = { val: val, i: i, m: m, cost: cost, s2: s2 };
-        }
-      });
-      if (!best || best.val <= 0.001) break;
-      plan.push({ h: best.i, m: best.m }); usedH[best.i] = 1; per[best.m]++; nrg -= best.cost;
-      Object.assign(sim, best.s2);
+  function aiStep(st, p) {
+    const base = evalFor(st, p), pl = st.pl[p];
+    let best = null;
+    const tryA = function (a, bonus) {
+      if (check(st, p, a)) return;
+      const s2 = clone(st); act(s2, p, a);
+      const v = evalFor(s2, p) - base + (bonus || 0);
+      if (!best || v > best.v) best = { v: v, a: a };
+    };
+    pl.hand.forEach(function (h, i) {
+      if (costOf(st, p, h) > pl.mana) return;
+      const lt = legalTargets(st, p, h.c);
+      let bonus = costOf(st, p, h) * .35;                           // utiliser son énergie est une bonne chose
+      if (DEFS[h.c].fx.some(function (e) { return e.o === 'mana'; }))   // la Pause technique : seulement si elle permet de jouer une carte de plus
+        bonus = pl.hand.some(function (x) { return x !== h && costOf(st, p, x) === pl.mana + 1; }) ? 1.5 : -5;
+      if (lt && lt.length) lt.forEach(function (t) { tryA({ t: 'play', h: i, tgt: t }, bonus); });
+      else tryA({ t: 'play', h: i }, bonus);
+    });
+    pl.board.forEach(function (m) { if (canAttack(st, m)) attackTargets(st, m).forEach(function (t) { tryA({ t: 'atk', from: m.u, to: t }, .2); }); });
+    return best && best.v > 0 ? best.a : null;
+  }
+  // Joue tout le tour de l'ordinateur ; renvoie une étape par action (pour l'animation)
+  function aiTurn(st, p, viewFor) {
+    const steps = [];
+    for (let k = 0; k < 30 && !st.over && st.cur === p; k++) {
+      const a = aiStep(st, p) || { t: 'end' };
+      const ev = act(st, p, a);
+      steps.push({ a: a, ev: ev, view: viewFor != null ? view(st, viewFor) : null });
+      if (a.t === 'end') break;
     }
-    return check(st, p, plan) ? [] : plan;
+    return steps;
   }
 
-  // ---------- Ce qu'un joueur a le droit de voir ----------
+  // ---------- Ce qu'un joueur voit ----------
+  function minView(st, m, me) {
+    return { u: m.u, c: m.c, o: m.o, a: atkOf(st, m), h: hpOf(st, m), mh: maxHpOf(st, m), ba: D(m).a, bh: D(m).h, kw: Object.keys(m.kw).filter(function (k) { return m.kw[k]; }), sil: m.sil,
+      can: m.o === me && canAttack(st, m), tg: m.o === me && canAttack(st, m) ? attackTargets(st, m) : null };
+  }
   function view(st, p) {
-    const sc = score(st);
+    const me = st.pl[p], fo = st.pl[1 - p], my = st.cur === p && !st.over;
     return {
-      turn: Math.min(st.turn, TURNS), over: st.over, res: st.res, me: p, names: st.names,
-      arenas: [0, 1, 2].map(function (m) { const a = arenaAt(st, m); return a ? { id: a, nom: AR[a].nom, txt: AR[a].txt } : null; }),
-      locked: st.locked.slice(), worth: [0, 1, 2].map(function (m) { return mapWorth(st, m); }), caps: [0, 1, 2].map(function (m) { return capOf(st, m); }),
-      board: st.board.map(function (sides, m) { return sides.map(function (cards) { return cards.map(function (c) { return { u: c.u, c: c.c, o: c.o, pw: cardPower(st, c), mute: c.mute, t: c.t }; }); }); }),
-      pw: sc.maps.map(function (x) { return [x.a, x.b]; }), pts: sc.pts,
-      hand: st.pl[p].hand.map(function (h) { return { c: h.c, m: h.m }; }), deck: st.pl[p].deck.length,
-      foeHand: st.pl[1 - p].hand.length, foeDeck: st.pl[1 - p].deck.length,
-      energy: st.over ? 0 : energy(st, p), bootcamp: [0, 1, 2].map(function (m) { return arenaAt(st, m) === 'bootcamp'; }),
-      plateau: [0, 1, 2].map(function (m) { return arenaAt(st, m) === 'plateau' && st.turn > 4; })
+      me: p, turn: st.turn, mine: my, over: st.over, res: st.res, names: st.names,
+      hero: [{ hp: me.hp, max: me.max, mana: me.mana, deck: me.deck.length, fat: me.fat }, { hp: fo.hp, max: fo.max, mana: fo.mana, deck: fo.deck.length, hand: fo.hand.length }],
+      board: [me.board.map(function (m) { return minView(st, m, p); }), fo.board.map(function (m) { return minView(st, m, p); })],
+      hand: me.hand.map(function (h) {
+        const cost = costOf(st, p, h), lt = legalTargets(st, p, h.c);
+        return { c: h.c, cost: cost, ok: my && !check(st, p, { t: 'play', h: me.hand.indexOf(h), tgt: lt && lt.length ? lt[0] : undefined }), tg: lt };
+      })
     };
   }
 
@@ -347,7 +402,7 @@
     if (!Array.isArray(deck) || deck.length !== DECK_SIZE) return 'Un deck contient exactement ' + DECK_SIZE + ' cartes.';
     const n = {};
     for (const c of deck) {
-      const d = DEFS[c]; if (!d) return 'Carte inconnue.';
+      const d = DEFS[c]; if (!d || d.t === 'Tok') return 'Carte inconnue.';
       n[c] = (n[c] || 0) + 1;
       const max = d.r === 'L' || d.r === 'S' || d.r === 'G' ? 1 : 2;
       if (n[c] > max) return max === 1 ? 'Une seule copie de chaque légendaire, secrète ou GOAT.' : '2 copies maximum par carte.';
@@ -356,7 +411,6 @@
     return null;
   }
 
-  root.PVP = { DEFS: DEFS, ARENAS: ARENAS, AR: AR, TURNS: TURNS, SLOTS: SLOTS, DECK_SIZE: DECK_SIZE, newMatch: newMatch, check: check, playTurn: playTurn,
-    aiPlays: aiPlays, view: view, score: score, cardPower: cardPower, mapPower: mapPower, costOf: costOf, cardText: cardText, fxText: fxText,
-    deckError: deckError, match: match, fLabel: fLabel };
+  root.PVP = { DEFS: DEFS, HERO_HP: HERO_HP, BOARD_MAX: BOARD_MAX, DECK_SIZE: DECK_SIZE, KWN: KWN, newMatch: newMatch, check: check, act: act,
+    aiStep: aiStep, aiTurn: aiTurn, view: view, cardText: cardText, deckError: deckError, match: match, legalTargets: legalTargets };
 })(typeof window !== 'undefined' ? window : globalThis);
