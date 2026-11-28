@@ -9,9 +9,10 @@ sont gérés par Supabase.
 - `marche.sql` : le marché entre joueurs (annonces, ventes, cours, taxe de 5 %).
 - `profil.sql` : le profil public (photo choisie parmi ses cartes, vitrine de 5 cartes, bannière, titres à débloquer) et le classement.
 - `amis.sql` : les amis et les échanges directs carte contre carte (rien ne bouge avant l'acceptation, tout est transféré d'un bloc).
+- `pvp.sql` : le mode classé (decks, matchs, rangs par saison, récompenses). Les matchs sont arbitrés par la fonction serveur `functions/pvp`, qui charge les règles `js/pvp-data.js` et `js/pvp-engine.js` du site et vérifie leur empreinte.
 - `catalogue.sql` : les 180 cartes (régénérer si `data/origines.js` change).
 
-Ordre d'installation : `schema.sql`, puis `catalogue.sql`, puis `marche.sql`, puis `profil.sql`, puis `amis.sql` (SQL Editor de Supabase).
+Ordre d'installation : `schema.sql`, puis `catalogue.sql`, puis `marche.sql`, puis `profil.sql`, puis `amis.sql`, puis `pvp.sql` (SQL Editor de Supabase).
 
 ## Sécurité
 

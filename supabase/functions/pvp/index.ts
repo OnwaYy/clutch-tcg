@@ -1,10 +1,21 @@
 // Fonction serveur « pvp » : arbitre les matchs classés.
 // Le navigateur envoie seulement ses coups ; le serveur garde l'état complet (mains, decks, hasard),
-// Les règles sont importées depuis le site publié (même fichier que le jeu) : redéployer la fonction après chaque changement de règles.
-// joue l'adversaire et calcule le résultat. Les fichiers pvp-data.js et pvp-engine.js sont les mêmes que ceux du site.
+// joue l'adversaire et calcule le résultat.
+// Les règles (pvp-data.js, pvp-engine.js) sont chargées depuis le site publié, donc identiques au jeu.
+// Leur empreinte SHA-256 est vérifiée : après chaque changement de règles, publier le site puis
+// redéployer cette fonction avec les nouvelles empreintes (sha256sum js/pvp-data.js js/pvp-engine.js).
 import { createClient } from 'npm:@supabase/supabase-js@2.45.4';
-import 'https://onwayy.github.io/clutch-tcg/js/pvp-data.js?v=a8df419e';
-import 'https://onwayy.github.io/clutch-tcg/js/pvp-engine.js?v=a8df419e';
+
+const RULES: [string, string][] = [
+  ['pvp-data.js', 'ff77aae27f8d14c3318ae9c37cd2b7155e7520594625155198bc1cfe0d212db4'],
+  ['pvp-engine.js', 'd73cd89210e8467c9fccf889ac6bb2f13a0f4fe153d9959287ddfccdb3631118'],
+];
+for (const [name, sha] of RULES) {
+  const code = await (await fetch('https://onwayy.github.io/clutch-tcg/js/' + name + '?v=' + sha.slice(0, 8))).text();
+  const got = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(code)))).map((b) => b.toString(16).padStart(2, '0')).join('');
+  if (got !== sha) throw new Error('Règles PvP inattendues pour ' + name + ' : redéployer la fonction.');
+  (0, eval)(code);
+}
 
 // deno-lint-ignore no-explicit-any
 const PVP = (globalThis as any).PVP;
