@@ -909,35 +909,57 @@
   const TIERS = [[0, 'Bronze'], [100, 'Argent'], [250, 'Or'], [450, 'Platine'], [700, 'Diamant'], [1000, 'Légende']];
   function tierOf(p) { let i = 0; TIERS.forEach(function (t, k) { if (p >= t[0]) i = k; }); return { nom: TIERS[i][1], min: TIERS[i][0], next: TIERS[i + 1] ? TIERS[i + 1][0] : null, nextNom: TIERS[i + 1] ? TIERS[i + 1][1] : null }; }
   const rankBadge = function (nom, sm) { return '<span class="rk-badge tier tier-' + nom + (sm ? ' sm' : '') + '"><b>' + nom.charAt(0) + '</b></span>'; };
-  const KWC = { 'Entrée': 'k-ent', 'Aura': 'k-aura', 'Fin de tour': 'k-end', 'Dernier mot': 'k-dead', 'Sort': 'k-sort' };
-  const kwClass = function (k) { return KWC[k] || 'k-kw'; };
+  const TOKI = { 901: '👥', 902: '🔁', 903: '⏸', 904: '🐛' };
   const FAMN = { FPS: 'FPS', MOBA: 'MOBA', RTS: 'Stratégie', COMBAT: 'Combat', SPORT: 'Rocket League', MULTI: 'Multi-jeux' };
-  const TOKI = { 901: '👥', 902: '🔁', 903: '⏸' };
   const cardName = function (cid) { return window.PVP_NAMES[cid] || (PV.DEFS[cid] && PV.DEFS[cid].nom) || ''; };
-  function gcText(cid) {
-    const d = PV.DEFS[cid], t = PV.cardText(cid);
-    const tags = [d.k === 's' ? 'Sort' : 'Serviteur', FAMN[d.fam]].concat(d.tags.filter(function (x) { return x.indexOf('club:') === 0; }).map(function (x) { return (window.PVP_CLUBS || {})[x.slice(5)] || x.slice(5); }));
-    return '<div class="g-txt">' + (t.length ? t.map(function (x) { return '<p><i class="kw ' + kwClass(x.kw) + '">' + x.kw + '</i>' + esc(x.txt) + '</p>'; }).join('') : '<p>Pas d\'effet : des statistiques pures.</p>') +
-      '<span class="tags">' + esc(tags.join(' · ')) + '</span></div>';
+  // Couleur du cadre selon la famille de jeu, couleur du liseré selon la rareté
+  const FAMC = { FPS: '#d0662b', MOBA: '#3f7fe0', RTS: '#3aa264', COMBAT: '#d23c3c', SPORT: '#21b3c9', MULTI: '#8b8578' };
+  const RIM = { C: '#b3a689', P: '#4fd1c5', E: '#b46bff', L: '#f2c25b', S: '#ff7ad9', G: '#ffffff' };
+  const SPELLT = { 'Map': 'Map', 'Logo de ligue': 'Ligue', 'Logo de tournoi': 'Tournoi', 'Jeu': 'Jeu', 'Événement': 'Événement', 'Lieu': 'Lieu', 'Média': 'Média', 'Moment': 'Moment' };
+  const UNITT = { J: 'Joueur', Club: 'Club', Tro: 'Trophée', Cast: 'Caster', Tok: 'Invocation' };
+  const GLAB = { CS: 'CS', LoL: 'LoL', Dota: 'Dota 2', Val: 'Valorant', CoD: 'CoD', RL: 'Rocket League', SC2: 'SC2', BW: 'Brood War', WC3: 'WC3', OW: 'Overwatch', FN: 'Fortnite', Quake: 'Quake', Halo: 'Halo', R6: 'R6', Smash: 'Smash', SF: 'SF', FGC: 'Combat', Multi: '' };
+  const KWTIP = { 'Entrée': 'se déclenche quand tu poses la carte.', 'Dernier mot': 'se déclenche quand ce serviteur meurt.', 'Fin de tour': 'se déclenche à la fin de chacun de tes tours.', 'Aura': 'agit tant que ce serviteur est en jeu.' };
+  function artHTML(cid) {
+    const d = PV.DEFS[cid], c = BY_ID[cid] || (d && d.src && BY_ID[d.src]);
+    if (!c || !c.img) return '<div class="ha tk" style="--ac:#4a4560"><span>' + (TOKI[cid] || '★') + '</span></div>';
+    const m = c.player ? 'pl' : (c.photo || c.map) ? 'ph' : 'lg';
+    return '<div class="ha ' + m + (BY_ID[cid] ? '' : ' tok') + '" style="--ac:' + (c.color || '#3a3550') + '"><img src="' + c.img + '" alt="" draggable="false"></div>';
   }
-  // Carte habillée pour le jeu. o : { cost, a, h, mh, kw (puce), big, cls, attrs, noCost }
+  function typeLine(cid) {
+    const d = PV.DEFS[cid], c = BY_ID[cid], g = GLAB[d.g];
+    const t = d.k === 's' ? (c && SPELLT[c.type]) || 'Sort' : c && c.type === 'Joueuse' ? 'Joueuse' : UNITT[d.t] || 'Serviteur';
+    return t + (g ? ' · ' + g : '');
+  }
+  function textHTML(cid) {
+    const t = PV.cardText(cid), keys = t.filter(function (x) { return x.key; }).map(function (x) { return x.kw; });
+    return (keys.length ? '<p><b>' + keys.join(', ') + '</b></p>' : '') + t.filter(function (x) { return !x.key; }).map(function (x) {
+      return '<p>' + (x.kw === 'Sort' || x.kw === 'Aura' ? '' : '<b>' + x.kw + ' :</b> ') + esc(x.txt) + '</p>';
+    }).join('');
+  }
+  function gcText(cid) { return textHTML(cid).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); }
+  // Carte complète. o : { cost, a, h, mh, cls, attrs, style }
   function gcHTML(cid, o) {
-    o = o || {}; const c = BY_ID[cid], d = PV.DEFS[cid]; if (!d) return '';
+    o = o || {}; const d = PV.DEFS[cid]; if (!d) return '';
+    const nm = cardName(cid), txt = textHTML(cid), L = gcText(cid).length, N = nm.length;
+    const tf = L <= 24 ? 8.4 : L <= 48 ? 7.4 : L <= 80 ? 6.4 : L <= 110 ? 5.7 : 5.1;
+    const nf = N <= 7 ? 10.5 : N <= 10 ? 9 : N <= 13 ? 7.6 : N <= 17 ? 6.4 : 5.4;
     const cost = o.cost != null ? o.cost : d.c;
-    const art = c ? '<div class="cc mini ' + finish(c) + '" style="' + cardStyle(c) + '">' + cardInner(c).replace(/ loading="lazy"/g, '') + corners(c) + '</div>'
-      : '<div class="gtok"><span><i>' + (TOKI[cid] || '★') + '</i>' + esc(d.nom || '') + '</span></div>';
-    let st = '';
+    let st = '<span class="st mana' + (cost < d.c ? ' up' : cost > d.c ? ' dn' : '') + '">' + cost + '</span>';
     if (d.k === 'u') {
       const a = o.a != null ? o.a : d.a, h = o.h != null ? o.h : d.h, mh = o.mh != null ? o.mh : d.h;
-      st = '<span class="g-atk' + (a > d.a ? ' up' : '') + '">' + a + '</span><span class="g-hp' + (h < mh ? ' hurt' : mh > d.h ? ' up' : '') + '">' + h + '</span>';
+      st += '<span class="st atk' + (a > d.a ? ' up' : a < d.a ? ' dn' : '') + '">' + a + '</span><span class="st hp' + (h < mh ? ' dn' : mh > d.h ? ' up' : '') + '">' + h + '</span>';
     }
-    const first = PV.cardText(cid)[0];
-    return '<div class="gc' + (o.cls ? ' ' + o.cls : '') + '" data-cid="' + cid + '"' + (o.attrs || '') + '>' + art +
-      (o.noCost ? '' : '<span class="g-cost' + (cost < d.c ? ' cheap' : '') + '">' + cost + '</span>') + st +
-      (o.kw ? '<span class="g-kw ' + (d.k === 's' ? 'k-sort' : first ? kwClass(first.kw) : 'k-dead') + '">' + (d.k === 's' ? 'Sort' : first ? first.kw : 'Serviteur') + '</span>' : '') +
-      (o.big ? gcText(cid) : '') + '</div>';
+    return '<div class="gc ' + (d.k === 's' ? 'sp' : 'un') + ' r' + d.r + (o.cls ? ' ' + o.cls : '') + '" data-cid="' + cid + '"' + (o.attrs || '') +
+      ' style="--fc:' + FAMC[d.fam] + ';--rim:' + RIM[d.r] + ';--tf:calc(var(--u) * ' + tf + ');--nf:calc(var(--u) * ' + nf + ')' + (o.style ? ';' + o.style : '') + '">' +
+      '<div class="hb"></div>' + artHTML(cid) + ('LSG'.indexOf(d.r) >= 0 && d.t !== 'Tok' ? '<i class="hd"></i>' : '') +
+      '<div class="hr"><b>' + esc(nm) + '</b></div>' + (d.t !== 'Tok' ? '<i class="hg"></i>' : '') +
+      '<div class="ht">' + txt + '</div><div class="hy">' + esc(typeLine(cid)) + '</div>' + st + '</div>';
   }
-  const bigCard = function (cid) { return gcHTML(cid, { cls: 'gbig', big: true }); };
+  // Grande carte + rappel des mots-clés
+  const bigCard = function (cid) {
+    const tips = PV.cardText(cid).filter(function (x) { return x.key || KWTIP[x.kw]; }).map(function (x) { return '<p><b>' + x.kw + '</b>' + esc(x.key ? x.txt : KWTIP[x.kw]) + '</p>'; }).join('');
+    return '<div class="gbig-w">' + gcHTML(cid, { cls: 'gbig' }) + (tips ? '<div class="gtips">' + tips + '</div>' : '') + '</div>';
+  };
 
   // ---------- Appels au serveur de match (ou simulation locale en mode démo) ----------
   async function pvpCall(action, body) {
@@ -1043,11 +1065,11 @@
       .sort(function (a, b) { return PV.DEFS[a.id].c - PV.DEFS[b.id].c || RORDER[b.rarity] - RORDER[a.rarity] || a.id - b.id; });
     $('#dkGrid').innerHTML = pool.length ? pool.map(function (c) {
       const k = dkCount(c.id), mx2 = dkMax(c.id);
-      return '<button class="dk-pc" type="button" data-dk-add="' + c.id + '"' + (k >= mx2 || n >= 20 ? ' disabled' : '') + '>' + gcHTML(c.id, { kw: true }) + '<span class="n' + (k ? ' in' : '') + '">' + (k ? k + '/' + mx2 + ' dans le deck' : '×' + S.collection[c.id]) + '</span></button>';
+      return '<button class="dk-pc" type="button" data-dk-add="' + c.id + '"' + (k >= mx2 || n >= 20 ? ' disabled' : '') + '>' + gcHTML(c.id) + '<span class="n' + (k ? ' in' : '') + '">' + (k ? k + '/' + mx2 + ' dans le deck' : '×' + S.collection[c.id]) + '</span></button>';
     }).join('') : '<p class="am-empty">Aucune carte ne correspond.</p>';
     const grp = {}; DK.cards.forEach(function (x) { grp[x] = (grp[x] || 0) + 1; });
     const ids = Object.keys(grp).map(Number).sort(function (a, b) { return PV.DEFS[a].c - PV.DEFS[b].c || a - b; });
-    $('#dkList').innerHTML = ids.length ? ids.map(function (x) { const c = BY_ID[x]; return '<button class="dk-li r-' + c.rarity + '" type="button" data-dk-rm="' + x + '" data-cid="' + x + '" title="Retirer"><i>' + PV.DEFS[x].c + '</i><span>' + esc(window.PVP_NAMES[x]) + '</span><small>' + PV.DEFS[x].p + '</small><em>' + (grp[x] > 1 ? '×' + grp[x] : '') + '</em></button>'; }).join('')
+    $('#dkList').innerHTML = ids.length ? ids.map(function (x) { const c = BY_ID[x]; return '<button class="dk-li r-' + c.rarity + '" type="button" data-dk-rm="' + x + '" data-cid="' + x + '" title="Retirer"><i>' + PV.DEFS[x].c + '</i><span>' + esc(window.PVP_NAMES[x]) + '</span><small>' + (PV.DEFS[x].k === 'u' ? PV.DEFS[x].a + '/' + PV.DEFS[x].h : 'Sort') + '</small><em>' + (grp[x] > 1 ? '×' + grp[x] : '') + '</em></button>'; }).join('')
       : '<p class="am-empty">Clique sur des cartes pour les ajouter à ton deck.</p>';
     $('#dkSave').disabled = n !== 20;
   }
@@ -1128,13 +1150,22 @@
     return av + '<span class="hp' + (h.hp <= 8 ? ' low' : '') + '">' + h.hp + '</span><span class="hn"><b>' + esc(name) + '</b><small>' + (i === 0 ? h.deck + ' cartes dans ton deck' : h.hand + ' en main · ' + h.deck + ' dans le deck') + '</small></span>';
   }
   function minionHTML(m) {
-    const cls = ['mn'];
+    const d = PV.DEFS[m.c], cls = ['mn', 'r' + d.r];
     m.kw.forEach(function (k) { cls.push(k); }); if (m.sil) cls.push('sil');
     if (m.can && MT.v.mine) cls.push('can');
-    if (m.o === MT.v.me && MT.v.mine && !m.can && m.a > 0 && m.tg == null && !m.kw.length) cls.push('');
     if (MT.sel && MT.sel.type === 'atk' && MT.sel.from === m.u) cls.push('sel');
-    const marks = m.kw.filter(function (k) { return k === 'wind' || k === 'charge'; }).map(function (k) { return '<span>' + PV.KWN[k] + '</span>'; }).join('');
-    return gcHTML(m.c, { a: m.a, h: m.h, mh: m.mh, noCost: true, cls: cls.join(' '), attrs: ' data-id="' + m.u + '"' }).replace('</div>', '</div>' + (marks ? '<span class="mk">' + marks + '</span>' : ''));
+    let ic = '';
+    if (!m.sil) {
+      if (d.fx.some(function (e) { return e.w === 'death'; })) ic += '<i title="Dernier mot">☠</i>';
+      if (d.fx.some(function (e) { return e.w === 'aura'; })) ic += '<i title="Aura">✦</i>';
+      if (d.fx.some(function (e) { return e.w === 'end'; })) ic += '<i title="Fin de tour">↻</i>';
+    }
+    if (m.kw.indexOf('wind') >= 0) ic += '<i title="Double attaque">»</i>';
+    return '<div class="' + cls.join(' ') + '" data-id="' + m.u + '" data-cid="' + m.c + '" style="--rim:' + RIM[d.r] + '">' +
+      (m.kw.indexOf('taunt') >= 0 ? '<i class="mt"></i>' : '') + artHTML(m.c) + ('LSG'.indexOf(d.r) >= 0 && d.t !== 'Tok' ? '<i class="hd"></i>' : '') +
+      (m.kw.indexOf('shield') >= 0 ? '<i class="ms"></i>' : '') +
+      '<span class="st atk' + (m.a > d.a ? ' up' : m.a < d.a ? ' dn' : '') + '">' + m.a + '</span><span class="st hp' + (m.h < m.mh ? ' dn' : m.mh > d.h ? ' up' : '') + '">' + m.h + '</span>' +
+      (ic ? '<span class="mi">' + ic + '</span>' : '') + '</div>';
   }
   function targetsOfSel() {
     const s = MT.sel; if (!s) return [];
@@ -1151,7 +1182,7 @@
     $('#pmMana').innerHTML = '<b>' + mana + '/' + max + '</b><div>' + Array.from({ length: 10 }, function (_, k) { return '<i class="' + (k < mana ? 'on' : '') + '"' + (k >= max ? ' style="opacity:.25"' : '') + '></i>'; }).join('') + '</div>';
     const n = v.hand.length;
     $('#pmHand').innerHTML = v.hand.map(function (h, i) {
-      return gcHTML(h.c, { cost: h.cost, kw: true, cls: (h.ok && !MT.busy ? 'ok' : 'no') + (MT.sel && MT.sel.type === 'play' && MT.sel.h === i ? ' sel' : ''), attrs: ' data-h="' + i + '" style="--k:' + i + ';--n:' + n + '"' });
+      return gcHTML(h.c, { cost: h.cost, cls: (h.ok && !MT.busy ? 'ok' : 'no') + (MT.sel && MT.sel.type === 'play' && MT.sel.h === i ? ' sel' : ''), attrs: ' data-h="' + i + '"', style: '--k:' + i + ';--n:' + n });
     }).join('');
     const anyMove = v.mine && (v.hand.some(function (h) { return h.ok; }) || v.board[0].some(function (m) { return m.can; }));
     const btn = $('#pmEnd'); btn.disabled = !v.mine || MT.busy || v.over; btn.textContent = v.mine ? 'Fin du tour' : 'Tour adverse'; btn.classList.toggle('ready', v.mine && !anyMove && !MT.busy);
@@ -1218,13 +1249,13 @@
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && MT.sel && !$('#pvpMatch').hidden) { MT.sel = null; renderMatch(); } });
   // aperçu de la carte survolée (ordinateur) ou appui long (mobile)
   $('#pvpMatch').addEventListener('mouseover', function (e) {
-    const g = e.target.closest('.gc[data-cid]'), pv = $('#pmPrev');
+    const g = e.target.closest('[data-cid]'), pv = $('#pmPrev');
     if (!g || !matchMedia('(hover: hover)').matches) { pv.hidden = true; return; }
     if (pv._c !== g.dataset.cid) { pv.innerHTML = bigCard(+g.dataset.cid); pv._c = g.dataset.cid; }
     pv.hidden = false;
   });
   let lp = null;
-  $('#pvpMatch').addEventListener('touchstart', function (e) { const g = e.target.closest('.gc[data-cid]'); if (!g) return; lp = setTimeout(function () { const pv = $('#pmPrev'); pv.innerHTML = bigCard(+g.dataset.cid); pv.hidden = false; }, 420); }, { passive: true });
+  $('#pvpMatch').addEventListener('touchstart', function (e) { const g = e.target.closest('[data-cid]'); if (!g) return; lp = setTimeout(function () { const pv = $('#pmPrev'); pv.innerHTML = bigCard(+g.dataset.cid); pv.hidden = false; }, 420); }, { passive: true });
   $('#pvpMatch').addEventListener('touchend', function () { clearTimeout(lp); setTimeout(function () { $('#pmPrev').hidden = true; }, 1200); });
   $('#pmQuit').addEventListener('click', async function () {
     const b = this;

@@ -28,26 +28,34 @@
   function match(f, cid) { const d = DEFS[cid]; return !!d && String(f || '*').split('&').every(function (t) { return test1(t, d); }); }
 
   // ---------- Textes ----------
-  const GNAME = { CS: 'Counter-Strike', LoL: 'LoL', Dota: 'Dota 2', Val: 'Valorant', CoD: 'Call of Duty', RL: 'Rocket League', SC2: 'StarCraft II', BW: 'Brood War', WC3: 'Warcraft III', OW: 'Overwatch', FN: 'Fortnite', Quake: 'Quake', Halo: 'Halo', R6: 'Rainbow Six', Smash: 'Smash', SF: 'Street Fighter', FGC: 'jeux de combat' };
-  const FNAME = { FPS: 'FPS', MOBA: 'MOBA', RTS: 'de stratégie', COMBAT: 'de jeux de combat', SPORT: 'Rocket League', MULTI: 'multi-jeux' };
+  const GNAME = { CS: 'Counter-Strike', LoL: 'LoL', Dota: 'Dota 2', Val: 'Valorant', CoD: 'Call of Duty', RL: 'Rocket League', SC2: 'StarCraft II', BW: 'Brood War', WC3: 'Warcraft III', OW: 'Overwatch', FN: 'Fortnite', Quake: 'Quake', Halo: 'Halo', R6: 'Rainbow Six', Smash: 'Smash', SF: 'Street Fighter', FGC: 'jeu de combat' };
+  const FNAME = { FPS: 'FPS', MOBA: 'MOBA', RTS: 'de stratégie', COMBAT: 'de combat', SPORT: 'Rocket League', MULTI: 'multi-jeux' };
   const KWN = { taunt: 'Provocation', charge: 'Charge', shield: 'Armure', stealth: 'Camouflage', wind: 'Double attaque' };
   const KWD = { taunt: 'les ennemis doivent l\'attaquer en premier', charge: 'peut attaquer dès qu\'il arrive', shield: 'ignore les premiers dégâts subis', stealth: 'ne peut pas être ciblé tant qu\'il n\'a pas attaqué', wind: 'peut attaquer deux fois par tour' };
-  function fLabel(f, one) {
-    const toks = String(f || '*').split('&'); let noun = one ? 'carte' : 'cartes'; const q = [];
+  // f : filtre (« J&LoL », « club:T1 », « FPS »…) ; base : 'carte' ou 'serviteur' ; one : singulier
+  function fLabel(f, one, base) {
+    const toks = String(f || '*').split('&'); base = base || 'carte';
+    let noun = base; const q = [];
     toks.forEach(function (t) {
-      if (t === 'J') noun = one ? 'joueur' : 'joueurs';
+      if (t === 'J') noun = 'joueur';
       else if (t === '*') {}
       else if (t.indexOf('club:') === 0) q.push(CLUBS[t.slice(5)] || t.slice(5));
       else if (t.indexOf('id:') === 0) { noun = ''; q.push(root.PVP_NAMES ? root.PVP_NAMES[+t.slice(3)] : '#' + t.slice(3)); }
-      else if (GNAME[t]) q.push(noun.indexOf('joueur') === 0 ? 'de ' + GNAME[t] : GNAME[t]);
+      else if (GNAME[t]) q.push(noun === 'joueur' || t === 'FGC' ? 'de ' + GNAME[t] : GNAME[t]);
       else if (FNAME[t]) q.push(FNAME[t]);
     });
+    if (noun && !one) noun += 's';
     return (noun + ' ' + q.join(' ')).trim();
   }
+  const fem = function (f, base) { return (base || 'carte') === 'carte' && String(f || '').indexOf('J') < 0; };
+  const un = function (f, base) { return fem(f, base) ? 'une ' : 'un '; };
   const TGT = { any: 'un personnage', enemy: 'un ennemi', enemyMin: 'un serviteur adverse', min: 'un serviteur', friendMin: 'un serviteur allié', self: 'ce serviteur',
     myHero: 'ton héros', foeHero: 'le héros adverse', allEnemyMin: 'tous les serviteurs adverses', allFriendMin: 'tes autres serviteurs', allMin: 'tous les autres serviteurs', allEnemy: 'tous les ennemis', randEnemy: 'un ennemi au hasard' };
-  function tgtText(e) {
-    if (e.f && e.f !== '*' && (e.t === 'allFriendMin' || e.t === 'friendMin')) return (e.t === 'friendMin' ? 'un(e) ' + fLabel(e.f, true) + ' allié(e)' : 'tes ' + fLabel(e.f));
+  function tgtText(e, spell) {
+    if (e.f && e.f !== '*' && e.t === 'friendMin') return un(e.f, 'serviteur') + fLabel(e.f, true, 'serviteur') + ' allié';
+    if (e.f && e.f !== '*' && e.t === 'allFriendMin') return 'tes ' + (spell ? '' : 'autres ') + fLabel(e.f, false, 'serviteur');
+    if (spell && e.t === 'allFriendMin') return 'tes serviteurs';
+    if (spell && e.t === 'allMin') return 'tous les serviteurs';
     return TGT[e.t] || '';
   }
   function condText(c) {
@@ -55,42 +63,64 @@
     if (c.alone) return 'tu n\'as aucun autre serviteur';
     if (c.hurt) return 'ton héros a ' + HURT_AT + ' PV ou moins';
     if (c.nothurt) return 'ton héros a plus de ' + HURT_AT + ' PV';
-    if (c.has) return 'tu contrôles ' + (c.has.indexOf('id:') === 0 ? fLabel(c.has) : 'un(e) autre ' + fLabel(c.has, true));
+    if (c.has) return 'tu contrôles ' + (c.has.indexOf('id:') === 0 ? fLabel(c.has) : un(c.has, 'serviteur') + 'autre ' + fLabel(c.has, true, 'serviteur'));
     return '';
   }
-  function opText(e) {
-    const tg = tgtText(e);
+  const aTo = function (tg) { return tg.indexOf('le ') === 0 ? 'au ' + tg.slice(3) : tg.indexOf('les ') === 0 ? 'aux ' + tg.slice(4) : 'à ' + tg; };
+  function opText(e, spell) {
+    const tg = tgtText(e, spell);
     switch (e.o) {
-      case 'dmg': return 'inflige ' + e.n + ' dégât' + (e.n > 1 ? 's' : '') + ' à ' + tg + (e.times ? ', ' + e.times + ' fois' : '');
+      case 'dmg': return 'inflige ' + e.n + ' dégât' + (e.n > 1 ? 's' : '') + ' ' + aTo(tg) + (e.times ? ', ' + e.times + ' fois' : '');
       case 'heal': return 'rend ' + e.n + ' PV à ' + tg;
       case 'buff': return (e.t === 'self' ? 'gagne ' : 'donne ') + '+' + e.a + '/+' + e.h + (e.t === 'self' ? '' : ' à ' + tg);
-      case 'buffPer': return 'gagne +' + e.a + '/+' + e.h + ' pour chaque autre ' + fLabel(e.f, true) + ' que tu contrôles';
+      case 'buffPer': return 'gagne +' + e.a + '/+' + e.h + ' pour chaque autre ' + fLabel(e.f, true, 'serviteur') + ' que tu contrôles';
       case 'kw': return (e.t === 'self' ? 'gagne ' : 'donne ') + KWN[e.k] + (e.t === 'self' ? '' : ' à ' + tg);
-      case 'draw': return 'pioche ' + (e.n > 1 ? e.n + ' ' + fLabel(e.f) : (e.f === '*' ? 'une carte' : 'un(e) ' + fLabel(e.f, true)));
+      case 'draw': return 'pioche ' + (e.n > 1 ? e.n + ' ' + fLabel(e.f) : un(e.f) + fLabel(e.f, true));
       case 'cost': return 'tes ' + fLabel(e.f) + ' en main coûtent ' + e.v + ' de moins';
       case 'ramp': return 'gagne ' + e.n + ' cristal d\'énergie';
       case 'mana': return 'gagne ' + e.n + ' énergie pour ce tour';
       case 'silence': return 'réduit au silence ' + tg + ' (il perd ses effets)';
       case 'destroy': return 'détruit ' + tg + (e.min ? ' qui a ' + e.min + ' ATQ ou plus' : '');
-      case 'summon': return 'invoque ' + (e.n > 1 ? e.n + ' ' : 'un ') + (DEFS[e.tok] ? DEFS[e.tok].nom + (e.n > 1 ? 's' : '') + ' ' + DEFS[e.tok].a + '/' + DEFS[e.tok].h : '');
+      case 'summon': { const T = DEFS[e.tok]; return 'invoque ' + (e.n > 1 ? e.n + ' ' : 'un ') + (T ? T.nom + (e.n > 1 ? 's' : '') + ' ' + T.a + '/' + T.h + (T.kw.length ? ' avec ' + T.kw.map(function (k) { return KWN[k]; }).join(' et ') : '') : ''); }
       case 'revive': return 'ramène en jeu tes ' + e.n + ' derniers serviteurs morts';
       case 'duel': return 'affronte ' + tg + ' : ils s\'infligent leurs dégâts';
     }
     return '';
   }
+  const cap = function (s) { return s.charAt(0).toUpperCase() + s.slice(1); };
+  // Phrases d'un groupe d'effets : « A, puis B. », « Si X : A et B. Sinon, C. »
+  function sentence(list) {
+    const seg = [];
+    list.forEach(function (x) {
+      const k = x.c ? JSON.stringify(x.c) : '';
+      if (seg.length && seg[seg.length - 1].k === k) seg[seg.length - 1].t.push(x.t); else seg.push({ k: k, c: x.c, t: [x.t] });
+    });
+    if (seg.length === 1 && seg[0].t.length === 1) return cap(seg[0].t[0] + (seg[0].c ? ' si ' + condText(seg[0].c) : '')) + '.';
+    return seg.map(function (g, i) {
+      const body = g.t.join(' et ');
+      if (!g.c) return cap(body.replace(/ et /g, ', puis ')) + '.';
+      if (g.c.nothurt && i && seg[i - 1].c && seg[i - 1].c.hurt) return 'Sinon, ' + body + '.';
+      return 'Si ' + condText(g.c) + ' : ' + body + '.';
+    }).join(' ');
+  }
   function cardText(cid) {
     const d = DEFS[cid]; if (!d) return [];
-    const out = [];
-    d.kw.forEach(function (k) { out.push({ kw: KWN[k], txt: KWD[k].charAt(0).toUpperCase() + KWD[k].slice(1) + '.' }); });
+    const out = [], spell = d.k === 's';
+    d.kw.forEach(function (k) { out.push({ kw: KWN[k], key: 1, txt: cap(KWD[k]) + '.' }); });
     const groups = {};
-    d.fx.forEach(function (e) {
+    d.fx.forEach(function (e, i) {
       let t;
-      if (e.w === 'aura') t = e.o === 'self' ? 'a +' + e.a + '/+' + e.h + ' tant que ' + condText(e.if) : 'tes autres ' + fLabel(e.f) + ' ont +' + e.a + '/+' + e.h;
-      else t = opText(e) + (e.if ? ' si ' + condText(e.if) : '');
-      const kw = d.k === 's' ? 'Sort' : { play: 'Entrée', aura: 'Aura', end: 'Fin de tour', death: 'Dernier mot' }[e.w];
-      (groups[kw] = groups[kw] || []).push(t);
+      const p = d.fx[i - 1];
+      if (e.o === 'kw' && p && p.o === 'buff' && p.t === e.t && p.w === e.w && e.t !== 'self' && !e.if && !p.if) {   // « donne +2/+0 et Charge à … »
+        const g = groups[spell ? 'Sort' : { play: 'Entrée', aura: 'Aura', end: 'Fin de tour', death: 'Dernier mot' }[e.w]], last = g[g.length - 1];
+        last.t = last.t.replace(' à ', ' et ' + KWN[e.k] + ' à '); return;
+      }
+      if (e.w === 'aura') t = e.o === 'self' ? 'a +' + e.a + '/+' + e.h + ' tant que ' + condText(e.if) : 'tes autres ' + fLabel(e.f, false, 'serviteur') + ' ont +' + e.a + '/+' + e.h;
+      else t = opText(e, spell);
+      const kw = spell ? 'Sort' : { play: 'Entrée', aura: 'Aura', end: 'Fin de tour', death: 'Dernier mot' }[e.w];
+      (groups[kw] = groups[kw] || []).push({ t: t, c: e.w === 'aura' ? null : e.if });
     });
-    Object.keys(groups).forEach(function (k) { const s = groups[k].join(', puis '); out.push({ kw: k, txt: s.charAt(0).toUpperCase() + s.slice(1) + '.' }); });
+    Object.keys(groups).forEach(function (k) { out.push({ kw: k, txt: k === 'Aura' ? groups[k].map(function (x) { return cap(x.t) + '.'; }).join(' ') : sentence(groups[k]) }); });
     return out;
   }
 

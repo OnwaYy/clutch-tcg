@@ -16,7 +16,7 @@ assert len(rows) == 180, len(rows)
 GAME = {'Counter-Strike': 'CS', 'League of Legends': 'LoL', 'Dota 2': 'Dota', 'Valorant': 'Val', 'Call of Duty': 'CoD',
         'Rocket League': 'RL', 'StarCraft II': 'SC2', 'StarCraft: Brood War': 'BW', 'StarCraft': 'BW', 'Warcraft III': 'WC3',
         'Overwatch': 'OW', 'Fortnite': 'FN', 'Quake': 'Quake', 'Halo': 'Halo', 'Rainbow Six Siege': 'R6',
-        'Super Smash Bros. Melee': 'Smash', 'Street Fighter': 'SF', 'Jeux de combat': 'FGC', 'Counter-Strike / Valorant': 'CS',
+        'Super Smash Bros. Melee': 'Smash', 'Super Smash Bros.': 'Smash', 'Street Fighter': 'SF', 'Jeux de combat': 'FGC', 'Counter-Strike / Valorant': 'CS',
         'Multi-jeux': 'Multi'}
 FAM = {'CS': 'FPS', 'Val': 'FPS', 'CoD': 'FPS', 'OW': 'FPS', 'FN': 'FPS', 'Quake': 'FPS', 'Halo': 'FPS', 'R6': 'FPS',
        'LoL': 'MOBA', 'Dota': 'MOBA', 'SC2': 'RTS', 'BW': 'RTS', 'WC3': 'RTS', 'Smash': 'COMBAT', 'SF': 'COMBAT', 'FGC': 'COMBAT',
@@ -226,7 +226,7 @@ unit(154, 5, 5, 5, ('charge',), play('dmg', n=1, t='allEnemyMin'))     # donk
 unit(155, 4, 4, 4, (), aura('self', a=3, h=3, **{'if': ALONE}))        # BoxeR
 unit(156, 6, 6, 6, (), play('destroy', t='enemyMin'))                  # Flash — le Dieu
 unit(157, 4, 4, 5, (), aura('buff', a=1, h=1, f='RTS'))                # Grubby
-unit(161, 5, 4, 4, (), play('summon', n=2, tok=901))                   # Serral — l'essaim
+unit(161, 6, 4, 5, (), play('summon', n=2, tok=904))                   # Serral — l'essaim de zerglings
 unit(163, 4, 4, 4, (), aura('buff', a=2, h=2, f='SPORT'), play('draw', n=1, f='SPORT'))   # Kaydop (secrète)
 unit(165, 5, 3, 5, ('taunt',), aura('buff', a=1, h=1, f='J&CS'))       # apEX — le capitaine
 unit(174, 4, 3, 6, ('taunt',), death('summon', n=1, tok=902))          # Ceb (secrète)
@@ -244,12 +244,14 @@ out = []
 for i, (name, rar, typ, game) in enumerate(rows, 1):
     g = GAME.get(game, game)
     tags = [club(k) for k, ids in CLUBS.items() if i in ids] + (['stream'] if i in STREAM else [])
-    d = dict(id=i, **C[i], g=g, fam=FAM.get(g, 'MULTI'), t=TYPE[typ], r=rar, tags=tags)
+    assert g in FAM, (i, name, game)          # chaque carte doit appartenir à une famille connue
+    d = dict(id=i, **C[i], g=g, fam=FAM[g], t=TYPE[typ], r=rar, tags=tags)
     out.append(d)
 # jetons invoqués par certains effets
-out.append(dict(id=901, k='u', c=1, a=1, h=1, kw=[], fx=[], g='Multi', fam='MULTI', t='Tok', r='C', tags=[], nom='Fan'))
+out.append(dict(id=901, k='u', c=1, a=1, h=1, kw=[], fx=[], g='Multi', fam='MULTI', t='Tok', r='C', tags=[], nom='Fan', src=85))
+out.append(dict(id=904, k='u', c=1, a=1, h=1, kw=['charge'], fx=[], g='SC2', fam='RTS', t='Tok', r='C', tags=[], nom='Zergling', src=161))
 out.append(dict(id=903, k='s', c=0, kw=[], fx=[play('mana', n=1)], g='Multi', fam='MULTI', t='Tok', r='C', tags=[], nom='Pause technique'))
-out.append(dict(id=902, k='u', c=2, a=2, h=2, kw=[], fx=[], g='Multi', fam='MULTI', t='Tok', r='C', tags=[], nom='Remplaçant'))
+out.append(dict(id=902, k='u', c=2, a=2, h=2, kw=[], fx=[], g='Multi', fam='MULTI', t='Tok', r='C', tags=[], nom='Remplaçant', src=174))
 
 clubs = {k: CLUB_NAME[k] for k in CLUBS}
 js = ('// Généré par tools/pvp_cartes.py — ne pas modifier à la main.\n'
