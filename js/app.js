@@ -324,14 +324,14 @@
   // ---------- GOAT : carte en profondeur (fond du jeu, joueur détouré qui sort du cadre) ----------
   const G3 = { Faker: ['6× champion du monde', '#e2012d'], ZywOo: ['3× champion du Major', '#f5c935'], Kaydop: ['3× champion du monde', '#5aa9ff'], Shotzzy: ['3× champion du monde', '#92c83e'], N0tail: ['2× champion de The International', '#e84a3a'] };
   const CROWN = '<svg class="g3-crown" viewBox="0 0 40 28" aria-hidden="true"><path d="M3 24 L1 6 L11 14 L20 2 L29 14 L39 6 L37 24 Z"/><rect x="3" y="23" width="34" height="4" rx="1"/></svg>';
-  function goatInner(c) {
+  function goatInner(c, G) {
     const g = G3[c.name] || ['', '#f2c25b'], slug = c.name.toLowerCase();
     return '<span class="g3-holo"></span><span class="g3-clip" style="--c:' + g[1] + '"><span class="g3-bg" style="background-image:url(assets/goat/' + slug + '-1.webp?v=1)"></span><span class="g3-dust far"></span><span class="g3-light"></span>' +
       '<span class="g3-beam a"></span><span class="g3-beam b"></span><span class="g3-word">GOAT</span><span class="g3-dust"></span></span>' +
       '<img class="g3-cut" src="assets/goat/cut-' + slug + '.webp?v=1" alt="' + esc(c.name) + '" loading="lazy"><span class="g3-shade"></span>' + CROWN +
-      '<span class="g3-tag"><b>GOAT</b><small>HORS SÉRIE</small></span><span class="cc-ed">PREMIÈRE ÉDITION</span>' +
+      (G ? '<span class="g3-tag gm-cost"><b>' + G.cost + '</b><small>ÉNERGIE</small></span>' + G.stats : '<span class="g3-tag"><b>GOAT</b><small>HORS SÉRIE</small></span>') + '<span class="cc-ed">PREMIÈRE ÉDITION</span>' +
       '<span class="g3-plate"><small>Greatest of all time</small><b>' + esc(c.name) + '</b><span class="g3-meta">' + esc(c.game) + (c.year ? ' · ' + esc(String(c.year)) : '') + '</span>' +
-      (g[0] ? '<span class="g3-hook">' + esc(g[0]) + '</span>' : '') + '</span>';
+      (G ? '<span class="gm-fx">' + G.fx + '</span>' : g[0] ? '<span class="g3-hook">' + esc(g[0]) + '</span>' : '') + '</span>';
   }
   // ---------- Secrètes : encre invisible, révélée par la lumière ----------
   // Ce que révèle la lumière sur chaque secrète : un détail lié à la carte
@@ -355,8 +355,8 @@
       '<path class="uv-line" d="M56 ' + b.toFixed(0) + ' C 110 ' + (b - 40).toFixed(0) + ', 150 ' + (b + 20).toFixed(0) + ', 200 ' + (b - 20).toFixed(0) + ' S 280 ' + (b - 30).toFixed(0) + ', 300 ' + b.toFixed(0) + '"/></svg></span><span class="cc-lamp"></span>';
   }
   const footFit = function (t) { t = String(t); return t.length > 30 ? ' f-xs' : t.length > 22 ? ' f-s' : ''; };
-  function cardInner(c) {
-    if (c.rarity === 'goat') return goatInner(c);
+  function cardInner(c, G) {
+    if (c.rarity === 'goat') return goatInner(c, G);
     const s = setById(c.set);
     const fr = /fran[cç]/i.test((c.note || '') + ' ' + c.name), goat = c.rarity === 'goat';
     // « Nom — Sous-titre » : le nom en gros, le sous-titre en dessous
@@ -368,10 +368,10 @@
     const subLine = story && !parts[1] ? (c.year ? String(c.year) : c.type) : sub;
     return '<div class="cc-panel"><div class="cc-photo"><span class="cc-ghost">' + (goat ? 'GOAT' : n3(c.num)) + '</span>' +
       (c.img ? '<img' + (c.map ? ' class="is-map' + (c.fade ? ' is-fade' : '') + '"' : c.player ? ' class="is-player"' : c.photo ? ' class="is-photo"' : '') + ' src="' + c.img + '" alt="' + esc(c.name) + '" loading="lazy">' + (c.rarity === 'secret' ? uvLayer(c) : '') : '<span class="cc-todo"><b>' + esc(initialsOf(c.name)) + '</b>Visuel à venir</span>') +
-      (goat ? '<span class="cc-num"><b>GOAT</b><small>HORS SÉRIE</small></span>' : '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>') +
-      '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-ed">PREMIÈRE ÉDITION</span>' + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
-      '<div class="cc-band' + (fr ? ' fr' : '') + (story ? ' has-story' : '') + '">' + (c.rarity === 'legend' ? '<span class="cc-crest"><b>★</b> LÉGENDAIRE <b>★</b></span>' : c.rarity === 'secret' ? '<span class="cc-crest"><b>★</b> SECRÈTE <b>★</b></span>' : goat ? '<span class="cc-crest"><b>★★★</b> GREATEST OF ALL TIME <b>★★★</b></span>' : '') + (story ? '<h3>' + esc(title) + '</h3><p class="cc-story">' + esc(story) + '</p>' : '<h3>' + esc(title) + '</h3><p>' + esc(subLine) + '</p>') + '</div>' +
-      '<div class="cc-foot' + footFit(story ? subLine : c.type + ' · ' + c.game) + '"><span>' + esc(story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + numText(c) + '<i></i></span></div></div>';
+      (G ? '<span class="cc-num gm-cost"><b>' + G.cost + '</b><small>ÉNERGIE</small></span>' : goat ? '<span class="cc-num"><b>GOAT</b><small>HORS SÉRIE</small></span>' : '<span class="cc-num"><b>' + n3(c.num) + '</b><small>/' + s.size + '</small></span>') +
+      (G ? G.stats + '<span class="cc-ed">PREMIÈRE ÉDITION</span>' : '<span class="cc-tag"><svg><use href="#sym-ori"/></svg>ORIGINES</span><span class="cc-ed">PREMIÈRE ÉDITION</span>') + (c.rarity === 'epic' ? '<span class="cc-spark"></span>' : '') + '</div>' +
+      '<div class="cc-band' + (fr ? ' fr' : '') + (story ? ' has-story' : '') + (G ? ' gm' : '') + '">' + (c.rarity === 'legend' ? '<span class="cc-crest"><b>★</b> LÉGENDAIRE <b>★</b></span>' : c.rarity === 'secret' ? '<span class="cc-crest"><b>★</b> SECRÈTE <b>★</b></span>' : goat ? '<span class="cc-crest"><b>★★★</b> GREATEST OF ALL TIME <b>★★★</b></span>' : '') + (G ? '<h3>' + esc(title) + '</h3><p class="gm-fx">' + G.fx + '</p>' : story ? '<h3>' + esc(title) + '</h3><p class="cc-story">' + esc(story) + '</p>' : '<h3>' + esc(title) + '</h3><p>' + esc(subLine) + '</p>') + '</div>' +
+      '<div class="cc-foot' + footFit(G ? G.type : story ? subLine : c.type + ' · ' + c.game) + '"><span>' + esc(G ? G.type : story ? subLine : c.type + ' · ' + c.game) + '</span><span class="cc-set"><svg><use href="#sym-ori"/></svg>' + numText(c) + '<i></i></span></div></div>';
   }
   // Finition selon la rareté
   const FINISH = { uncommon: 'u-silver u-foil u-holo u-soft', epic: 'e-epic', legend: 'l-legend l-glass', goat: 'g3d', secret: 'l-legend s-secret s-uv' };
@@ -909,51 +909,44 @@
   const TIERS = [[0, 'Bronze'], [100, 'Argent'], [250, 'Or'], [450, 'Platine'], [700, 'Diamant'], [1000, 'Légende']];
   function tierOf(p) { let i = 0; TIERS.forEach(function (t, k) { if (p >= t[0]) i = k; }); return { nom: TIERS[i][1], min: TIERS[i][0], next: TIERS[i + 1] ? TIERS[i + 1][0] : null, nextNom: TIERS[i + 1] ? TIERS[i + 1][1] : null }; }
   const rankBadge = function (nom, sm) { return '<span class="rk-badge tier tier-' + nom + (sm ? ' sm' : '') + '"><b>' + nom.charAt(0) + '</b></span>'; };
-  const TOKI = { 901: '👥', 902: '🔁', 903: '⏸', 904: '🐛' };
-  const FAMN = { FPS: 'FPS', MOBA: 'MOBA', RTS: 'Stratégie', COMBAT: 'Combat', SPORT: 'Rocket League', MULTI: 'Multi-jeux' };
+    const FAMN = { FPS: 'FPS', MOBA: 'MOBA', RTS: 'Stratégie', COMBAT: 'Combat', SPORT: 'Rocket League', MULTI: 'Multi-jeux' };
   const cardName = function (cid) { return window.PVP_NAMES[cid] || (PV.DEFS[cid] && PV.DEFS[cid].nom) || ''; };
   // Couleur du cadre selon la famille de jeu, couleur du liseré selon la rareté
-  const FAMC = { FPS: '#d0662b', MOBA: '#3f7fe0', RTS: '#3aa264', COMBAT: '#d23c3c', SPORT: '#21b3c9', MULTI: '#8b8578' };
-  const RIM = { C: '#b3a689', P: '#4fd1c5', E: '#b46bff', L: '#f2c25b', S: '#ff7ad9', G: '#ffffff' };
   const SPELLT = { 'Map': 'Map', 'Logo de ligue': 'Ligue', 'Logo de tournoi': 'Tournoi', 'Jeu': 'Jeu', 'Événement': 'Événement', 'Lieu': 'Lieu', 'Média': 'Média', 'Moment': 'Moment' };
   const UNITT = { J: 'Joueur', Club: 'Club', Tro: 'Trophée', Cast: 'Caster', Tok: 'Invocation' };
-  const GLAB = { CS: 'CS', LoL: 'LoL', Dota: 'Dota 2', Val: 'Valorant', CoD: 'CoD', RL: 'Rocket League', SC2: 'SC2', BW: 'Brood War', WC3: 'WC3', OW: 'Overwatch', FN: 'Fortnite', Quake: 'Quake', Halo: 'Halo', R6: 'R6', Smash: 'Smash', SF: 'SF', FGC: 'Combat', Multi: '' };
+  const GLAB = { CS: 'Counter-Strike', LoL: 'League of Legends', Dota: 'Dota 2', Val: 'Valorant', CoD: 'Call of Duty', RL: 'Rocket League', SC2: 'StarCraft II', BW: 'Brood War', WC3: 'Warcraft III', OW: 'Overwatch', FN: 'Fortnite', Quake: 'Quake', Halo: 'Halo', R6: 'Rainbow Six', Smash: 'Smash Bros.', SF: 'Street Fighter', FGC: 'Jeux de combat', Multi: 'Multi-jeux' };
   const KWTIP = { 'Entrée': 'se déclenche quand tu poses la carte.', 'Dernier mot': 'se déclenche quand ce serviteur meurt.', 'Fin de tour': 'se déclenche à la fin de chacun de tes tours.', 'Aura': 'agit tant que ce serviteur est en jeu.' };
-  function artHTML(cid) {
-    const d = PV.DEFS[cid], c = BY_ID[cid] || (d && d.src && BY_ID[d.src]);
-    if (!c || !c.img) return '<div class="ha tk" style="--ac:#4a4560"><span>' + (TOKI[cid] || '★') + '</span></div>';
-    const m = c.player ? 'pl' : (c.photo || c.map) ? 'ph' : 'lg';
-    return '<div class="ha ' + m + (BY_ID[cid] ? '' : ' tok') + '" style="--ac:' + (c.color || '#3a3550') + '"><img src="' + c.img + '" alt="" draggable="false"></div>';
-  }
   function typeLine(cid) {
-    const d = PV.DEFS[cid], c = BY_ID[cid], g = GLAB[d.g];
-    const t = d.k === 's' ? (c && SPELLT[c.type]) || 'Sort' : c && c.type === 'Joueuse' ? 'Joueuse' : UNITT[d.t] || 'Serviteur';
-    return t + (g ? ' · ' + g : '');
+    const d = PV.DEFS[cid], c = BY_ID[cid];
+    const t = d.k === 's' ? 'Sort · ' + ((c && SPELLT[c.type]) || 'Effet') : c && c.type === 'Joueuse' ? 'Joueuse' : UNITT[d.t] || 'Serviteur';
+    return t + ' · ' + GLAB[d.g];
   }
+  // Texte d'effet : mots-clés en petites capitales, puis la phrase
   function textHTML(cid) {
     const t = PV.cardText(cid), keys = t.filter(function (x) { return x.key; }).map(function (x) { return x.kw; });
-    return (keys.length ? '<p><b>' + keys.join(', ') + '</b></p>' : '') + t.filter(function (x) { return !x.key; }).map(function (x) {
-      return '<p>' + (x.kw === 'Sort' || x.kw === 'Aura' ? '' : '<b>' + x.kw + ' :</b> ') + esc(x.txt) + '</p>';
-    }).join('');
+    const parts = (keys.length ? ['<i>' + keys.join(' · ') + '</i>'] : []).concat(t.filter(function (x) { return !x.key; }).map(function (x) {
+      return (x.kw === 'Sort' ? '' : '<i>' + x.kw + '</i>') + esc(x.txt);
+    }));
+    return parts.join('<br>') || '<em>Aucun effet : que des statistiques.</em>';
   }
-  function gcText(cid) { return textHTML(cid).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); }
-  // Carte complète. o : { cost, a, h, mh, cls, attrs, style }
+  // Carte « jeton » (invocations) : fiche minimale bâtie sur la carte d'origine
+  function tokenCard(cid) {
+    const d = PV.DEFS[cid], src = d.src && BY_ID[d.src];
+    return Object.assign({ set: 'ori', num: 0, img: null, color: '#3a3550', game: '', year: null }, src || {}, { id: cid, name: d.nom, rarity: 'common', type: 'Invocation', note: '' });
+  }
+  // Carte de jeu = la carte de collection, avec ses textes remplacés par les infos de match
+  // o : { cost, a, h, mh, cls, attrs, style }
   function gcHTML(cid, o) {
     o = o || {}; const d = PV.DEFS[cid]; if (!d) return '';
-    const nm = cardName(cid), txt = textHTML(cid), L = gcText(cid).length, N = nm.length;
-    const tf = L <= 24 ? 8.4 : L <= 48 ? 7.4 : L <= 80 ? 6.4 : L <= 110 ? 5.7 : 5.1;
-    const nf = N <= 7 ? 10.5 : N <= 10 ? 9 : N <= 13 ? 7.6 : N <= 17 ? 6.4 : 5.4;
-    const cost = o.cost != null ? o.cost : d.c;
-    let st = '<span class="st mana' + (cost < d.c ? ' up' : cost > d.c ? ' dn' : '') + '">' + cost + '</span>';
+    const c = BY_ID[cid] || tokenCard(cid), cost = o.cost != null ? o.cost : d.c;
+    let stats;
     if (d.k === 'u') {
       const a = o.a != null ? o.a : d.a, h = o.h != null ? o.h : d.h, mh = o.mh != null ? o.mh : d.h;
-      st += '<span class="st atk' + (a > d.a ? ' up' : a < d.a ? ' dn' : '') + '">' + a + '</span><span class="st hp' + (h < mh ? ' dn' : mh > d.h ? ' up' : '') + '">' + h + '</span>';
-    }
-    return '<div class="gc ' + (d.k === 's' ? 'sp' : 'un') + ' r' + d.r + (o.cls ? ' ' + o.cls : '') + '" data-cid="' + cid + '"' + (o.attrs || '') +
-      ' style="--fc:' + FAMC[d.fam] + ';--rim:' + RIM[d.r] + ';--tf:calc(var(--u) * ' + tf + ');--nf:calc(var(--u) * ' + nf + ')' + (o.style ? ';' + o.style : '') + '">' +
-      '<div class="hb"></div>' + artHTML(cid) + ('LSG'.indexOf(d.r) >= 0 && d.t !== 'Tok' ? '<i class="hd"></i>' : '') +
-      '<div class="hr"><b>' + esc(nm) + '</b></div>' + (d.t !== 'Tok' ? '<i class="hg"></i>' : '') +
-      '<div class="ht">' + txt + '</div><div class="hy">' + esc(typeLine(cid)) + '</div>' + st + '</div>';
+      stats = '<span class="gm-stats"><span class="gm-atk' + (a > d.a ? ' up' : a < d.a ? ' dn' : '') + '"><b>' + a + '</b><small>ATQ</small></span><span class="gm-hp' + (h < mh ? ' dn' : mh > d.h ? ' up' : '') + '"><b>' + h + '</b><small>PV</small></span></span>';
+    } else stats = '<span class="gm-stats"><span class="gm-sp"><b>Sort</b></span></span>';
+    const G = { cost: cost, stats: stats, fx: textHTML(cid), type: typeLine(cid) };
+    return '<div class="gc' + (cost < d.c ? ' cheap' : '') + (o.cls ? ' ' + o.cls : '') + '" data-cid="' + cid + '"' + (o.attrs || '') + (o.style ? ' style="' + o.style + '"' : '') + '>' +
+      '<div class="cc mini ' + finish(c) + '" style="' + cardStyle(c) + '">' + cardInner(c, G).replace(/ loading="lazy"/g, '') + corners(c) + '</div></div>';
   }
   // Grande carte + rappel des mots-clés
   const bigCard = function (cid) {
@@ -1150,22 +1143,18 @@
     return av + '<span class="hp' + (h.hp <= 8 ? ' low' : '') + '">' + h.hp + '</span><span class="hn"><b>' + esc(name) + '</b><small>' + (i === 0 ? h.deck + ' cartes dans ton deck' : h.hand + ' en main · ' + h.deck + ' dans le deck') + '</small></span>';
   }
   function minionHTML(m) {
-    const d = PV.DEFS[m.c], cls = ['mn', 'r' + d.r];
+    const d = PV.DEFS[m.c], cls = ['mn'];
     m.kw.forEach(function (k) { cls.push(k); }); if (m.sil) cls.push('sil');
     if (m.can && MT.v.mine) cls.push('can');
     if (MT.sel && MT.sel.type === 'atk' && MT.sel.from === m.u) cls.push('sel');
     let ic = '';
+    m.kw.forEach(function (k) { ic += '<i class="k-' + k + '">' + PV.KWN[k] + '</i>'; });
     if (!m.sil) {
-      if (d.fx.some(function (e) { return e.w === 'death'; })) ic += '<i title="Dernier mot">☠</i>';
-      if (d.fx.some(function (e) { return e.w === 'aura'; })) ic += '<i title="Aura">✦</i>';
-      if (d.fx.some(function (e) { return e.w === 'end'; })) ic += '<i title="Fin de tour">↻</i>';
+      if (d.fx.some(function (e) { return e.w === 'death'; })) ic += '<i>Dernier mot</i>';
+      if (d.fx.some(function (e) { return e.w === 'aura'; })) ic += '<i>Aura</i>';
+      if (d.fx.some(function (e) { return e.w === 'end'; })) ic += '<i>Fin de tour</i>';
     }
-    if (m.kw.indexOf('wind') >= 0) ic += '<i title="Double attaque">»</i>';
-    return '<div class="' + cls.join(' ') + '" data-id="' + m.u + '" data-cid="' + m.c + '" style="--rim:' + RIM[d.r] + '">' +
-      (m.kw.indexOf('taunt') >= 0 ? '<i class="mt"></i>' : '') + artHTML(m.c) + ('LSG'.indexOf(d.r) >= 0 && d.t !== 'Tok' ? '<i class="hd"></i>' : '') +
-      (m.kw.indexOf('shield') >= 0 ? '<i class="ms"></i>' : '') +
-      '<span class="st atk' + (m.a > d.a ? ' up' : m.a < d.a ? ' dn' : '') + '">' + m.a + '</span><span class="st hp' + (m.h < m.mh ? ' dn' : m.mh > d.h ? ' up' : '') + '">' + m.h + '</span>' +
-      (ic ? '<span class="mi">' + ic + '</span>' : '') + '</div>';
+    return gcHTML(m.c, { a: m.a, h: m.h, mh: m.mh, cls: cls.join(' '), attrs: ' data-id="' + m.u + '"' }).replace(/<\/div>$/, (ic ? '<span class="mi">' + ic + '</span>' : '') + '</div>');
   }
   function targetsOfSel() {
     const s = MT.sel; if (!s) return [];
@@ -1250,12 +1239,12 @@
   // aperçu de la carte survolée (ordinateur) ou appui long (mobile)
   $('#pvpMatch').addEventListener('mouseover', function (e) {
     const g = e.target.closest('[data-cid]'), pv = $('#pmPrev');
-    if (!g || !matchMedia('(hover: hover)').matches) { pv.hidden = true; return; }
+    if (!g || !matchMedia('(hover: hover)').matches || Date.now() - lastTouch < 900) { pv.hidden = true; return; }
     if (pv._c !== g.dataset.cid) { pv.innerHTML = bigCard(+g.dataset.cid); pv._c = g.dataset.cid; }
     pv.hidden = false;
   });
-  let lp = null;
-  $('#pvpMatch').addEventListener('touchstart', function (e) { const g = e.target.closest('[data-cid]'); if (!g) return; lp = setTimeout(function () { const pv = $('#pmPrev'); pv.innerHTML = bigCard(+g.dataset.cid); pv.hidden = false; }, 420); }, { passive: true });
+  let lp = null, lastTouch = 0;
+  $('#pvpMatch').addEventListener('touchstart', function (e) { lastTouch = Date.now(); const g = e.target.closest('[data-cid]'); if (!g) return; lp = setTimeout(function () { const pv = $('#pmPrev'); pv.innerHTML = bigCard(+g.dataset.cid); pv.hidden = false; }, 420); }, { passive: true });
   $('#pvpMatch').addEventListener('touchend', function () { clearTimeout(lp); setTimeout(function () { $('#pmPrev').hidden = true; }, 1200); });
   $('#pmQuit').addEventListener('click', async function () {
     const b = this;
