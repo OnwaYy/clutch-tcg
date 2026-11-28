@@ -7,8 +7,8 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.45.4';
 
 const RULES: [string, string][] = [
-  ['pvp-data.js', '7e06b7c0d76cd3c172001c4800d2c53f03c1017073f58b8d9f63c202c27885f0'],
-  ['pvp-engine.js', 'ee70346b5a9c26eb93ab85a37eb55fb33d1209146f96bb4db920d5b9d9d08d91'],
+  ['pvp-data.js', '7b28a64ef47d16e949af131662476802f6d36d85dc39c41d52da89176750dca9'],
+  ['pvp-engine.js', 'd06fbb515afe49ccfb4c5918499c08e06517f381d3a03ea622bafad18334a591'],
 ];
 for (const [name, sha] of RULES) {
   const code = await (await fetch('https://onwayy.github.io/clutch-tcg/js/' + name + '?v=' + sha.slice(0, 8))).text();
