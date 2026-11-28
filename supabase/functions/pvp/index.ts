@@ -116,7 +116,9 @@ Deno.serve(async (req) => {
       }
       const st = m.etat, x = body.a || {};
       const a = x.t === 'play' ? { t: 'play', h: x.h | 0, tgt: x.tgt == null ? undefined : (typeof x.tgt === 'number' ? x.tgt : String(x.tgt)) }
-        : x.t === 'atk' ? { t: 'atk', from: x.from | 0, to: typeof x.to === 'number' ? x.to : String(x.to) } : { t: 'end' };
+        : x.t === 'atk' ? { t: 'atk', from: x.from | 0, to: typeof x.to === 'number' ? x.to : String(x.to) }
+        : x.t === 'power' ? { t: 'power', tgt: x.tgt == null ? undefined : (typeof x.tgt === 'number' ? x.tgt : String(x.tgt)) }
+        : x.t === 'pick' ? { t: 'pick', i: x.i | 0 } : { t: 'end' };
       const err = PVP.check(st, 0, a);
       if (err) return fail(err);
       const steps = [{ a, ev: PVP.act(st, 0, a), view: PVP.view(st, 0) }];

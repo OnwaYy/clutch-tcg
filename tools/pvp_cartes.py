@@ -68,7 +68,7 @@ unit(5, 2, 2, 2, (), play('draw', n=1, f='LoL'))                       # CLG
 unit(7, 3, 2, 3, (), aura('buff', a=1, h=0, f='J&Dota'))               # Alliance
 unit(8, 3, 3, 3, (), play('cost', v=1, f='Dota'))                      # Newbee
 unit(11, 4, 3, 3, (), play('draw', n=2, f='*'))                        # 100 Thieves
-unit(12, 2, 3, 2, ('charge',))                                         # FURIA
+unit(12, 2, 3, 2, ('rush',))                                         # FURIA
 unit(13, 3, 2, 4, ('taunt',), aura('buff', a=1, h=0, f='J&CS'))        # MIBR
 unit(47, 4, 4, 4, (), play('dmg', n=1, t='allEnemyMin'))               # Virtus.pro
 unit(78, 2, 2, 2, (), death('draw', n=1, f='*'))                       # SK Gaming
@@ -83,16 +83,16 @@ spell(18, 1, play('draw', n=1, f='LoL'))                               # LCS
 spell(19, 2, play('buff', a=1, h=1, t='allFriendMin', f='J&Val'))      # VCT
 spell(20, 2, play('buff', a=2, h=2, t='friendMin'))                    # RLCS
 spell(21, 2, play('buff', a=1, h=1, t='allFriendMin', f='J&CS'))       # ESL Pro League
-spell(22, 3, play('draw', n=2, f='CS'))                                # BLAST Premier
+spell(22, 2, play('draft', f='CS'), play('draw', n=1, f='*'))                                # BLAST Premier
 spell(23, 3, play('buff', a=1, h=1, t='allFriendMin', f='J&FPS'))      # Overwatch League
-spell(24, 2, play('buff', a=1, h=0, t='friendMin'), play('kw', k='charge', t='friendMin'))   # CDL
+spell(24, 2, play('buff', a=1, h=0, t='friendMin'), play('kw', k='rush', t='friendMin'))   # CDL
 
 # ---- Maps (sorts) ----
 spell(25, 1, play('dmg', n=2, t='min'))                                # Dust2
 spell(26, 2, play('dmg', n=3, t='any'))                                # Mirage
 spell(27, 4, play('dmg', n=2, t='allEnemyMin'))                        # Inferno
 spell(28, 5, play('dmg', n=4, t='allMin'))                             # Nuke
-spell(29, 2, play('buff', a=1, h=1, t='allFriendMin'))                 # Train
+spell(29, 3, play('freeze', t='allEnemyMin'))                 # Train
 spell(30, 1, play('buff', a=2, h=0, t='friendMin'), play('kw', k='charge', t='friendMin'))   # Overpass : le boost
 spell(31, 2, play('buff', a=1, h=1, t='allFriendMin', f='J&MOBA'))     # Faille de l'invocateur
 spell(32, 3, play('dmg', n=2, t='min'), play('draw', n=1, f='*'))      # Ascent
@@ -118,7 +118,7 @@ spell(66, 1, play('draw', n=1, f='COMBAT'))                            # Street 
 # ---- Lieux, événements, médias, casters ----
 spell(79, 3, play('buff', a=2, h=2, t='friendMin', f='FPS'))           # Spodek
 spell(80, 4, play('buff', a=2, h=2, t='allFriendMin', f='J&CS'))       # Lanxess Arena
-spell(81, 3, play('draw', n=2, f='*'))                                 # DreamHack
+spell(81, 1, play('draft', f='*'))                                 # DreamHack
 spell(82, 2, play('draw', n=2, f='RTS'))                               # BlizzCon
 spell(83, 2, play('draw', n=2, f='COMBAT'))                            # Evo
 spell(84, 2, play('silence', t='min'), play('draw', n=1, f='*'))       # OGN : coupe le direct
@@ -160,20 +160,20 @@ unit(169, 5, 0, 8, ('taunt',), aura('buff', a=2, h=0, f='J&Dota'))
 unit(170, 5, 0, 8, ('taunt',), aura('buff', a=2, h=0, f='J&CS'))
 
 # ---- Joueurs ----
-unit(33, 2, 3, 1, ('charge',))                                         # Jankos — first blood
+unit(33, 2, 3, 1, ('rush',))                                         # Jankos — first blood
 unit(34, 3, 2, 5, ('taunt',))                                          # Wunder
 unit(35, 1, 1, 2, (), play('kw', k='shield', t='friendMin'))           # Mikyx
 unit(36, 3, 3, 3, (), play('buff', a=1, h=1, t='self', **{'if': has('J&LoL')}))   # Upset
 unit(37, 2, 3, 2)                                                      # Sneaky
 unit(38, 2, 2, 3, (), play('buff', a=2, h=0, t='self', **{'if': has(club('Fnatic'))}))   # Bwipo
-unit(39, 3, 3, 2, ('charge',))                                         # Stewie2K
+unit(39, 3, 3, 3, ('rush',))                                         # Stewie2K
 unit(40, 3, 3, 3, (), play('dmg', n=1, t='enemy'))                     # Twistzz
 unit(41, 2, 2, 2, ('stealth',))                                        # ropz
 unit(42, 4, 4, 5)                                                      # Hiko
 unit(43, 3, 3, 2, (), play('dmg', n=2, t='min'))                       # yay
 unit(44, 4, 3, 5, ('taunt',))                                          # Crimsix
-unit(45, 3, 2, 4, (), aura('buff', a=1, h=0, f='J&Dota'))              # KuroKy — capitaine
-unit(46, 3, 3, 3, (), play('draw', n=1, f='*'))                        # Shroud
+unit(45, 3, 2, 4, (), aura('buff', a=1, h=0, f='J&Dota'), play('freeze', t='enemyMin'))              # KuroKy — capitaine
+unit(46, 3, 3, 3, (), play('draft', f='FPS'))                        # Shroud
 unit(88, 3, 3, 3, (), play('buffPer', a=1, h=1, f=club('G2')))         # Perkz
 unit(89, 4, 4, 4, (), play('draw', n=1, f='LoL'))                      # Bjergsen
 unit(90, 5, 4, 4, ('wind',))                                           # Arteezy
@@ -187,11 +187,11 @@ unit(97, 3, 2, 4, (), end('buff', a=1, h=0, t='self'))                 # Chovy
 unit(98, 3, 2, 4, ('shield',), play('buff', a=2, h=2, t='self', **{'if': HURT}))   # Xyp9x — le clutch
 unit(99, 4, 4, 4, (), play('dmg', n=2, t='min'))                       # NiKo
 unit(100, 3, 3, 3, (), play('buffPer', a=1, h=1, f=club('Astralis')))  # dupreeh
-unit(101, 3, 2, 4, (), aura('buff', a=1, h=0, f='J&CS'))               # gla1ve — IGL
+unit(101, 3, 2, 4, (), aura('buff', a=1, h=0, f='J&CS'), play('freeze', t='enemyMin'))               # gla1ve — IGL
 unit(102, 4, 3, 3, (), play('dmg', n=3, t='min'))                      # ScreaM
-unit(103, 4, 3, 4, (), end('buff', a=1, h=1, t='self'))                # Miracle-
+unit(103, 4, 3, 4, ('life',), end('buff', a=1, h=1, t='self'))                # Miracle-
 unit(104, 3, 3, 4, ('taunt',))                                         # Ceb
-unit(105, 5, 5, 5, ('stealth',))                                       # Ana
+unit(105, 5, 5, 5, ('stealth', 'life'))                                       # Ana
 unit(106, 3, 3, 3, ('stealth',))                                       # cNed
 unit(107, 4, 3, 3, ('wind',))                                          # aspas
 unit(108, 3, 3, 3, (), play('kw', k='charge', t='self', **{'if': has(club('Fnatic'))}))   # Derke
@@ -201,7 +201,7 @@ unit(111, 3, 3, 3, (), aura('self', a=2, h=2, **{'if': ALONE}))        # Scarlet
 unit(112, 3, 4, 3, (), play('duel', t='enemyMin'))                     # Tokido
 unit(113, 2, 3, 2, (), play('duel', t='enemyMin'))                     # Mang0
 unit(114, 4, 4, 4, (), play('buff', a=1, h=1, t='allFriendMin', f='J&CoD'))   # Scump
-unit(115, 3, 3, 2, ('charge',))                                        # Sinatraa
+unit(115, 3, 3, 3, ('rush',))                                        # Sinatraa
 unit(116, 3, 2, 3, (), play('draw', n=2, f='*'))                       # Ninja
 unit(117, 5, 7, 4)                                                     # Uzi
 unit(118, 4, 4, 3, (), play('dmg', n=1, t='allEnemyMin'))              # Caps
@@ -212,9 +212,9 @@ unit(122, 3, 3, 3, (), play('buff', a=2, h=2, t='self', **{'if': has(club('Vital
 unit(123, 3, 3, 3, ('stealth',))                                       # GeT_RiGhT
 unit(124, 3, 3, 3, (), play('buff', a=2, h=2, t='self', **{'if': has('id:123')}))   # f0rest + GeT_RiGhT
 unit(125, 4, 3, 4, (), play('dmg', n=3, t='min'))                      # device
-unit(126, 3, 3, 3, (), play('dmg', n=2, t='enemy'))                    # Dendi
+unit(126, 3, 3, 3, ('life',), play('dmg', n=2, t='enemy'))                    # Dendi
 unit(127, 4, 3, 5, (), aura('buff', a=1, h=1, f=club('OG')))           # N0tail (épique)
-unit(128, 3, 2, 4, (), play('draw', n=1, f='Dota'))                    # Puppey
+unit(128, 3, 2, 4, (), play('draft', f='Dota'))                    # Puppey
 unit(129, 3, 3, 3, (), aura('self', a=2, h=2, **{'if': ALONE}))        # Jaedong
 unit(130, 4, 4, 4, (), aura('self', a=3, h=3, **{'if': ALONE}))        # Mvp
 unit(131, 3, 3, 2, (), play('dmg', n=2, t='enemy'))                    # TenZ
@@ -222,7 +222,7 @@ unit(132, 3, 2, 5, ('taunt', 'shield'))                                # Armada
 unit(133, 2, 2, 3, (), play('duel', t='enemyMin'))                     # Justin Wong
 unit(149, 5, 3, 5, ('charge', 'wind'))                                 # Fatal1ty
 unit(153, 3, 3, 3, (), end('buff', a=1, h=1, t='self'))                # Zen
-unit(154, 5, 5, 5, ('charge',), play('dmg', n=1, t='allEnemyMin'))     # donk
+unit(154, 5, 5, 5, ('rush',), play('dmg', n=1, t='allEnemyMin'))     # donk
 unit(155, 4, 4, 4, (), aura('self', a=3, h=3, **{'if': ALONE}))        # BoxeR
 unit(156, 6, 6, 6, (), play('destroy', t='enemyMin'))                  # Flash — le Dieu
 unit(157, 4, 4, 5, (), aura('buff', a=1, h=1, f='RTS'))                # Grubby

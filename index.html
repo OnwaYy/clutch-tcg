@@ -808,6 +808,7 @@
   .ar-row .pt { font: 700 15px var(--f-mono); color: var(--tc); text-align: right; }
   .ar-rules summary { cursor: pointer; list-style: none; } .ar-rules summary::-webkit-details-marker { display: none; }
   .ar-rules summary h2::after { content: " +"; color: var(--muted); } .ar-rules[open] summary h2::after { content: " −"; }
+  .ar-rules-in p i { font-style: normal; font-weight: 700; color: var(--gold); }
   .ar-rules-in { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 16px; }
   .ar-rules-in b { display: block; margin-bottom: 6px; } .ar-rules-in p { color: var(--muted); font-size: 14px; line-height: 1.5; }
 
@@ -936,6 +937,20 @@
   .pm-endbtn:hover { transform: translateY(-2px); } .pm-endbtn:active { transform: translateY(3px); box-shadow: 0 2px 0 #a8761a; }
   .pm-endbtn.ready { animation: endGlow 1.4s ease-in-out infinite; } @keyframes endGlow { 50% { box-shadow: 0 5px 0 #a8761a, 0 0 34px rgba(60,207,116,.9); } }
   .pm-endbtn:disabled { filter: grayscale(1) brightness(.6); cursor: default; animation: none; }
+  .pm-pw { position: relative; display: grid; justify-items: center; align-content: center; gap: 2px; width: 92px; min-height: 58px; margin-left: 6px; padding: 7px 8px 6px; border-radius: 14px; border: 0; cursor: pointer; text-align: center; color: #fff; background: linear-gradient(180deg, #2a2440, #15121f); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 6px 14px rgba(0,0,0,.5); transition: transform .12s, box-shadow .15s, filter .15s; }
+  .pm-pw b { font: 800 13px/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; } .pm-pw small { font: 500 10px/1.2 'Barlow', sans-serif; color: #c9cbe0; }
+  .pm-pw i { position: absolute; top: -9px; left: -9px; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 7px; font: 700 14px 'Oswald', sans-serif; font-style: normal; background: linear-gradient(180deg, #4aa3ff, #1756c4); box-shadow: 0 0 0 1px rgba(255,255,255,.5); }
+  .pm-pw.ok { box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 0 0 2px #46ff86, 0 0 16px rgba(70,255,134,.6); } .pm-pw.ok:hover { transform: translateY(-2px); }
+  .pm-pw.sel { box-shadow: 0 0 0 2px #ffd36b, 0 0 18px rgba(255,211,107,.8); }
+  .pm-pw.used, .pm-pw:not(.ok):not(.foe) { filter: grayscale(.8) brightness(.65); cursor: default; }
+  .pm-pw.foe { cursor: help; width: 86px; } .pm-pw.foe.used { filter: grayscale(.8) brightness(.6); }
+  .mn.frz .cc { filter: saturate(.35) brightness(1.08) hue-rotate(160deg); box-shadow: 0 0 0 calc(var(--u) * 1.6) #8fe3ff, 0 0 calc(var(--u) * 12) rgba(143,227,255,.9); }
+  .mn .mi i.k-frz { background: #2a8fc4; } .mn .mi i.k-rush { background: #b8641d; } .mn .mi i.k-life { background: #a3243a; }
+  .pm-choice { position: fixed; inset: 0; z-index: 85; display: grid; place-content: center; justify-items: center; gap: 10px; background: rgba(5,5,8,.78); backdrop-filter: blur(5px); text-align: center; }
+  .pm-choice > h3 { font: 900 34px var(--f-display); text-transform: uppercase; letter-spacing: .08em; color: var(--gold); } .pm-choice > p { color: var(--muted); margin-bottom: 14px; }
+  .pm-choice .opts { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; } .pm-choice button { background: none; border: 0; padding: 0; cursor: pointer; transition: transform .15s; } .pm-choice button:hover { transform: translateY(-8px) scale(1.03); }
+  .pm-choice .gc { --cw: 230px; }
+  .dk-syn span.pw { border-color: rgba(74,163,255,.6); color: #cfe4ff; }
   .pm-mana { position: absolute; right: 18px; bottom: 170px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
   .pm-mana b { font: 900 22px/1 var(--f-display); color: #9ff4ff; text-shadow: 0 0 12px rgba(27,143,214,.8); }
   .pm-mana div { display: flex; gap: 3px; }
@@ -973,7 +988,7 @@
     .pm-hand { height: 96px; } .pm-hand .gc { --cw: 72px; margin: 0 -12px; transform: translateY(26px) rotate(calc((var(--k) - var(--n) / 2 + .5) * 3deg)); }
     .pm-hand .gc:hover, .pm-hand .gc.sel { transform: translateY(-60px) scale(1.5); margin: 0 4px; }
     .pm-endbtn { font-size: 13px; padding: 10px 12px; } .pm-line #pmTurnTag { font-size: 10px; }
-    .pm-mana { right: 6px; bottom: 160px; } .pm-hero.foe { justify-self: start; margin-left: 4px; } .pm-msg { font-size: 20px; padding: 12px 20px; white-space: nowrap; } .pm-mana i { width: 9px; height: 11px; } .pm-mana b { font-size: 16px; }
+    .pm-mana { right: 6px; bottom: 160px; } .pm-hero.foe .hn small { display: none; } .pm-hero.foe { max-width: calc(100% - 96px); } .pm-pw { width: 64px; min-height: 40px; padding: 4px; } .pm-pw small { display: none; } .pm-pw b { font-size: 10px; } .pm-choice .gc { --cw: 104px; } .pm-choice .opts { gap: 8px; } .pm-hero.foe { justify-self: start; margin-left: 4px; } .pm-msg { font-size: 20px; padding: 12px 20px; white-space: nowrap; } .pm-mana i { width: 9px; height: 11px; } .pm-mana b { font-size: 16px; }
     .pm-prev { left: 50%; top: 40%; transform: translate(-50%, -50%); }
     .pm-quit { top: 4px; right: 4px; padding: 6px 8px; font-size: 11px; }
     .pm-foehand i { width: 14px; height: 20px; }
@@ -1666,9 +1681,10 @@
         <div><b>Ton deck</b><p>20 cartes de ta collection. 2 exemplaires maximum d'une même carte, un seul de chaque légendaire, secrète ou GOAT. Mélange des joueurs (qui restent sur le plateau) et des sorts (moments, maps, jeux, ligues…).</p></div>
         <div><b>L'énergie</b><p>Tu commences avec 1 énergie, puis +1 à chaque tour (10 maximum). Chaque carte coûte de l'énergie. Le joueur qui commence en second reçoit une « Pause technique » (+1 énergie une fois).</p></div>
         <div><b>Attaquer</b><p>Tes joueurs attaquent à partir du tour suivant leur arrivée : clique sur l'un d'eux (contour vert), puis sur sa cible. Les deux s'infligent leurs dégâts (ATQ). Un joueur à 0 PV quitte le plateau.</p></div>
-        <div><b>Gagner</b><p>Chaque héros a 25 PV. Fais tomber le héros adverse à 0 PV. Plus de cartes dans ton deck ? Tu perds de plus en plus de PV à chaque pioche.</p></div>
-        <div><b>Les mots-clés</b><p><i class="kw k-kw">Provocation</i> doit être attaqué en premier. <i class="kw k-kw">Charge</i> attaque tout de suite. <i class="kw k-kw">Armure</i> ignore les premiers dégâts. <i class="kw k-kw">Camouflage</i> ne peut pas être ciblé avant d'attaquer. <i class="kw k-kw">Double attaque</i> attaque deux fois.</p></div>
-        <div><b>Les synergies</b><p><i class="kw k-ent">Entrée</i> agit quand la carte arrive, <i class="kw k-aura">Aura</i> tant qu'elle est en jeu, <i class="kw k-end">Fin de tour</i> à chaque fin de ton tour, <i class="kw k-dead">Dernier mot</i> quand elle meurt. Les clubs renforcent leurs joueurs, les ligues et les jeux leur famille (FPS, MOBA, stratégie…).</p></div>
+        <div><b>Gagner</b><p>Chaque héros a 30 PV. Fais tomber le héros adverse à 0 PV. Plus de cartes dans ton deck ? Tu perds de plus en plus de PV à chaque pioche.</p></div>
+        <div><b>Le pouvoir</b><p>Une fois par tour, pour 2 énergie, ton héros utilise son pouvoir. Il dépend de la famille la plus présente dans ton deck : FPS <i>Headshot</i>, MOBA <i>Farm</i>, Stratégie <i>Macro</i>, Combat <i>Combo</i>, Rocket League <i>Kickoff</i>, Multi-jeux <i>Coaching</i>.</p></div>
+        <div><b>Les mots-clés</b><p><i>Provocation</i> doit être attaqué en premier. <i>Charge</i> attaque tout de suite. <i>Rush</i> attaque tout de suite, mais seulement les serviteurs. <i>Armure</i> ignore les premiers dégâts. <i>Camouflage</i> ne peut pas être ciblé avant d'attaquer. <i>Double attaque</i> attaque deux fois. <i>Vol de vie</i> soigne ton héros des dégâts qu'il inflige.</p></div>
+        <div><b>Les effets</b><p><i>Entrée</i> agit quand la carte arrive, <i>Aura</i> tant qu'elle est en jeu, <i>Fin de tour</i> à chaque fin de ton tour, <i>Dernier mot</i> quand elle meurt. <i>Timeout</i> empêche un serviteur d'attaquer à son prochain tour. <i>Draft</i> te fait choisir 1 carte parmi 3.</p></div>
       </div>
     </details>
   </div>
@@ -1936,8 +1952,8 @@
 <script src="data/origines.js?v=43e1d476"></script>
 <script src="js/vendor/supabase.js?v=43b205e2"></script>
 <script src="config.js?v=0e2600ff"></script>
-<script src="js/pvp-data.js?v=6d20e17d"></script>
-<script src="js/pvp-engine.js?v=19fc874f"></script>
-<script src="js/app.js?v=2a8a4674"></script>
+<script src="js/pvp-data.js?v=d3c27dce"></script>
+<script src="js/pvp-engine.js?v=efedec7f"></script>
+<script src="js/app.js?v=f458c17c"></script>
 </body>
 </html>

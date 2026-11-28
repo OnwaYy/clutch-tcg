@@ -950,7 +950,10 @@
   }
   // Grande carte + rappel des mots-clés
   const bigCard = function (cid) {
-    const tips = PV.cardText(cid).filter(function (x) { return x.key || KWTIP[x.kw]; }).map(function (x) { return '<p><b>' + x.kw + '</b>' + esc(x.key ? x.txt : KWTIP[x.kw]) + '</p>'; }).join('');
+    const T = PV.cardText(cid), all = T.map(function (x) { return x.txt; }).join(' ');
+    const tips = T.filter(function (x) { return x.key || KWTIP[x.kw]; }).map(function (x) { return '<p><b>' + x.kw + '</b>' + esc(x.key ? x.txt : KWTIP[x.kw]) + '</p>'; }).join('') +
+      (all.indexOf('Timeout') >= 0 ? '<p><b>Timeout</b>le serviteur ne peut pas attaquer pendant le prochain tour de son propriétaire.</p>' : '') +
+      (all.indexOf('Draft') >= 0 ? '<p><b>Draft</b>on te propose 3 cartes au hasard, tu en ajoutes une à ta main.</p>' : '');
     return '<div class="gbig-w">' + gcHTML(cid, { cls: 'gbig' }) + (tips ? '<div class="gtips">' + tips + '</div>' : '') + '</div>';
   };
 
@@ -1052,7 +1055,8 @@
     $('#dkCurve').innerHTML = curve.slice(1).map(function (v, i) { return '<span data-c="' + (i + 1) + '" style="height:' + (v / mx * 100) + '%" title="' + v + ' carte(s) à ' + (i + 1) + '"></span>'; }).join('');
     const fam = {}, clubs = {}; DK.cards.forEach(function (x) { const d = PV.DEFS[x]; fam[d.fam] = (fam[d.fam] || 0) + 1; d.tags.forEach(function (t) { if (t.indexOf('club:') === 0) clubs[t] = (clubs[t] || 0) + 1; }); });
     $('#dkSyn').innerHTML = Object.keys(fam).sort(function (a, b) { return fam[b] - fam[a]; }).slice(0, 3).map(function (f) { return '<span>' + FAMN[f] + ' <b>' + fam[f] + '</b></span>'; }).join('') +
-      Object.keys(clubs).filter(function (c) { return clubs[c] >= 2; }).sort(function (a, b) { return clubs[b] - clubs[a]; }).slice(0, 3).map(function (c) { return '<span>' + esc((window.PVP_CLUBS || {})[c.slice(5)] || c) + ' <b>' + clubs[c] + '</b></span>'; }).join('');
+      Object.keys(clubs).filter(function (c) { return clubs[c] >= 2; }).sort(function (a, b) { return clubs[b] - clubs[a]; }).slice(0, 3).map(function (c) { return '<span>' + esc((window.PVP_CLUBS || {})[c.slice(5)] || c) + ' <b>' + clubs[c] + '</b></span>'; }).join('') +
+      (DK.cards.length ? '<span class="pw" title="' + esc(PV.powerText(PV.deckFamily(DK.cards))) + '">Pouvoir <b>' + esc(PV.POWERS[PV.deckFamily(DK.cards)].nom) + '</b></span>' : '');
     const q = DK.q.trim().toLowerCase();
     const pool = CATALOG.filter(function (c) { const d = PV.DEFS[c.id]; return owns(c.id) && (!DK.fam || d.fam === DK.fam) && (!DK.cost || (DK.cost === '6' ? d.c >= 6 : d.c === +DK.cost)) && (!q || (c.name + ' ' + c.game).toLowerCase().indexOf(q) >= 0); })
       .sort(function (a, b) { return PV.DEFS[a.id].c - PV.DEFS[b.id].c || RORDER[b.rarity] - RORDER[a.rarity] || a.id - b.id; });
@@ -1140,14 +1144,18 @@
   const el = function (id) { return $('#pvpMatch [data-id="' + id + '"]'); };
   function heroHTML(i) {
     const v = MT.v, h = v.hero[i], name = v.names[i], av = i === 0 ? avatarHTML(S && S.avatar && owns(S.avatar) ? S.avatar : null, name) : avatarHTML(null, name);
-    return av + '<span class="hp' + (h.hp <= 8 ? ' low' : '') + '">' + h.hp + '</span><span class="hn"><b>' + esc(name) + '</b><small>' + (i === 0 ? h.deck + ' cartes dans ton deck' : h.hand + ' en main · ' + h.deck + ' dans le deck') + '</small></span>';
+    const P = PV.POWERS[h.pw], tip = esc(P.nom + ' (' + PV.POWER_COST + ' énergie) : ' + PV.powerText(h.pw));
+    const pw = i === 0 ? '<button class="pm-pw' + (h.pwok && !MT.busy ? ' ok' : '') + (h.pwu ? ' used' : '') + (MT.sel && MT.sel.type === 'power' ? ' sel' : '') + '" type="button" data-pw title="' + tip + '"><i>' + PV.POWER_COST + '</i><b>' + esc(P.nom) + '</b><small>' + esc(PV.powerText(h.pw)) + '</small></button>'
+      : '<span class="pm-pw foe' + (h.pwu ? ' used' : '') + '" title="' + tip + '"><b>' + esc(P.nom) + '</b><small>' + esc(PV.powerText(h.pw)) + '</small></span>';
+    return av + '<span class="hp' + (h.hp <= 10 ? ' low' : '') + '">' + h.hp + '</span><span class="hn"><b>' + esc(name) + '</b><small>' + (i === 0 ? h.deck + ' cartes dans ton deck' : h.hand + ' en main · ' + h.deck + ' dans le deck') + '</small></span>' + pw;
   }
   function minionHTML(m) {
     const d = PV.DEFS[m.c], cls = ['mn'];
     m.kw.forEach(function (k) { cls.push(k); }); if (m.sil) cls.push('sil');
     if (m.can && MT.v.mine) cls.push('can');
     if (MT.sel && MT.sel.type === 'atk' && MT.sel.from === m.u) cls.push('sel');
-    let ic = '';
+    if (m.frz) cls.push('frz');
+    let ic = m.frz ? '<i class="k-frz">Timeout</i>' : '';
     m.kw.forEach(function (k) { ic += '<i class="k-' + k + '">' + PV.KWN[k] + '</i>'; });
     if (!m.sil) {
       if (d.fx.some(function (e) { return e.w === 'death'; })) ic += '<i>Dernier mot</i>';
@@ -1159,6 +1167,7 @@
   function targetsOfSel() {
     const s = MT.sel; if (!s) return [];
     if (s.type === 'atk') { const m = MT.v.board[0].find(function (x) { return x.u === s.from; }); return m && m.tg ? m.tg : []; }
+    if (s.type === 'power') return MT.v.hero[0].pwtg || [];
     const h = MT.v.hand[s.h]; return h && h.tg ? h.tg : [];
   }
   function renderMatch() {
@@ -1174,7 +1183,7 @@
       return gcHTML(h.c, { cost: h.cost, cls: (h.ok && !MT.busy ? 'ok' : 'no') + (MT.sel && MT.sel.type === 'play' && MT.sel.h === i ? ' sel' : ''), attrs: ' data-h="' + i + '"', style: '--k:' + i + ';--n:' + n });
     }).join('');
     const anyMove = v.mine && (v.hand.some(function (h) { return h.ok; }) || v.board[0].some(function (m) { return m.can; }));
-    const btn = $('#pmEnd'); btn.disabled = !v.mine || MT.busy || v.over; btn.textContent = v.mine ? 'Fin du tour' : 'Tour adverse'; btn.classList.toggle('ready', v.mine && !anyMove && !MT.busy);
+    const btn = $('#pmEnd'); btn.disabled = !v.mine || MT.busy || v.over || !!v.choice; btn.textContent = v.mine ? 'Fin du tour' : 'Tour adverse'; btn.classList.toggle('ready', v.mine && !anyMove && !MT.busy);
     const tag = $('#pmTurnTag'); tag.textContent = v.over ? 'Match terminé' : v.mine ? 'Ton tour' : 'Tour de ' + v.names[1]; tag.classList.toggle('mine', v.mine && !v.over);
     // cibles possibles
     const tg = targetsOfSel();
@@ -1182,6 +1191,12 @@
     tg.forEach(function (id) { const e = el(id); if (e) e.classList.add('tgt'); });
     $('#pmMyBoard').classList.toggle('drop', !!(MT.sel && MT.sel.type === 'play' && !tg.length));
     if (!MT.sel) $('#pmArrow').style.display = 'none';
+    let ch = $('#pmChoice');
+    if (!ch) { ch = document.createElement('div'); ch.id = 'pmChoice'; ch.className = 'pm-choice'; ch.hidden = true; $('#pvpMatch').appendChild(ch); }
+    if (v.choice && !MT.busy) {
+      ch.innerHTML = '<h3>Draft</h3><p>Choisis une carte à ajouter à ta main</p><div class="opts">' + v.choice.map(function (c, i) { return '<button type="button" data-pick="' + i + '">' + gcHTML(c) + '</button>'; }).join('') + '</div>';
+      ch.hidden = false;
+    } else ch.hidden = true;
   }
   // ---- Interactions ----
   function center(e) { const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }
@@ -1211,7 +1226,18 @@
     // 1) clic sur une cible valide
     if (MT.sel && node && tg.indexOf(isNaN(+node.dataset.id) ? node.dataset.id : +node.dataset.id) >= 0) {
       const id = isNaN(+node.dataset.id) ? node.dataset.id : +node.dataset.id;
-      if (MT.sel.type === 'atk') doAct({ t: 'atk', from: MT.sel.from, to: id }); else doAct({ t: 'play', h: MT.sel.h, tgt: id });
+      if (MT.sel.type === 'atk') doAct({ t: 'atk', from: MT.sel.from, to: id }); else if (MT.sel.type === 'power') doAct({ t: 'power', tgt: id }); else doAct({ t: 'play', h: MT.sel.h, tgt: id });
+      return;
+    }
+    // Draft : choix d'une carte
+    const pk = e.target.closest('[data-pick]');
+    if (pk) { doAct({ t: 'pick', i: +pk.dataset.pick }); return; }
+    // pouvoir héroïque
+    if (e.target.closest('[data-pw]')) {
+      const H = MT.v.hero[0];
+      if (!H.pwok) { toast(H.pwu ? 'Pouvoir déjà utilisé ce tour.' : H.mana < PV.POWER_COST ? 'Pas assez d\'énergie.' : 'Aucune cible possible.', true); return; }
+      if (MT.sel && MT.sel.type === 'power') { MT.sel = null; renderMatch(); return; }
+      if (H.pwtg) { MT.sel = { type: 'power' }; renderMatch(); aimFrom($('#pmMyHero .pm-pw')); } else doAct({ t: 'power' });
       return;
     }
     // 2) carte de la main
@@ -1264,13 +1290,13 @@
     const a = el(from), b = el(to); if (!a || !b) return;
     const ca = center(a), cb = center(b), dx = (cb[0] - ca[0]) * .82, dy = (cb[1] - ca[1]) * .82;
     a.style.zIndex = 40; a.style.position = 'relative';
-    const an = a.animate([{ transform: 'none' }, { transform: 'translate(' + dx * -.08 + 'px,' + dy * -.08 + 'px) scale(1.08)', offset: .25 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(1.05)', offset: .6 }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.4,0,.3,1)' });
-    await wait(310); b.classList.add('shake'); setTimeout(function () { b.classList.remove('shake'); }, 400);
+    const an = a.animate([{ transform: 'none' }, { transform: 'translate(' + dx * -.08 + 'px,' + dy * -.08 + 'px) scale(1.08)', offset: .25 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(1.05)', offset: .6 }, { transform: 'none' }], { duration: 650, easing: 'cubic-bezier(.4,0,.3,1)' });
+    await wait(390); b.classList.add('shake'); setTimeout(function () { b.classList.remove('shake'); }, 400);
     await an.finished.catch(function () {}); a.style.zIndex = '';
   }
   async function showCard(cid, who) {
     const s = $('#pmShow'); s.innerHTML = bigCard(cid) + '<small>' + esc(who) + ' joue ' + esc(cardName(cid)) + '</small>'; s.hidden = false;
-    await wait(1250); s.hidden = true;
+    await wait(1700); s.hidden = true;
   }
   async function playEvents(ev, stepView) {
     for (const e of ev) {
@@ -1283,6 +1309,9 @@
       else if (e.t === 'silence') floatOn(e.id, 'Silence', 'info');
       else if (e.t === 'destroy') floatOn(e.id, 'Détruit', 'info');
       else if (e.t === 'kw') floatOn(e.id, PV.KWN[e.k], 'info');
+      else if (e.t === 'freeze') floatOn(e.id, 'Timeout', 'info');
+      else if (e.t === 'power') { floatOn('h' + (e.p === MT.v.me ? 0 : 1), PV.POWERS[e.pw].nom, 'info'); if (e.p !== MT.v.me) await wait(700); }
+      else if (e.t === 'draft' && e.p !== MT.v.me) floatOn('h1', 'Draft', 'info');
       else if (e.t === 'die') { const n = el(e.u); if (n) n.classList.add('dying'); }
       else if (e.t === 'fatigue') floatOn('h' + e.p, 'Fatigue −' + e.n, 'info');
       else if (e.t === 'burn' && e.p === MT.v.me) toast('Main pleine : ' + cardName(e.c) + ' est brûlée.', true);
@@ -1298,7 +1327,7 @@
         MT.v = st.view; renderMatch();
         [0, 1].forEach(function (k) { MT.v.board[k].forEach(function (m) { if (before[k].indexOf(m.u) < 0) { const n = el(m.u); if (n) n.classList.add('pop'); } }); });
         if (st.ev.some(function (e) { return e.t === 'turn' && e.p !== MT.v.me; })) await banner('Tour de ' + MT.v.names[1], 800);
-        await wait(st.a && st.a.t !== 'end' && st.ev[0] && st.ev[0].p !== MT.v.me ? 450 : 120);
+        await wait(st.view && !st.view.mine && st.a && st.a.t !== 'end' ? 950 : 120);
       }
     }
   }

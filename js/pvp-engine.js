@@ -5,7 +5,7 @@
   'use strict';
   const DEFS = {}; (root.PVP_CARDS || []).forEach(function (d) { DEFS[d.id] = d; });
   const CLUBS = root.PVP_CLUBS || {};
-  const HERO_HP = 25, BOARD_MAX = 6, HAND_MAX = 10, MANA_MAX = 10, DECK_SIZE = 20, TURN_CAP = 50, HURT_AT = 12;
+  const HERO_HP = 30, BOARD_MAX = 6, HAND_MAX = 10, MANA_MAX = 10, DECK_SIZE = 20, TURN_CAP = 50, HURT_AT = 12;
   const CHOICE = { any: 1, enemy: 1, enemyMin: 1, min: 1, friendMin: 1 };
 
   // ---------- Hasard reproductible ----------
@@ -30,8 +30,8 @@
   // ---------- Textes ----------
   const GNAME = { CS: 'Counter-Strike', LoL: 'LoL', Dota: 'Dota 2', Val: 'Valorant', CoD: 'Call of Duty', RL: 'Rocket League', SC2: 'StarCraft II', BW: 'Brood War', WC3: 'Warcraft III', OW: 'Overwatch', FN: 'Fortnite', Quake: 'Quake', Halo: 'Halo', R6: 'Rainbow Six', Smash: 'Smash', SF: 'Street Fighter', FGC: 'jeu de combat' };
   const FNAME = { FPS: 'FPS', MOBA: 'MOBA', RTS: 'de stratégie', COMBAT: 'de combat', SPORT: 'Rocket League', MULTI: 'multi-jeux' };
-  const KWN = { taunt: 'Provocation', charge: 'Charge', shield: 'Armure', stealth: 'Camouflage', wind: 'Double attaque' };
-  const KWD = { taunt: 'les ennemis doivent l\'attaquer en premier', charge: 'peut attaquer dès qu\'il arrive', shield: 'ignore les premiers dégâts subis', stealth: 'ne peut pas être ciblé tant qu\'il n\'a pas attaqué', wind: 'peut attaquer deux fois par tour' };
+  const KWN = { taunt: 'Provocation', charge: 'Charge', rush: 'Rush', shield: 'Armure', stealth: 'Camouflage', wind: 'Double attaque', life: 'Vol de vie' };
+  const KWD = { taunt: 'les ennemis doivent l\'attaquer en premier', charge: 'peut attaquer dès qu\'il arrive', rush: 'peut attaquer les serviteurs adverses dès qu\'il arrive (pas le héros)', life: 'les dégâts qu\'il inflige en attaquant soignent ton héros', shield: 'ignore les premiers dégâts subis', stealth: 'ne peut pas être ciblé tant qu\'il n\'a pas attaqué', wind: 'peut attaquer deux fois par tour' };
   // f : filtre (« J&LoL », « club:T1 », « FPS »…) ; base : 'carte' ou 'serviteur' ; one : singulier
   function fLabel(f, one, base) {
     const toks = String(f || '*').split('&'); base = base || 'carte';
@@ -84,6 +84,8 @@
       case 'summon': { const T = DEFS[e.tok]; return 'invoque ' + (e.n > 1 ? e.n + ' ' : 'un ') + (T ? T.nom + (e.n > 1 ? 's' : '') + ' ' + T.a + '/' + T.h + (T.kw.length ? ' avec ' + T.kw.map(function (k) { return KWN[k]; }).join(' et ') : '') : ''); }
       case 'revive': return 'ramène en jeu tes ' + e.n + ' derniers serviteurs morts';
       case 'duel': return 'affronte ' + tg + ' : ils s\'infligent leurs dégâts';
+      case 'freeze': return 'met en Timeout ' + tg;
+      case 'draft': return 'Draft : choisis ' + un(e.f) + fLabel(e.f, true) + ' parmi 3';
     }
     return '';
   }
@@ -124,11 +126,29 @@
     return out;
   }
 
+  // ---------- Pouvoirs héroïques (selon la famille principale du deck) ----------
+  const POWERS = {
+    FPS: { nom: 'Headshot', fx: [{ w: 'play', o: 'dmg', n: 1, t: 'enemy' }] },
+    MOBA: { nom: 'Farm', fx: [{ w: 'play', o: 'buff', a: 1, h: 1, t: 'friendMin' }] },
+    RTS: { nom: 'Macro', fx: [{ w: 'play', o: 'draw', n: 1, f: '*' }, { w: 'play', o: 'dmg', n: 2, t: 'myHero' }] },
+    COMBAT: { nom: 'Combo', fx: [{ w: 'play', o: 'buff', a: 2, h: 0, t: 'friendMin' }] },
+    SPORT: { nom: 'Kickoff', fx: [{ w: 'play', o: 'summon', n: 1, tok: 901 }] },
+    MULTI: { nom: 'Coaching', fx: [{ w: 'play', o: 'heal', n: 2, t: 'any' }] }
+  };
+  const POWER_COST = 2;
+  function pwOf(st, p) { return POWERS[st.pl[p].pw] || POWERS.MULTI; }
+  function deckFamily(deck) {
+    const n = {}; deck.forEach(function (c) { const d = DEFS[c]; if (d && d.fam !== 'MULTI') n[d.fam] = (n[d.fam] || 0) + 1; });
+    let best = 'MULTI', v = 0; FAMS.forEach(function (f) { if ((n[f] || 0) > v) { v = n[f]; best = f; } });
+    return best;
+  }
+  function powerText(fam) { return sentence(POWERS[fam].fx.map(function (e) { return { t: opText(e, true) }; })); }
+
   // ---------- Création ----------
   function newMatch(deckA, deckB, opts) {
     opts = opts || {};
     const st = { v: 2, rng: (opts.seed >>> 0) || 1, n: 0, turn: 0, cur: 0, over: false, res: null, names: opts.names || ['Toi', 'Adversaire'], pl: [] };
-    [deckA, deckB].forEach(function (deck, p) { st.pl[p] = { hp: HERO_HP, max: 0, mana: 0, deck: shuffle(st, deck.slice()), hand: [], board: [], grave: [], fat: 0 }; });
+    [deckA, deckB].forEach(function (deck, p) { st.pl[p] = { hp: HERO_HP, max: 0, mana: 0, deck: shuffle(st, deck.slice()), hand: [], board: [], grave: [], fat: 0, pw: deckFamily(deck), pwu: 0 }; });
     const first = rnd(st) < .5 ? 0 : 1;
     const ev = [];
     for (let i = 0; i < 3; i++) { draw(st, first, '*', ev); draw(st, 1 - first, '*', ev); }
@@ -152,7 +172,7 @@
   function startTurn(st, p, ev) {
     st.cur = p; st.turn++;
     const pl = st.pl[p];
-    pl.max = Math.min(MANA_MAX, pl.max + 1); pl.mana = pl.max;
+    pl.max = Math.min(MANA_MAX, pl.max + 1); pl.mana = pl.max; pl.pwu = 0;
     pl.board.forEach(function (m) { m.sick = 0; m.atks = 0; });
     ev.push({ t: 'turn', p: p, n: st.turn });
     draw(st, p, '*', ev);
@@ -188,13 +208,13 @@
   }
 
   // ---------- Dégâts, soins, morts ----------
-  function damageHero(st, p, n, ev) { if (n <= 0) return; st.pl[p].hp -= n; ev.push({ t: 'dmg', id: 'h' + p, n: n }); }
+  function damageHero(st, p, n, ev) { if (n <= 0) return 0; st.pl[p].hp -= n; ev.push({ t: 'dmg', id: 'h' + p, n: n }); return n; }
   function damage(st, id, n, ev) {
-    if (n <= 0) return;
+    if (n <= 0) return 0;
     if (id === 'h0' || id === 'h1') return damageHero(st, +id[1], n, ev);
-    const m = findMin(st, id); if (!m) return;
-    if (m.kw.shield) { m.kw.shield = 0; ev.push({ t: 'shield', id: id }); return; }
-    m.dmg += n; ev.push({ t: 'dmg', id: id, n: n });
+    const m = findMin(st, id); if (!m) return 0;
+    if (m.kw.shield) { m.kw.shield = 0; ev.push({ t: 'shield', id: id }); return 0; }
+    m.dmg += n; ev.push({ t: 'dmg', id: id, n: n }); return n;
   }
   function heal(st, id, n, ev) {
     if (id === 'h0' || id === 'h1') { const pl = st.pl[+id[1]], v = Math.min(n, HERO_HP - pl.hp); if (v > 0) { pl.hp += v; ev.push({ t: 'heal', id: id, n: v }); } return; }
@@ -231,8 +251,9 @@
     const m = findMin(st, id); return !!m && (m.o === p || !m.kw.stealth);
   }
   function choiceOp(cid) { return DEFS[cid].fx.find(function (e) { return e.w === 'play' && CHOICE[e.t]; }); }
-  function legalTargets(st, p, cid) {
-    const e = choiceOp(cid); if (!e) return null;
+  function legalTargets(st, p, cid) { const e = choiceOp(cid); return e ? targetsFor(st, p, e) : null; }
+  function powerTargets(st, p) { const e = pwOf(st, p).fx.find(function (x) { return CHOICE[x.t]; }); return e ? targetsFor(st, p, e) : null; }
+  function targetsFor(st, p, e) {
     const foe = 1 - p, out = [];
     const addMins = function (q) { st.pl[q].board.forEach(function (m) {
       if (!targetable(st, p, m.u)) return;
@@ -295,17 +316,25 @@
       case 'destroy': ids.forEach(function (id) { const m = findMin(st, id); if (m) { m.dmg = 999; m.kw.shield = 0; ev.push({ t: 'destroy', id: id }); } }); break;
       case 'summon': for (let k = 0; k < e.n; k++) summon(st, p, e.tok, ev); break;
       case 'revive': st.pl[p].grave.slice(-e.n).forEach(function (c) { summon(st, p, c, ev); }); break;
+      case 'freeze': ids.forEach(function (id) { const m = findMin(st, id); if (m) { m.frz = 1; ev.push({ t: 'freeze', id: id }); } }); break;
+      case 'draft': {
+        const pool = Object.keys(DEFS).map(Number).filter(function (c) { const d = DEFS[c]; return d.t !== 'Tok' && d.r !== 'G' && match(e.f, c); });
+        const opts = []; for (let k = 0; k < 40 && opts.length < 3 && pool.length; k++) { const c = pool[Math.floor(rnd(st) * pool.length)]; if (opts.indexOf(c) < 0) opts.push(c); }
+        if (opts.length) { st.choice = { p: p, opts: opts }; ev.push({ t: 'draft', p: p }); }
+        break;
+      }
       case 'duel': ids.forEach(function (id) { const m = findMin(st, id); if (m && self) { const a1 = atkOf(st, self), a2 = atkOf(st, m); ev.push({ t: 'atk', from: self.u, to: id }); damage(st, id, a1, ev); damage(st, self.u, a2, ev); } }); break;
     }
   }
 
   // ---------- Coups ----------
   function costOf(st, p, h) { return Math.max(0, DEFS[h.c].c - h.m); }
-  function canAttack(st, m) { return st.cur === m.o && !st.over && atkOf(st, m) > 0 && (!m.sick || m.kw.charge) && m.atks < (m.kw.wind ? 2 : 1); }
+  function canAttack(st, m) { return st.cur === m.o && !st.over && !m.frz && atkOf(st, m) > 0 && (!m.sick || m.kw.charge || (m.kw.rush && st.pl[1 - m.o].board.some(function (x) { return !x.kw.stealth; }))) && m.atks < (m.kw.wind ? 2 : 1); }
   function attackTargets(st, m) {
     const foe = 1 - m.o, enemies = st.pl[foe].board.filter(function (x) { return !x.kw.stealth; });
     const taunts = enemies.filter(function (x) { return x.kw.taunt; });
-    return taunts.length ? taunts.map(function (x) { return x.u; }) : enemies.map(function (x) { return x.u; }).concat(['h' + foe]);
+    const face = !m.sick || m.kw.charge;                     // Rush : pas le héros le tour où il arrive
+    return taunts.length ? taunts.map(function (x) { return x.u; }) : enemies.map(function (x) { return x.u; }).concat(face ? ['h' + foe] : []);
   }
   // a : { t: 'play', h, tgt } | { t: 'atk', from, to } | { t: 'end' }
   function check(st, p, a) {
@@ -313,7 +342,16 @@
     if (st.cur !== p) return 'Ce n\'est pas ton tour.';
     if (!a || typeof a !== 'object') return 'Action invalide.';
     const pl = st.pl[p];
+    if (st.choice) return a.t === 'pick' && st.choice.p === p && st.choice.opts[a.i] != null ? null : 'Choisis d\'abord une carte (Draft).';
     if (a.t === 'end') return null;
+    if (a.t === 'power') {
+      if (pl.pwu) return 'Pouvoir déjà utilisé ce tour.';
+      if (pl.mana < POWER_COST) return 'Pas assez d\'énergie.';
+      const lt = powerTargets(st, p);
+      if (lt) { if (!lt.length) return 'Aucune cible possible.'; if (lt.indexOf(a.tgt) < 0) return 'Choisis une cible.'; }
+      if (pwOf(st, p).fx.some(function (e) { return e.o === 'summon'; }) && pl.board.length >= BOARD_MAX) return 'Ton plateau est plein.';
+      return null;
+    }
     if (a.t === 'play') {
       const h = pl.hand[a.h]; if (!h) return 'Carte introuvable.';
       const d = DEFS[h.c];
@@ -330,7 +368,7 @@
     if (a.t === 'atk') {
       const m = pl.board.find(function (x) { return x.u === a.from; });
       if (!m) return 'Attaquant introuvable.';
-      if (!canAttack(st, m)) return m.sick ? 'Ce joueur vient d\'arriver : il attaquera au prochain tour.' : 'Ce joueur a déjà attaqué.';
+      if (!canAttack(st, m)) return m.frz ? 'Ce joueur est en Timeout : il n\'attaque pas ce tour.' : m.sick ? 'Ce joueur vient d\'arriver : il attaquera au prochain tour.' : 'Ce joueur a déjà attaqué.';
       if (attackTargets(st, m).indexOf(a.to) < 0) return 'Cible invalide (une Provocation protège peut-être l\'adversaire).';
       return null;
     }
@@ -339,6 +377,18 @@
   function act(st, p, a) {
     const err = check(st, p, a); if (err) throw new Error(err);
     const ev = [], pl = st.pl[p];
+    if (a.t === 'pick') {
+      const c = st.choice.opts[a.i]; st.choice = null;
+      if (pl.hand.length >= HAND_MAX) ev.push({ t: 'burn', p: p, c: c }); else { pl.hand.push({ c: c, m: 0 }); ev.push({ t: 'pick', p: p, c: c }); }
+      return ev;
+    }
+    if (a.t === 'power') {
+      pl.mana -= POWER_COST; pl.pwu = 1;
+      ev.push({ t: 'power', p: p, pw: pl.pw || 'MULTI', tgt: a.tgt != null ? a.tgt : null });
+      pwOf(st, p).fx.forEach(function (e) { runOp(st, p, e, a.tgt != null ? a.tgt : null, null, ev); });
+      resolveDeaths(st, ev);
+      return ev;
+    }
     if (a.t === 'play') {
       const h = pl.hand.splice(a.h, 1)[0], d = DEFS[h.c];
       pl.mana -= costOf(st, p, h);
@@ -352,13 +402,15 @@
       const m = pl.board.find(function (x) { return x.u === a.from; });
       m.atks++; if (m.kw.stealth) m.kw.stealth = 0;
       ev.push({ t: 'atk', from: m.u, to: a.to });
-      const atk = atkOf(st, m);
-      if (a.to === 'h0' || a.to === 'h1') damage(st, a.to, atk, ev);
-      else { const t = findMin(st, a.to), back = atkOf(st, t); damage(st, a.to, atk, ev); damage(st, m.u, back, ev); }
+      const atk = atkOf(st, m); let dealt;
+      if (a.to === 'h0' || a.to === 'h1') dealt = damage(st, a.to, atk, ev);
+      else { const t = findMin(st, a.to), back = atkOf(st, t); dealt = damage(st, a.to, atk, ev); damage(st, m.u, back, ev); }
+      if (m.kw.life && dealt > 0) heal(st, 'h' + p, dealt, ev);
       resolveDeaths(st, ev);
     } else {
       pl.board.slice().forEach(function (m) { if (!m.sil && findMin(st, m.u)) D(m).fx.forEach(function (e) { if (e.w === 'end') runOp(st, p, e, null, m, ev); }); });
       resolveDeaths(st, ev);
+      pl.board.forEach(function (m) { m.frz = 0; });          // le Timeout dure jusqu'à la fin du tour de son propriétaire
       if (!st.over) startTurn(st, 1 - p, ev);
     }
     return ev;
@@ -377,7 +429,12 @@
     return s;
   }
   function aiStep(st, p) {
-    const base = evalFor(st, p), pl = st.pl[p];
+    const pl = st.pl[p];
+    if (st.choice && st.choice.p === p) {                       // Draft : la carte la plus forte pour son coût
+      let bi = 0, bv = -1; st.choice.opts.forEach(function (c, i) { const d = DEFS[c], v = (d.k === 'u' ? d.a + d.h : 5) + d.fx.length * 2 + d.kw.length - Math.abs(d.c - Math.min(pl.max + 1, 6)) * .6; if (v > bv) { bv = v; bi = i; } });
+      return { t: 'pick', i: bi };
+    }
+    const base = evalFor(st, p);
     let best = null;
     const tryA = function (a, bonus) {
       if (check(st, p, a)) return;
@@ -395,6 +452,10 @@
       else tryA({ t: 'play', h: i }, bonus);
     });
     pl.board.forEach(function (m) { if (canAttack(st, m)) attackTargets(st, m).forEach(function (t) { tryA({ t: 'atk', from: m.u, to: t }, .2); }); });
+    if (!pl.pwu && pl.mana >= POWER_COST) {                     // pouvoir : de préférence avec l'énergie qui reste
+      const lt = powerTargets(st, p), pb = pl.hand.some(function (h) { return costOf(st, p, h) <= pl.mana; }) ? -.3 : .9;
+      if (lt) lt.forEach(function (t) { tryA({ t: 'power', tgt: t }, pb); }); else tryA({ t: 'power' }, pb + (pl.pw === 'RTS' && pl.hp > 12 ? 2.5 : 0));
+    }
     return best && best.v > 0 ? best.a : null;
   }
   // Joue tout le tour de l'ordinateur ; renvoie une étape par action (pour l'animation)
@@ -412,13 +473,15 @@
   // ---------- Ce qu'un joueur voit ----------
   function minView(st, m, me) {
     return { u: m.u, c: m.c, o: m.o, a: atkOf(st, m), h: hpOf(st, m), mh: maxHpOf(st, m), ba: D(m).a, bh: D(m).h, kw: Object.keys(m.kw).filter(function (k) { return m.kw[k]; }), sil: m.sil,
-      can: m.o === me && canAttack(st, m), tg: m.o === me && canAttack(st, m) ? attackTargets(st, m) : null };
+      can: m.o === me && canAttack(st, m), tg: m.o === me && canAttack(st, m) ? attackTargets(st, m) : null, frz: m.frz ? 1 : 0, sick: m.sick && !m.kw.charge ? 1 : 0 };
   }
   function view(st, p) {
     const me = st.pl[p], fo = st.pl[1 - p], my = st.cur === p && !st.over;
     return {
       me: p, turn: st.turn, mine: my, over: st.over, res: st.res, names: st.names,
-      hero: [{ hp: me.hp, max: me.max, mana: me.mana, deck: me.deck.length, fat: me.fat }, { hp: fo.hp, max: fo.max, mana: fo.mana, deck: fo.deck.length, hand: fo.hand.length }],
+      hero: [{ hp: me.hp, max: me.max, mana: me.mana, deck: me.deck.length, fat: me.fat, pw: me.pw || 'MULTI', pwu: me.pwu, pwok: my && !check(st, p, { t: 'power', tgt: (powerTargets(st, p) || [])[0] }), pwtg: powerTargets(st, p) },
+        { hp: fo.hp, max: fo.max, mana: fo.mana, deck: fo.deck.length, hand: fo.hand.length, pw: fo.pw || 'MULTI', pwu: fo.pwu }],
+      choice: st.choice && st.choice.p === p ? st.choice.opts : null,
       board: [me.board.map(function (m) { return minView(st, m, p); }), fo.board.map(function (m) { return minView(st, m, p); })],
       hand: me.hand.map(function (h) {
         const cost = costOf(st, p, h), lt = legalTargets(st, p, h.c);
@@ -441,6 +504,6 @@
     return null;
   }
 
-  root.PVP = { DEFS: DEFS, HERO_HP: HERO_HP, BOARD_MAX: BOARD_MAX, DECK_SIZE: DECK_SIZE, KWN: KWN, newMatch: newMatch, check: check, act: act,
+  root.PVP = { DEFS: DEFS, HERO_HP: HERO_HP, POWERS: POWERS, POWER_COST: POWER_COST, powerText: powerText, deckFamily: deckFamily, BOARD_MAX: BOARD_MAX, DECK_SIZE: DECK_SIZE, KWN: KWN, newMatch: newMatch, check: check, act: act,
     aiStep: aiStep, aiTurn: aiTurn, view: view, cardText: cardText, deckError: deckError, match: match, legalTargets: legalTargets };
 })(typeof window !== 'undefined' ? window : globalThis);
